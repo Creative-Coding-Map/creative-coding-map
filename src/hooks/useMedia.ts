@@ -1,5 +1,6 @@
+import { useEffect, useLayoutEffect, useState } from 'react';
+import type { DependencyList, EffectCallback } from 'react';
 import { noop } from '@/lib/utils';
-import { useState, useEffect, useLayoutEffect, DependencyList, EffectCallback } from 'react';
 
 export type Effect = (effect: EffectCallback, deps?: DependencyList) => void;
 export type MediaQueryObject = { [key: string]: string | number | boolean };

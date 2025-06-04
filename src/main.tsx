@@ -7,12 +7,13 @@ import '@/styles/globals.css';
 import reportWebVitals from './reportWebVitals.ts';
 
 import App from './App.tsx';
+import About from './modules/about';
 
 const rootRoute = createRootRoute({
     component: () => (
         <>
             <Outlet />
-            <TanStackRouterDevtools />
+            <TanStackRouterDevtools initialIsOpen={false} position="bottom-right" />
         </>
     ),
 });
@@ -23,7 +24,14 @@ const indexRoute = createRoute({
     component: App,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute]);
+// Add the about modal route
+const aboutRoute = createRoute({
+    getParentRoute: () => indexRoute,
+    path: '/about',
+    component: About,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, aboutRoute]);
 
 const router = createRouter({
     routeTree,

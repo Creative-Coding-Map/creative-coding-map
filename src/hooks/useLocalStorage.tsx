@@ -49,11 +49,15 @@ export function useLocalStorageWithDefault<T>(key: string, defaultValue: T): [T,
     return [value, setValue];
 }
 
-export function useLocalStorage<T>(key: string): [T, Dispatch<SetStateAction<T>>] {
-    const [value, setValue] = useState<T>(getLocalStorage(key) as T);
+export function useLocalStorage<T>(key: string): [T | undefined, Dispatch<SetStateAction<T | undefined>>] {
+    const [value, setValue] = useState<T | undefined>(getLocalStorage(key));
 
     useEffect(() => {
-        saveLocalStorage(key, value);
+        if (value !== undefined) {
+            saveLocalStorage(key, value);
+        } else {
+            removeFromLocalStorage(key);
+        }
     }, [key, value]);
 
     return [value, setValue];

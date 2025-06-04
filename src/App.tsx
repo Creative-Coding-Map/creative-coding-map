@@ -1,20 +1,17 @@
-import { useAtomValue } from 'jotai';
+import { Outlet } from '@tanstack/react-router';
+import { InfoOverlay } from '@/modules/info-overlay';
 import CCMap from '@/modules/map/CCMap';
 import { Navbar } from '@/modules/navigation';
-import { showAboutAtom } from '@/state/pages';
-import { store } from '@/state/store';
-import { About } from '@/modules/about';
+import { ActionsOverlay } from '@/modules/actions-overlay';
 
 export default function App() {
-    const showAbout = useAtomValue(showAboutAtom, { store });
     return (
-        <section className="min-h-screen ccm-grid relative">
+        <main className="w-full h-screen relative">
             <Navbar />
-            {showAbout && <About />}
-            <CCMap className="flex" />
-        </section>
+            <InfoOverlay />
+            <ActionsOverlay />
+            <CCMap />
+            <Outlet />
+        </main>
     );
 }
-
-
-

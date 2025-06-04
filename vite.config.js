@@ -10,8 +10,8 @@ import { resolve } from 'node:path';
 export default defineConfig({
     plugins: [
         viteReact(),
-        tailwindcss(),
         svgr(),
+        tailwindcss(),
         // legacy({
         //     polyfills: ['set-methods-v2'],
         // }),

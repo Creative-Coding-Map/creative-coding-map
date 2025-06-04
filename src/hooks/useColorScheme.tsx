@@ -6,14 +6,16 @@ import { useMedia } from './useMedia';
 
 export function useColorScheme() {
     const [colorScheme, setColorScheme] = useLocalStorage('theme');
-    const systemPrefersDark = useMedia('(prefers-color-scheme: dark)', colorScheme === 'dark');
+    const systemPrefersDark = useMedia('(prefers-color-scheme: dark)');
+    console.log('systemPrefersDark', systemPrefersDark);
 
-    const value = useMemo(() => (colorScheme === undefined ? !!systemPrefersDark : colorScheme === 'dark'), [colorScheme, systemPrefersDark]);
+    const isDarkMode = useMemo(() => (colorScheme === undefined ? !!systemPrefersDark : colorScheme === 'dark'), [colorScheme, systemPrefersDark]);
 
     useEffect(() => {
-        console.log('useColorScheme', value);
-        document.documentElement.dataset.theme = value ? 'dark' : 'light';
-    }, [value]);
+        console.log('isDarkMode', isDarkMode);
+        // document.documentElement.classList.toggle('dunkle', isDarkMode);
+        document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
+    }, [isDarkMode]);
 
     return {
         colorScheme,

@@ -1,0 +1,111 @@
+@import 'tailwindcss';
+
+.ccmap {
+    @apply absolute top-0 left-0 w-full h-full overflow-hidden;
+}
+
+.ccmap-graph {
+    height: 100vh;
+    width: 100%;
+}
+
+.ccmap-inspectors {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.inspector {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 8px;
+    min-width: 200px;
+    max-width: 300px;
+    pointer-events: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ccmap-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.ccmap-loading p {
+    margin: 0;
+    color: #666;
+}
+
+.ccmap-error {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: bisque;
+}
+
+.error-message {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+}
+
+.error-message h3 {
+    color: #e74c3c;
+    margin-top: 0;
+}
+
+.error-message p {
+    color: #666;
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ccmap-inspectors {
+        position: static;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 8px;
+    }
+
+    .inspector {
+        margin: 4px 0;
+        min-width: auto;
+        max-width: none;
+    }
+}
