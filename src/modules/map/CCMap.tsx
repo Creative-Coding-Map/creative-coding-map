@@ -112,7 +112,6 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 graphData={graphData}
                 width={typeof window !== 'undefined' ? window.innerWidth : 800}
                 height={typeof window !== 'undefined' ? window.innerHeight : 600}
-                cooldownTicks={100}
                 onEngineStop={handleEngineStop}
                 nodeAutoColorBy={controllerRef.current.getNodeAutoColorBy}
                 linkVisibility={controllerRef.current.getLinkVisibility}
@@ -120,6 +119,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 nodeCanvasObject={controllerRef.current.getNodeCanvasObject}
                 nodePointerAreaPaint={controllerRef.current.getNodePointerAreaPaint}
                 backgroundColor="white"
+                d3AlphaDecay={0.01}
                 {...runtimeProps}
             />
             {/* <div className="ccmap-inspectors">

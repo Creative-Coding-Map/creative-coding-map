@@ -142,12 +142,8 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         let s = 0.0;
         this.graphRef.d3ReheatSimulation();
 
-        this.setRuntimeProps('d3AlphaDecay', 0.0001);
-
         const interval = setInterval(() => {
             if (!this.graphRef) return;
-            // TODO: does it need to be set here? It never gets changed anywhere else
-            //this.graphRef.d3AlphaDecay(0.0001);
 
             const linkForce = d3
                 .forceLink(graphData.links as any)
