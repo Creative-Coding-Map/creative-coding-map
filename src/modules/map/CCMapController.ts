@@ -147,7 +147,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         const interval = setInterval(() => {
             if (!this.graphRef) return;
             // TODO: does it need to be set here? It never gets changed anywhere else
-            // graph.d3AlphaDecay(0.0001);
+            //this.graphRef.d3AlphaDecay(0.0001);
 
             const linkForce = d3
                 .forceLink(graphData.links as any)

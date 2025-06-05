@@ -72,7 +72,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
     // Handle graph ready
     const handleEngineStop = () => {
         if (fgRef.current) {
-            fgRef.current.zoomToFit(400);
+            // fgRef.current.zoomToFit(400);
         }
     };
 

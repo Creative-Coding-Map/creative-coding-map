@@ -16,11 +16,11 @@ import { CCMNodeType } from '@/types/ccmap';
  */
 export function buildNodesFromCcmData(ccmData: CCMData): NodesCollection {
     const toolNodes: Array<CCMGraphNode> = ccmData.tools.map((it) => {
-        return { id: it[0], name: it[0], type: CCMNodeType.Tool, ccmData: it };
+        return { id: it[0], name: it[1].name || it[0], type: CCMNodeType.Tool, ccmData: it };
     });
 
     const techniqueNodes: Array<CCMGraphNode> = ccmData.techniques.map((it) => {
-        return { id: it[0], name: it[1].name || '', type: CCMNodeType.Technique, ccmData: it };
+        return { id: it[0], name: it[1].name || it[0], type: CCMNodeType.Technique, ccmData: it };
     });
 
     const tagNodes: Array<CCMGraphNode> = ccmData.tags.map((it) => {
@@ -50,13 +50,13 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
     const nodesById: { [id: string]: CCMGraphNode } = {};
 
     ccmData.tools.forEach((n) => {
-        const tooln = toolNodes.find((it) => it.name === n[0]);
+        const tooln = toolNodes.find((it) => it.id === n[0]);
         if (tooln) {
             nodesById[n[0]] = tooln;
 
             if (enableToolTagLinks && !mst) {
                 (n[1].tags || []).forEach((t) => {
-                    const tn = tagNodes.find((it) => it.name === t);
+                    const tn = tagNodes.find((it) => it.id === t);
                     if (tn) {
                         nodesById[t] = tn;
                         const link: CCMGraphLink = {
@@ -72,13 +72,12 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
 
             if (enableDependencyLinks && !mst) {
                 (n[1].dependsOn || []).forEach((t) => {
-                    const dependn = toolNodes.find((it) => it.name === t);
+                    const dependn = toolNodes.find((it) => it.id === t);
                     if (dependn) {
                         const link: CCMGraphLink = {
                             source: dependn.id,
                             target: tooln.id,
-                            type: 'dependency',
-                            curvature: 0.0,
+                            type: 'dependency'
                         };
                         links.push(link);
                     }
@@ -87,13 +86,12 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
 
             if (enableSupportLinks && !mst) {
                 (n[1].supports || []).forEach((t) => {
-                    const supportn = toolNodes.find((it) => it.name === t);
+                    const supportn = toolNodes.find((it) => it.id === t);
                     if (supportn) {
                         const link: CCMGraphLink = {
                             source: supportn.id,
                             target: tooln.id,
-                            type: 'support',
-                            curvature: 0.0,
+                            type: 'support'
                         };
                         links.push(link);
                     }
@@ -101,16 +99,15 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
             }
 
             if (enableTechniqueLinks && !mst) {
-                Object.entries(n[1].actions || {}).forEach((a) => {
-                    (a[1].techniques || []).forEach((t) => {
-                        const link: CCMGraphLink = {
-                            source: tooln.id,
-                            target: t,
-                            type: 'tool-technique',
-                        };
-                        links.push(link);
-                    });
-                });
+                const techniques = n[1].techniques || []
+                for (const technique of techniques) {
+                    const link: CCMGraphLink = {
+                        source: tooln.id,
+                        target: technique,
+                        type: 'tool-technique'
+                    }
+                    links.push(link);
+                }
             }
         }
     });
@@ -136,6 +133,7 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
                             type: 'tag',
                             curvature: 0.0,
                         };
+                        console.log(link);
                         links.push(link);
                     }
                 });

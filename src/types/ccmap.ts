@@ -11,9 +11,11 @@ export interface CCMNode {
     key: string;
     name?: string;
     tags?: string[];
+    partOf?: string[];
     dependsOn?: string[];
     references?: string[];
     supports?: string[];
+    techniques?: string[];
     actions?: {
         [actionKey: string]: {
             techniques?: string[];
