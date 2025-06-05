@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import ForceGraph2D from 'react-force-graph-2d';
+import { fetchCCMData } from './fetch-data';
 import { CCMapController } from './CCMapController';
 import type { ForceGraphProps } from 'react-force-graph-2d';
 import type { CCMGraphData, CCMGraphLink, CCMGraphNode } from '@/types/ccmap';
@@ -20,7 +21,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const [graphData, setGraphData] = useState<CCMGraphData | null>(null);
     const [runtimeProps, setRuntimeProps] = useState<ForceGraphProps<CCMGraphNode, CCMGraphLink>>({});
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const initializeGraph = async () => {
             try {
                 setIsLoading(true);
@@ -39,8 +40,10 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                     setRuntimeProps(newRuntimeProps);
                 });
 
+                const data = await fetchCCMData();
+
                 // Initialize data
-                await controller.initialize();
+                controller.initialize(data);
 
                 // Set the graph reference in the controller
                 if (fgRef.current) {
@@ -64,10 +67,6 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
             }
         };
     }, []);
-
-    useEffect(() => {
-        console.log('graphData', graphData);
-    }, [graphData]);
 
     // Handle graph ready
     const handleEngineStop = () => {
@@ -104,7 +103,6 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 // @ts-ignore - whiny typescript
                 ref={(node: any) => {
                     if (node) {
-                        console.log('setting graph ref', node);
                         controllerRef.current?.setGraphRef(node);
                     }
                     fgRef.current = node;

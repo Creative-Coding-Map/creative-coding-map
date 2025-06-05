@@ -45,6 +45,10 @@
     @apply px-4 lg:px-5;
 }
 
+@utility ccm-py {
+    @apply py-4 lg:py-5;
+}
+
 @utility ccm-border {
     @apply border-2 border-black dark:border-white;
 }
@@ -59,6 +63,10 @@
 
 @utility type-header {
     @apply text-xl font-bold;
+}
+
+@utility type-body {
+    @apply text-xs;
 }
 
 @layer components {
@@ -78,7 +86,7 @@
     }
 
     .ccm-page {
-        @apply ccm-px ccm-colors ccm-border ccm-rounded ccm-mx;
+        @apply ccm-px ccm-colors ccm-border ccm-rounded ccm-mx transition-all duration-300;
     }
 
     .ccm-colors {
@@ -97,9 +105,8 @@
     .type-filter {
         font-size: var(--size-11px);
     }
-    .type-body,
     .type-link {
-        @apply text-xs;
+        @apply type-body underline;
     }
 
     .type-labels,

@@ -8,7 +8,8 @@ export enum CCMNodeType {
 }
 
 export interface CCMNode {
-    key: string;
+    id: string;
+    type: CCMNodeType;
     name?: string;
     tags?: string[];
     partOf?: string[];

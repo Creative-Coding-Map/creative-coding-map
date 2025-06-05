@@ -9,7 +9,10 @@ export function useColorScheme() {
     const systemPrefersDark = useMedia('(prefers-color-scheme: dark)');
     console.log('systemPrefersDark', systemPrefersDark);
 
-    const isDarkMode = useMemo(() => (colorScheme === undefined ? !!systemPrefersDark : colorScheme === 'dark'), [colorScheme, systemPrefersDark]);
+    const isDarkMode = useMemo(
+        () => (colorScheme === undefined ? !!systemPrefersDark : colorScheme === 'dark'),
+        [colorScheme, systemPrefersDark]
+    );
 
     useEffect(() => {
         console.log('isDarkMode', isDarkMode);

@@ -1,37 +1,15 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Outlet, RouterProvider, createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { RouterProvider, createRouter } from '@tanstack/react-router';
+// import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 import '@/styles/globals.css';
 import reportWebVitals from './reportWebVitals.ts';
+import { IndexRoute, RootRoute } from './routes.tsx';
+import { AboutRoute } from './modules/about.tsx';
+import { BreakdownRoute } from './modules/breakdown.tsx';
 
-import App from './App.tsx';
-import About from './modules/about';
-
-const rootRoute = createRootRoute({
-    component: () => (
-        <>
-            <Outlet />
-            <TanStackRouterDevtools initialIsOpen={false} position="bottom-right" />
-        </>
-    ),
-});
-
-const indexRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/',
-    component: App,
-});
-
-// Add the about modal route
-const aboutRoute = createRoute({
-    getParentRoute: () => indexRoute,
-    path: '/about',
-    component: About,
-});
-
-const routeTree = rootRoute.addChildren([indexRoute, aboutRoute]);
+const routeTree = RootRoute.addChildren([IndexRoute, AboutRoute, BreakdownRoute]);
 
 const router = createRouter({
     routeTree,

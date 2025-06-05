@@ -1,0 +1,21 @@
+<svg
+    width="11"
+    height="10"
+    viewBox="0 0 11 10"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="0.75"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path d="M7.18516 1L3.81641 9.49063" stroke-linecap="round" stroke-linejoin="bevel" />
+    <path
+        d="M2.47656 3.09692L0.256329 4.92509C0.123747 5.03426 0.12256 5.2369 0.253855 5.34762L2.47656 7.22192"
+        stroke-linecap="round"
+        stroke-linejoin="bevel"
+    />
+    <path
+        d="M8.52539 3.09692L10.7456 4.92509C10.8782 5.03426 10.8794 5.2369 10.7481 5.34762L8.52539 7.22192"
+        stroke-linecap="round"
+        stroke-linejoin="bevel"
+    />
+</svg>

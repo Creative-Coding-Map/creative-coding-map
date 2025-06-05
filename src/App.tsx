@@ -3,6 +3,7 @@ import { InfoOverlay } from '@/modules/info-overlay';
 import CCMap from '@/modules/map/CCMap';
 import { Navbar } from '@/modules/navigation';
 import { ActionsOverlay } from '@/modules/actions-overlay';
+import { MapOverlay } from '@/modules/map-overlay';
 
 export default function App() {
     return (
@@ -10,6 +11,7 @@ export default function App() {
             <Navbar />
             <InfoOverlay />
             <ActionsOverlay />
+            <MapOverlay />
             <CCMap />
             <Outlet />
         </main>

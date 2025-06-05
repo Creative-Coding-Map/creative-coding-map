@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 import { blendGraphs } from './blend';
 import { colorGraph } from './coloring';
 import { findAdjacentSubtree, minimumSpanningTreeFromSubtree } from './dijkstra';
-import { fetchCcmData } from './ccm-data';
 import { buildGraph, buildNodesFromCcmData } from './build-graph';
 import { buildDomainGraph } from './domain-sets';
 import { COLOR_SETS, DOMAIN_SETS } from './data';
@@ -29,8 +28,8 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         super();
     }
 
-    async initialize(): Promise<void> {
-        this.ccmData = await fetchCcmData();
+    initialize(ccmData: CCMData): void {
+        this.ccmData = ccmData;
 
         this.nodes = buildNodesFromCcmData(this.ccmData);
 

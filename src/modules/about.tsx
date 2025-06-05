@@ -1,5 +1,13 @@
-import { useNavigate } from '@tanstack/react-router';
+import { createRoute, useNavigate } from '@tanstack/react-router';
 import { Shell } from '@/components/shell';
+import { IndexRoute } from '@/routes';
+
+// Add the about modal route
+export const AboutRoute = createRoute({
+    getParentRoute: () => IndexRoute,
+    path: '/about',
+    component: About,
+});
 
 export default function About() {
     const navigate = useNavigate();

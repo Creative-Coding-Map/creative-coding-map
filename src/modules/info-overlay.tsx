@@ -1,10 +1,9 @@
-import Breakdowns from "@/components/symbols/Breakdowns";
-import Tags from "@/components/symbols/Tags";
-import Techniques from "@/components/symbols/Techniques";
-import Tools from "@/components/symbols/Tools";
+import Breakdowns from '@/components/symbols/Breakdowns';
+import Tags from '@/components/symbols/Tags';
+import Techniques from '@/components/symbols/Techniques';
+import Tools from '@/components/symbols/Tools';
 
 export function InfoOverlay() {
-
     return (
         <aside className="z-10 absolute ccm-px top-1/5 flex flex-col type-hint gap-0.5">
             <h4 className="text-gray">SHAPE</h4>

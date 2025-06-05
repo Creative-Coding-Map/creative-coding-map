@@ -45,7 +45,6 @@ export function buildDomainGraph(graph: CCMGraphData, domainSets: CCMDomainSet[]
             strengthDelta: 1.0,
         };
     });
-    console.log(domainLinks);
 
     return {
         nodes: domainNodes.concat([rootNode]),

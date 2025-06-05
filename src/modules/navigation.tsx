@@ -14,6 +14,9 @@ export const Navbar = () => {
                 <Link className="link type-header z-10" to="/about">
                     {({ isActive }) => <span className={clsx(isActive && 'active')}>About</span>}
                 </Link>
+                <Link className="link type-header z-10" to="/breakdown/$id" params={{ id: 'test-breakdown' }}>
+                    {({ isActive }) => <span className={clsx(isActive && 'active')}>Breakdown</span>}
+                </Link>
                 <button className="link type-header z-10">Search</button>
             </section>
         </nav>
