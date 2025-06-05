@@ -10,7 +10,7 @@ import { noop } from '@/lib/utils';
 export function findAdjacentSubtree(links: CCMGraphLink[], node: string) {
     const adjacentNodes = new Set();
     const subLinks = [];
-    
+
     for (const link of links) {
         if ((link.source?.id || link.source) === node) {
             adjacentNodes.add(link.target);

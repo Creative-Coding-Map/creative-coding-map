@@ -5,37 +5,45 @@ import type { CCMGraphData } from '@/types/ccmap';
  * @param currentGraph The active graph (from the graph view)
  * @param nextGraph The new graph, which is a subset of currentGraph
  */
-export function blendGraphs(currentGraph: CCMGraphData, nextGraph: CCMGraphData): void {
-    // Mark existing links as fading out
-    currentGraph.links.forEach(link => {
-        if (!nextGraph.links.find(nextLink =>
-            nextLink.source === link.source && nextLink.target === link.target)) {
-            link.strengthDelta = -1.0;
-        }
-    });
+export function blendGraphs(viewGraph: CCMGraphData, nextGraph: CCMGraphData): void {
+    const linkCountMap = new Map();
 
-    // Add new links from nextGraph
-    nextGraph.links.forEach(nextLink => {
-        const existingLink = currentGraph.links.find(link =>
-            link.source === nextLink.source && link.target === nextLink.target);
+    // would be nice to have asymmetric hashing such that hash(a,b) == hash(b,a)
 
-        if (!existingLink) {
-            // Add new link
-            currentGraph.links.push({
-                ...nextLink,
-                strengthDelta: 1.0
-            });
+    for (const link of nextGraph.links) {
+        const sourceId = link.source.id || link.source;
+        const targetId = link.target.id || link.target;
+
+        linkCountMap.set(sourceId, (linkCountMap.get(sourceId) || 0) + 1);
+        linkCountMap.set(targetId, (linkCountMap.get(targetId) || 0) + 1);
+    }
+
+    const viewLinks = new Set(
+        viewGraph.links.flatMap((it) => [
+            `${it.source.id || it.source}-${it.target.id || it.target}`,
+            `${it.target.id || it.target}-${it.source.id || it.source}`,
+        ])
+    );
+    const nextLinks = new Set(nextGraph.links.flatMap((it) => [`${it.source}-${it.target}`, `${it.target}-${it.source}`]));
+
+    const newLinks = nextLinks.difference(viewLinks);
+    const removeLinks = viewLinks.difference(nextLinks);
+
+    for (const link of viewGraph.links) {
+        const sourceId = link.source.id || link.source;
+        const targetId = link.target.id || link.target;
+
+        if (removeLinks.has(`${link.source.id || link.source}-${link.target.id || link.target}`)) {
+            link.strength = 0.0;
+            link.strengthDelta = -0.01;
+        } else if (newLinks.has(`${link.source.id || link.source}-${link.target.id || link.target}`)) {
+            const count = Math.min(linkCountMap.get(sourceId), linkCountMap.get(targetId));
+            link.strength = 1.0 / count;
+            link.strengthDelta = 0.01;
         } else {
-            // Update existing link
-            existingLink.strengthDelta = 1.0;
+            const count = Math.min(linkCountMap.get(sourceId), linkCountMap.get(targetId));
+            link.strength = 1.0 / count;
+            link.strengthDelta = 0.0;
         }
-    });
-
-    // Update nodes if needed
-    nextGraph.nodes.forEach(nextNode => {
-        const existingNode = currentGraph.nodes.find(node => node.id === nextNode.id);
-        if (!existingNode) {
-            currentGraph.nodes.push(nextNode);
-        }
-    });
+    }
 }

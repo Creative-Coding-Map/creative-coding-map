@@ -54,7 +54,10 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         this.emit('graph-data:updated', graphData);
     }
 
-    setRuntimeProps<TKey extends keyof ForceGraphProps<CCMGraphNode, CCMGraphLink>>(key: TKey, value: ForceGraphProps<CCMGraphNode, CCMGraphLink>[TKey]) {
+    setRuntimeProps<TKey extends keyof ForceGraphProps<CCMGraphNode, CCMGraphLink>>(
+        key: TKey,
+        value: ForceGraphProps<CCMGraphNode, CCMGraphLink>[TKey]
+    ) {
         this.#runtimeProps[key] = value;
         this.emit('runtime-props:updated', this.#runtimeProps);
     }
@@ -82,9 +85,6 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     getNodeClickHandler = (node: any, _?: MouseEvent) => {
         if (!this.graphRef) return;
 
-        console.log('getNodeClickHandler', node);
-
-        // Reset all node positions
         const graphData = this.#graphData;
 
         if (!graphData) return;

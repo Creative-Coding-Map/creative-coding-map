@@ -8,9 +8,11 @@ export enum CCMNodeType {
 }
 
 export interface CCMNode {
+    key: string;
     name?: string;
     tags?: string[];
     dependsOn?: string[];
+    references?: string[];
     supports?: string[];
     actions?: {
         [actionKey: string]: {
