@@ -28,65 +28,45 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         super();
     }
 
-    initialize(ccmData: CCMData): void {
-        this.ccmData = ccmData;
 
-        this.nodes = buildNodesFromCcmData(this.ccmData);
-
-        const ogGraph = buildGraph(this.ccmData, this.nodes);
-
-        this.domainGraph = buildDomainGraph(ogGraph, DOMAIN_SETS) as CCMGraphData;
-        this.nodes.domainNodes = this.domainGraph.nodes;
-        this.nodes.allNodes = this.domainGraph.nodes.concat(ogGraph.nodes);
-        colorGraph(ogGraph, COLOR_SETS);
-
-        this.graphData = this.localBuildGraph();
-        this.#runtimeProps = {};
-    }
-
-    get graphData(): CCMGraphData | null {
-        return this.#graphData;
-    }
-
-    set graphData(graphData: CCMGraphData | null) {
-        this.#graphData = graphData;
-        this.emit('graph-data:updated', graphData);
-    }
-
-    setRuntimeProps<TKey extends keyof ForceGraphProps<CCMGraphNode, CCMGraphLink>>(
-        key: TKey,
-        value: ForceGraphProps<CCMGraphNode, CCMGraphLink>[TKey]
-    ) {
-        this.#runtimeProps[key] = value;
-        this.emit('runtime-props:updated', this.#runtimeProps);
-    }
-
-    setGraphRef(graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) {
-        this.graphRef = graph;
-    }
-
-    localBuildGraph(mstEdges?: Array<any>): CCMGraphData {
-        if (!this.ccmData || !this.nodes) {
-            throw new Error('Controller not initialized');
+    /**
+     * Centers the graph view on the specified node.
+     *
+     * @param {string | CCMGraphNode} node - The target node to center on. It can be either the node's ID (string)
+     * or the node object. If a string ID is provided and the node is not found, a warning will be logged, and the method will return.
+     * @return {void} This method does not return a value.
+     */
+    centerOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
+        if (typeof node === 'string') {
+            const candidate = this.nodeForId(node);
+            if (candidate) {
+                node = candidate;
+            } else {
+                console.warn(`Node ${node} not found`);
+                return null;
+            }
         }
 
-        const graph = buildGraph(this.ccmData, this.nodes, mstEdges);
-        if (this.domainGraph) {
-            graph.links = graph.links.concat(this.domainGraph.links);
+        if (this.graphRef != null) {
+            this.graphRef.centerAt(node.x, node.y, 1000);
         }
-        return graph;
+        return node
     }
 
-    getLinkVisibility(link: any) {
-        return (link.strengthDelta || 0) >= 0.0;
-    }
+    nodeForId: (nodeId: string) => CCMGraphNode | undefined = (nodeId) => {
+        return this.#graphData?.nodes.find((n) => n.id === nodeId);
+    };
 
-    getNodeClickHandler = (node: any, _?: MouseEvent) => {
-        if (!this.graphRef) return;
+    focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
+        if (typeof node === 'string') {
+            node = this.#graphData?.nodes.find((n) => n.id === node) as CCMGraphNode;
+        }
+
+        if (!this.graphRef) return null;
 
         const graphData = this.#graphData;
 
-        if (!graphData) return;
+        if (!graphData) return null;
 
         for (const graphNode of graphData.nodes) {
             delete graphNode.fx;
@@ -99,7 +79,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
         const subtree = findAdjacentSubtree(graphData.links, node.id);
 
-        const weight = (link: any, _2: any, _3: any): number => {
+        const weight = (link: any): number => {
             const t = `${link.source.type}-${link.target.type}`;
 
             switch (t) {
@@ -164,7 +144,66 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
                 clearInterval(interval);
             }
             this.graphRef.d3Force('link', linkForce);
+
         }, 100);
+        return node
+    }
+
+    initialize(ccmData: CCMData): void {
+        this.ccmData = ccmData;
+
+        this.nodes = buildNodesFromCcmData(this.ccmData);
+
+        const ogGraph = buildGraph(this.ccmData, this.nodes);
+
+        this.domainGraph = buildDomainGraph(ogGraph, DOMAIN_SETS) as CCMGraphData;
+        this.nodes.domainNodes = this.domainGraph.nodes;
+        this.nodes.allNodes = this.domainGraph.nodes.concat(ogGraph.nodes);
+        colorGraph(ogGraph, COLOR_SETS);
+
+        this.graphData = this.localBuildGraph();
+        this.#runtimeProps = {};
+    }
+
+    get graphData(): CCMGraphData | null {
+        return this.#graphData;
+    }
+
+    set graphData(graphData: CCMGraphData | null) {
+        this.#graphData = graphData;
+        this.emit('graph-data:updated', graphData);
+    }
+
+    setRuntimeProps<TKey extends keyof ForceGraphProps<CCMGraphNode, CCMGraphLink>>(
+        key: TKey,
+        value: ForceGraphProps<CCMGraphNode, CCMGraphLink>[TKey]
+    ) {
+        this.#runtimeProps[key] = value;
+        this.emit('runtime-props:updated', this.#runtimeProps);
+    }
+
+    setGraphRef(graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) {
+        this.graphRef = graph;
+    }
+
+    localBuildGraph(mstEdges?: Array<any>): CCMGraphData {
+        if (!this.ccmData || !this.nodes) {
+            throw new Error('Controller not initialized');
+        }
+
+        const graph = buildGraph(this.ccmData, this.nodes, mstEdges);
+        if (this.domainGraph) {
+            graph.links = graph.links.concat(this.domainGraph.links);
+        }
+        return graph;
+    }
+
+    getLinkVisibility(link: any) {
+        return (link.strengthDelta || 0) >= 0.0;
+    }
+
+    getNodeClickHandler = (node: any, _?: MouseEvent) => {
+        this.focusOnNode(node);
     };
 
     getNodeCanvasObject = (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
