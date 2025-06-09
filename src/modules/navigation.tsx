@@ -5,19 +5,21 @@ export const Navbar = () => {
     return (
         <nav className="flex justify-between items-center absolute top-0 left-0 right-0 ccm-padding">
             <section className="flex items-center gap-4">
-                <Link className="type-header z-10" to="/">
+                <Link className="type-header z-20" to="/">
                     Creative Coding Map
                 </Link>
             </section>
             <section className="flex items-center gap-4">
-                <button className="link type-header z-10">Index</button>
-                <Link className="link type-header z-10" to="/about">
+                <Link className="link type-header z-20" to="/index">
+                    {({ isActive }) => <span className={clsx(isActive && 'active')}>Index</span>}
+                </Link>
+                <Link className="link type-header z-20" to="/about">
                     {({ isActive }) => <span className={clsx(isActive && 'active')}>About</span>}
                 </Link>
-                <Link className="link type-header z-10" to="/breakdown/$id" params={{ id: 'test-breakdown' }}>
+                <Link className="link type-header z-20" to="/breakdown/$id" params={{ id: 'test-breakdown' }}>
                     {({ isActive }) => <span className={clsx(isActive && 'active')}>Breakdown</span>}
                 </Link>
-                <button className="link type-header z-10">Search</button>
+                <button className="link type-header z-20">Search</button>
             </section>
         </nav>
     );

@@ -21,7 +21,8 @@
     --color-green: #03ff00;
     --color-salmon: #ffbfcb;
 
-    --text-xxs: 0.5rem;
+    --text-xs: 0.688rem;
+
     --size-11px: 0.688rem;
 }
 
@@ -61,12 +62,8 @@
     @apply invert-0 dark:invert;
 }
 
-@utility type-header {
-    @apply text-xl font-bold;
-}
-
-@utility type-body {
-    @apply text-xs;
+@utility ccm-transition {
+    @apply transition-all duration-300;
 }
 
 @layer components {
@@ -93,25 +90,38 @@
         @apply bg-white dark:bg-black text-black dark:text-white;
     }
 
+    .type-header {
+        @apply text-xl font-bold;
+    }
+
+    .type-body {
+        @apply text-base;
+    }
+
     .type-window-title {
-        @apply text-sm font-bold;
+        @apply text-base font-bold;
     }
-    .type-hint,
-    .type-caption {
-        @apply text-xxs;
-    }
-    .type-metadata,
+
     .type-button,
     .type-filter {
-        font-size: var(--size-11px);
+        @apply text-sm;
     }
+
     .type-link {
-        @apply type-body underline;
+        @apply text-sm underline;
+    }
+    .type-metadata {
+        @apply text-xs leading-[1.4rem];
+    }
+
+    .type-hint,
+    .type-caption {
+        @apply text-xs;
     }
 
     .type-labels,
     .type-legend {
-        @apply text-xxs font-roboto;
+        @apply text-xs font-roboto;
     }
 
     .link,
@@ -122,6 +132,118 @@
     .link.active {
         @apply underline underline-offset-2;
     }
+
+    .ellipsis {
+        @apply whitespace-nowrap overflow-hidden text-ellipsis;
+    }
+
+    .mosaic {
+        @apply columns-[350px] gap-8;
+    }
+
+    .mosaic-item {
+        @apply h-full w-full mb-12 break-inside-avoid;
+    }
+
+    .clip-bottom {
+        clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+
+    .tooltip {
+        @apply invisible absolute ccm-colors ccm-border ccm-rounded px-3 py-0.5 max-w-2xs;
+    }
+
+    .has-tooltip:hover .tooltip {
+        @apply visible z-50;
+    }
+
+    .ccm-filters {
+        /* tag */
+
+        &.filter-tag .tag {
+            @apply opacity-100;
+        }
+
+        /* &.filter-tag .tag .category {
+            @apply text-gray transition-colors delay-150;
+        } */
+
+        &:not(.filter-tag) .tag {
+            @apply opacity-35;
+        }
+
+        /* &:not(.filter-tag) .tag .category {
+            @apply text-black;
+        } */
+
+        /* tool */
+
+        &.filter-tool .tool {
+            @apply opacity-100;
+        }
+
+        /* &.filter-tool .tool .category {
+            @apply text-gray;
+        } */
+
+        &:not(.filter-tool) .tool {
+            @apply opacity-35;
+        }
+
+        /* &:not(.filter-tool) .tool .category {
+            @apply text-black;
+        } */
+
+        /* technique */
+
+        &.filter-technique .technique {
+            @apply opacity-100;
+        }
+
+        /* &.filter-technique .technique .category {
+            @apply text-gray;
+        } */
+
+        &:not(.filter-technique) .technique {
+            @apply opacity-35;
+        }
+        /* 
+        &:not(.filter-technique) .technique .category {
+            @apply text-black;
+        } */
+
+        /* breakdown */
+
+        &.filter-breakdown .breakdown {
+            @apply opacity-100;
+        }
+
+        /* &.filter-breakdown .breakdown .category {
+            @apply text-gray transition-colors delay-150;
+        } */
+
+        &:not(.filter-breakdown) .breakdown {
+            @apply opacity-35;
+        }
+
+        /* &:not(.filter-breakdown) .breakdown .category {
+            @apply text-black;
+        } */
+    }
+
+    /* .mosaic-item:last-child {
+        @apply relative;
+    }
+    .mosaic-item:last-child::after {
+        display: block;
+        width: 11px;
+        height: 1px;
+        position: absolute;
+        top: 0;
+        left: 100%;
+        visibility: hidden;
+        content: '';
+    } */
 }
 
 @layer base {

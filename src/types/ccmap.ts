@@ -5,6 +5,7 @@ export enum CCMNodeType {
     Technique = 'technique',
     Tag = 'tag',
     Domain = 'domain',
+    Breakdown = 'breakdown',
 }
 
 export interface CCMNode {
@@ -17,11 +18,6 @@ export interface CCMNode {
     references?: string[];
     supports?: string[];
     techniques?: string[];
-    actions?: {
-        [actionKey: string]: {
-            techniques?: string[];
-        };
-    };
 }
 
 export interface CCMData {

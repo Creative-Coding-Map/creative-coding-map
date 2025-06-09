@@ -3,9 +3,9 @@ import { faker } from '@faker-js/faker';
 import { format } from 'date-fns';
 import { ExternalLink } from '@/components/external-link';
 import { Shell } from '@/components/shell';
-import { IndexRoute } from '@/routes';
+import { HomeRoute } from '@/routes';
 import { BREAKDOWN_KEYS } from '@/state/constants';
-import TagIcon from '@/components/icons/tag';
+import TagIcon from '@/components/icons/Tag';
 import DocumentIcon from '@/components/icons/Document';
 import ClockIcon from '@/components/icons/Clock';
 import LanguageIcon from '@/components/icons/Language';
@@ -46,7 +46,7 @@ const BRKD: Breakdown = {
 };
 
 export const BreakdownRoute = createRoute({
-    getParentRoute: () => IndexRoute,
+    getParentRoute: () => HomeRoute,
     path: '/breakdown/$id',
     component: BreakdownView,
 });

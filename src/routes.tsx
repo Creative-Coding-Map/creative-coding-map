@@ -10,7 +10,7 @@ export const RootRoute = createRootRoute({
     ),
 });
 
-export const IndexRoute = createRoute({
+export const HomeRoute = createRoute({
     getParentRoute: () => RootRoute,
     path: '/',
     component: App,

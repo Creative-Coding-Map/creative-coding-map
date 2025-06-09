@@ -1,10 +1,10 @@
 import { createRoute, useNavigate } from '@tanstack/react-router';
 import { Shell } from '@/components/shell';
-import { IndexRoute } from '@/routes';
+import { HomeRoute } from '@/routes';
 
 // Add the about modal route
 export const AboutRoute = createRoute({
-    getParentRoute: () => IndexRoute,
+    getParentRoute: () => HomeRoute,
     path: '/about',
     component: About,
 });
@@ -14,7 +14,7 @@ export default function About() {
 
     return (
         <Shell className="ccm-pt" onOutsideClick={() => navigate({ to: '/' })}>
-            <aside className="max-w-screen-md ml-auto z-10 relative ccm-page">
+            <aside className="max-w-screen-md ml-auto z-10 relative ccm-page py-4">
                 <div className="w-full">
                     <h1 className="type-header">About Unfolding the coding landscape</h1>
                     <button onClick={() => navigate({ to: '/' })} className="absolute top-4 right-4">

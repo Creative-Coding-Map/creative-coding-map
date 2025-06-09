@@ -21,6 +21,14 @@ export class Database {
         console.log('%c[Database]: initialized', 'color: orange');
     }
 
+    get initialized(): boolean {
+        return this.#initialized;
+    }
+
+    get values(): CCMNode[] {
+        return Array.from(this.#data.values()).sort((a, b) => a.id.localeCompare(b.id));
+    }
+
     getNode(id: string): CCMNode | undefined {
         return this.#data.get(id);
     }

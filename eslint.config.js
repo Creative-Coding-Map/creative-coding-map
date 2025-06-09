@@ -20,6 +20,7 @@ export default [
                     ignoreRestSiblings: true,
                 },
             ],
+            'import/order': 'warn',
         },
     },
 ];

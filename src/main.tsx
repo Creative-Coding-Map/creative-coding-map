@@ -5,11 +5,12 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 
 import '@/styles/globals.css';
 import reportWebVitals from './reportWebVitals.ts';
-import { IndexRoute, RootRoute } from './routes.tsx';
+import { HomeRoute, RootRoute } from './routes.tsx';
 import { AboutRoute } from './modules/about.tsx';
 import { BreakdownRoute } from './modules/breakdown.tsx';
+import { IndexRoute } from './modules/index/index.tsx';
 
-const routeTree = RootRoute.addChildren([IndexRoute, AboutRoute, BreakdownRoute]);
+const routeTree = RootRoute.addChildren([HomeRoute, AboutRoute, BreakdownRoute, IndexRoute]);
 
 const router = createRouter({
     routeTree,
