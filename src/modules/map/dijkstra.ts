@@ -20,7 +20,6 @@ export function findAdjacentSubtree(links: CCMGraphLink[], node: string) {
             subLinks.push({ source: node, target: link.source });
         }
     }
-    console.log('adjacent nodes: ', adjacentNodes);
     return subLinks;
 }
 
@@ -288,10 +287,10 @@ export function minimumSpanningTree(edges, startNode) {
  * Find the minimum spanning tree using Prim's algorithm starting from a given subtree
  * @param {Array<{source: string, target: string, weight: number}>} edges - Array of edge objects
  * @param {Array<{source: string, target: string, weight: number}>} initialSubtree - Edges of the initial subtree
- * @param {function} weightFunction
+ * @param {(any)=>number} weightFunction
  * @returns {Object} - Object containing the total weight and edges of the MST
  */
-export function minimumSpanningTreeFromSubtree(edges, initialSubtree, weightFunction = noop) {
+export function minimumSpanningTreeFromSubtree(edges, initialSubtree, weightFunction: (linkType: any) => number = () => 1.0) {
     // Build adjacency list from all edges (bidirectional)
     const graph = buildUndirectedGraph(edges, weightFunction);
 
