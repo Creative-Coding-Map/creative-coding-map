@@ -114,6 +114,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 nodeAutoColorBy={controllerRef.current.getNodeAutoColorBy}
                 linkVisibility={controllerRef.current.getLinkVisibility}
                 onNodeClick={controllerRef.current.getNodeClickHandler}
+                enableNodeDrag={false}
                 nodeCanvasObject={controllerRef.current.getNodeCanvasObject}
                 nodePointerAreaPaint={controllerRef.current.getNodePointerAreaPaint}
                 backgroundColor="white"
