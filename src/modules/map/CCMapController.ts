@@ -186,7 +186,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         this.graphRef = graph;
     }
 
-    localBuildGraph(mstEdges?: Array<any>): CCMGraphData {
+    private localBuildGraph(mstEdges?: Array<any>): CCMGraphData {
         if (!this.ccmData || !this.nodes) {
             throw new Error('Controller not initialized');
         }
@@ -253,22 +253,60 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         // Draw labels if zoomed in enough
         if (scale >= minScale) {
             const label = node.name;
-            const fontSize = 16 / globalScale;
+
+            const fontSizes = {
+                'domain': 14 / globalScale,
+                'tag' : 12 / globalScale,
+                'tool': 12 / globalScale,
+                'technique': 9 / globalScale,
+            }
+
+            const fontSize = fontSizes[node.type] as number;
             ctx.font = `${fontSize}px Space Mono`;
             const textWidth = ctx.measureText(label).width;
-            const bckgDimensions: [number, number] = [textWidth, fontSize + 16 / globalScale].map((n) => n + fontSize * 0.2) as [
+            const hmargin = 10.0 / globalScale;
+
+            const vmargins = {
+                'domain': 16 / globalScale,
+                'tag' : 8 / globalScale,
+                'tool': 6 / globalScale,
+                'technique': 2 / globalScale,
+            }
+            const vmargin = vmargins[node.type] as number;
+
+            const radii = {
+                'domain': 10 / globalScale,
+                'tag' : 5 / globalScale,
+                'tool': 2.5 / globalScale,
+                'technique': 2.5 / globalScale,
+            }
+            const radius = radii[node.type] as number;
+            const bckgDimensions: [number, number] = [textWidth + 2*hmargin, fontSize + vmargin].map((n) => n + fontSize * 0.2) as [
                 number,
                 number,
             ];
 
             // TODO: implement labels per design
-            // ctx.fillStyle = 'bisque';
-            // ctx.fillRect(node.x! - bckgDimensions[0] / 2, 16 / globalScale + node.y! - bckgDimensions[1] / 2, ...bckgDimensions);
+            ctx.fillStyle = 'orange';
+            ctx.beginPath();
+            ctx.roundRect(
+                node.x! - bckgDimensions[0] / 2,
+                node.y! - bckgDimensions[1] / 2,
+                ...bckgDimensions, radius)
+
+            ctx.fillStyle = 'white'
+            ctx.fill()
+            ctx.strokeStyle = 'red'
+            ctx.lineWidth = 0.5 / globalScale
+            ctx.stroke();
+
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = node.color || '#000000';
-            ctx.fillText(label, node.x, 16 / globalScale + node.y!);
+            ctx.fillStyle = 'red'; //node.color || '#000000';
+            ctx.fillText(label, node.x, node.y!);
             node.__bckgDimensions = bckgDimensions;
+
+            // TODO: add focus widget right from the label
         }
     };
 
