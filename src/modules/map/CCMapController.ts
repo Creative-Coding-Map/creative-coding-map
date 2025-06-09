@@ -227,6 +227,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         // Draw node shape
         ctx.fillStyle = node.color || '#000000';
 
+        // TODO: Implement glyphs per design
         switch (node.type) {
             case 'tag':
                 ctx.beginPath();
@@ -260,9 +261,9 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
                 number,
             ];
 
-            ctx.fillStyle = 'bisque';
-            ctx.fillRect(node.x! - bckgDimensions[0] / 2, 16 / globalScale + node.y! - bckgDimensions[1] / 2, ...bckgDimensions);
-
+            // TODO: implement labels per design
+            // ctx.fillStyle = 'bisque';
+            // ctx.fillRect(node.x! - bckgDimensions[0] / 2, 16 / globalScale + node.y! - bckgDimensions[1] / 2, ...bckgDimensions);
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = node.color || '#000000';
