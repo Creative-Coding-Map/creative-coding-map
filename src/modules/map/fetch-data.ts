@@ -1,4 +1,3 @@
-import * as d3 from 'd3';
 import type { CCMData, CCMNode } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
 import { TECHNIQUES_URL, TOOLS_URL } from '@/state/constants';
@@ -15,8 +14,9 @@ import { Database } from '@/state/database';
  */
 export async function fetchCCMData(): Promise<CCMData> {
     try {
-        const tools = ((await d3.json(TOOLS_URL)) as { tools: Record<string, CCMNode> }).tools;
-        const techniques = ((await d3.json(TECHNIQUES_URL)) as { techniques: Record<string, CCMNode> }).techniques;
+        const tools = ((await fetch(TOOLS_URL).then((res) => res.json())) as { tools: Record<string, CCMNode> }).tools;
+        const techniques = ((await fetch(TECHNIQUES_URL).then((res) => res.json())) as { techniques: Record<string, CCMNode> })
+            .techniques;
 
         const data = new Map<string, CCMNode>();
         const toolsArray = [];

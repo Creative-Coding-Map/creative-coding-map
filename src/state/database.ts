@@ -29,6 +29,10 @@ export class Database {
         return Array.from(this.#data.values()).sort((a, b) => a.id.localeCompare(b.id));
     }
 
+    get nodeIds(): string[] {
+        return Array.from(this.#data.keys()).sort();
+    }
+
     getNode(id: string): CCMNode | undefined {
         return this.#data.get(id);
     }

@@ -11,3 +11,7 @@ export const updateArray = <T, K extends T>(item: K): SetStateAction<T[]> => {
         return [...prev, item];
     };
 };
+
+export const pick = <T>(collection: T[]): T => {
+    return collection[Math.floor(Math.random() * collection.length)];
+};

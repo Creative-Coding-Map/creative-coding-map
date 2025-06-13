@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Link } from '@tanstack/react-router';
+import { Link } from 'wouter';
 
 export const Navbar = () => {
     return (
@@ -10,14 +10,14 @@ export const Navbar = () => {
                 </Link>
             </section>
             <section className="flex items-center gap-4">
-                <Link className="link type-header z-20" to="/index">
-                    {({ isActive }) => <span className={clsx(isActive && 'active')}>Index</span>}
+                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/index">
+                    Index
                 </Link>
-                <Link className="link type-header z-20" to="/about">
-                    {({ isActive }) => <span className={clsx(isActive && 'active')}>About</span>}
+                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/about">
+                    About
                 </Link>
-                <Link className="link type-header z-20" to="/breakdown/$id" params={{ id: 'test-breakdown' }}>
-                    {({ isActive }) => <span className={clsx(isActive && 'active')}>Breakdown</span>}
+                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/breakdown/test-breakdown">
+                    Breakdown
                 </Link>
                 <button className="link type-header z-20">Search</button>
             </section>

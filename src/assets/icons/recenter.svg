@@ -1,6 +1,16 @@
 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="0.25" y="19.7502" width="19.5" height="19.5" rx="4.75" transform="rotate(-90 0.25 19.7502)" fill="white" stroke="black" stroke-width="0.5"/>
-<circle cx="5.93407" cy="5.93407" r="5.43407" transform="matrix(1 0 0 -1 4.10754 15.9899)" stroke="black"/>
-<path d="M10.0417 18.0002V2.11135" stroke="black"/>
-<path d="M17.9999 10.056L2.11105 10.056" stroke="black"/>
+    <!-- <rect
+        x="0.25"
+        y="19.7502"
+        width="19.5"
+        height="19.5"
+        rx="4.75"
+        transform="rotate(-90 0.25 19.7502)"
+        fill="white"
+        stroke="black"
+        stroke-width="0.5"
+    /> -->
+    <circle cx="5.93407" cy="5.93407" r="5.43407" transform="matrix(1 0 0 -1 4.10754 15.9899)" stroke="black" />
+    <path d="M10.0417 18.0002V2.11135" stroke="black" />
+    <path d="M17.9999 10.056L2.11105 10.056" stroke="black" />
 </svg>

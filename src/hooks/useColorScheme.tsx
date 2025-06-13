@@ -7,7 +7,6 @@ import { useMedia } from './useMedia';
 export function useColorScheme() {
     const [colorScheme, setColorScheme] = useLocalStorage('theme');
     const systemPrefersDark = useMedia('(prefers-color-scheme: dark)');
-    console.log('systemPrefersDark', systemPrefersDark);
 
     const isDarkMode = useMemo(
         () => (colorScheme === undefined ? !!systemPrefersDark : colorScheme === 'dark'),
@@ -15,7 +14,6 @@ export function useColorScheme() {
     );
 
     useEffect(() => {
-        console.log('isDarkMode', isDarkMode);
         // document.documentElement.classList.toggle('dunkle', isDarkMode);
         document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
     }, [isDarkMode]);

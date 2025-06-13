@@ -1,43 +1,37 @@
-import { createRoute } from '@tanstack/react-router';
 import { memo, useMemo, useState } from 'react';
-import { faker } from '@faker-js/faker';
 import clsx from 'clsx';
-import { fetchCCMData } from '../map/fetch-data';
-import { Navbar } from '../navigation';
-import { NodeData } from '../node-data';
+import { faker } from '@faker-js/faker';
+import { atom, useAtom } from 'jotai';
+import { NodeData } from '../modules/node-data';
 import type { CCMNode } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
-import { RootRoute } from '@/routes';
 import Breakdowns from '@/components/symbols/Breakdowns';
 import Tags from '@/components/symbols/Tags';
 import Tools from '@/components/symbols/Tools';
 import Techniques from '@/components/symbols/Techniques';
 import { databaseAtom } from '@/state/model';
-import { store } from '@/state/store';
-import { updateArray } from '@/lib/utils';
+import { pick, updateArray } from '@/lib/utils';
 import Tooltip from '@/components/tooltip';
-
-// Add the about modal route
-export const IndexRoute = createRoute({
-    getParentRoute: () => RootRoute,
-    path: '/index',
-    component: Index,
-    loader: async () => {
-        const database = store.get(databaseAtom);
-        console.log('database is initialized', database.initialized);
-        if (!database.initialized) {
-            await fetchCCMData();
-            console.log(database.initialized);
-            return;
-        }
-        return;
-    },
-});
+import { fetchCCMData } from '@/modules/map/fetch-data';
+import { store } from '@/state/store';
 
 type IndexNode = CCMNode & { category: string; description: string };
 
-export default function Index() {
-    const database = store.get(databaseAtom);
+const asyncDatabase = atom(async (get) => {
+    const database = get(databaseAtom);
+
+    if (!database.initialized) {
+        console.log('fetching CCMData');
+        await fetchCCMData();
+    }
+
+    console.log('database initialized', database.initialized);
+
+    return database;
+});
+
+export default function IndexView() {
+    const [database] = useAtom(asyncDatabase, { store });
     const [filters, setFilters] = useState<CCMNodeType[]>([]);
 
     const dataByLetter = useMemo(() => {
@@ -55,17 +49,15 @@ export default function Index() {
             }
             map.get(letter)?.push({
                 ...node,
-                category: node.tags
-                    ? faker.helpers.arrayElement(node.tags)
-                    : faker.helpers.arrayElement(['application', 'tools', 'framework', 'libraries', 'language']),
+                category: node.tags ? pick(node.tags) : pick(['application', 'tools', 'framework', 'libraries', 'language']),
                 description: faker.lorem.paragraph(),
             });
         }
         return Array.from(map.entries());
     }, [database]);
+
     return (
         <main className="w-full h-screen relative ccm-pt ccm-px">
-            <Navbar />
             <section className={clsx('w-full h-full ccm-filters', addActiveFilters(filters))}>
                 <section className="pt-[80px] ml-auto z-10 relative ccm-colors transition-all duration-300">
                     <ul className="flex flex-col gap-0.5 type-hint">
@@ -133,35 +125,7 @@ const RenderLetterCollection = memo(function RenderLetterCollection({ data }: { 
                     <p className="type-filter uppercase border-b-2 border-gray-200 pb-4 w-full">{letter}</p>
                     <ul className="flex flex-col gap-0.5 mt-6">
                         {nodes.map((node) => {
-                            return (
-                                <li key={node.id}>
-                                    <details className="group/details">
-                                        <summary className={clsx('flex items-center gap-2 ccm-transition', node.type)}>
-                                            <span className="w-4">{renderIcon(node.type)}</span>{' '}
-                                            <Tooltip
-                                                className="type-filter cursor-pointer group-open/details:hidden"
-                                                message={<span className="type-hint">{node.description}</span>}
-                                            >
-                                                <span className="group-open:font-bold ellipsis">{node.id}</span>
-                                            </Tooltip>
-                                            <span className="hidden group-open/details:block group-open:font-bold ellipsis type-filter">
-                                                {node.id}
-                                            </span>
-                                            <span className={clsx('ml-auto type-hint ellipsis category')}>[{node.category}]</span>
-                                        </summary>
-                                        <div className="ml-6 flex flex-col gap-2 pb-5 mt-2">
-                                            <p className="type-hint flex items-center gap-1">
-                                                NODE SELECTED ({node.type.toUpperCase()})
-                                            </p>
-                                            <p className="type-body mb-4 line-clamp-4">{node.description}</p>
-                                            <NodeData node={node} prop="tags" />
-                                            <NodeData node={node} prop="dependsOn" />
-                                            <NodeData node={node} prop="supports" />
-                                            <NodeData node={node} prop="references" />
-                                        </div>
-                                    </details>
-                                </li>
-                            );
+                            return <NodeListItem key={node.id} node={node} />;
                         })}
                     </ul>
                 </div>
@@ -169,6 +133,34 @@ const RenderLetterCollection = memo(function RenderLetterCollection({ data }: { 
         </section>
     );
 });
+
+function NodeListItem({ node }: { node: IndexNode }) {
+    return (
+        <li key={node.id}>
+            <details className="group/details">
+                <summary className={clsx('flex items-center gap-2 ccm-transition', node.type)}>
+                    <span className="w-4">{renderIcon(node.type)}</span>{' '}
+                    <Tooltip
+                        className="type-filter cursor-pointer group-open/details:hidden"
+                        message={<span className="type-hint">{node.description}</span>}
+                    >
+                        <span className="group-open:font-bold ellipsis">{node.id}</span>
+                    </Tooltip>
+                    <span className="hidden group-open/details:block group-open:font-bold ellipsis type-filter">{node.id}</span>
+                    <span className={clsx('ml-auto type-hint ellipsis category')}>[{node.category}]</span>
+                </summary>
+                <div className="ml-6 flex flex-col gap-2 pb-5 mt-2">
+                    <p className="type-hint flex items-center gap-1">NODE SELECTED ({node.type.toUpperCase()})</p>
+                    <p className="type-body mb-4 line-clamp-4">{node.description}</p>
+                    <NodeData node={node} prop="tags" />
+                    <NodeData node={node} prop="dependsOn" />
+                    <NodeData node={node} prop="supports" />
+                    <NodeData node={node} prop="references" />
+                </div>
+            </details>
+        </li>
+    );
+}
 
 function renderIcon(type: CCMNodeType) {
     switch (type) {

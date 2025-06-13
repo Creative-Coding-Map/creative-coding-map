@@ -21,7 +21,7 @@ export default function Tooltip({
             {children}
             <div
                 className={clsx(
-                    'absolute left-full top-4 min-w-max transition-opacity delay-150 duration-300 hidden z-10',
+                    'absolute left-full top-4 min-w-max transition-opacity duration-300 hidden z-10',
                     'group-hover/tooltip:block opacity-100 starting:group-hover/tooltip:opacity-0',
                     tooltipClassName
                 )}

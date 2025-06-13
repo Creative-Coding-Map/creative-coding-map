@@ -1,13 +1,27 @@
 import { useAtomValue } from 'jotai';
+import { AnimatePresence } from 'motion/react';
 import { NodeData } from './node-data';
-import { selectedNodeAtom } from '@/state/model';
+import { ShortestPath } from './shortest-path';
+import { InfoOverlay } from './info-overlay';
+import { selectedNodeAtom, showInfoAtom } from '@/state/model';
 import { store } from '@/state/store';
 
 export function MapOverlay() {
+    const showInfo = useAtomValue(showInfoAtom);
+
+    return (
+        <>
+            <AnimatePresence>{showInfo && <InfoOverlay />}</AnimatePresence>
+            <ShortestPath />
+            <SelectedNode />
+        </>
+    );
+}
+
+function SelectedNode() {
     const selectedNode = useAtomValue(selectedNodeAtom, { store });
 
     if (!selectedNode) return null;
-    console.log(selectedNode);
 
     return (
         <aside className="max-w-xl z-10 absolute p-3.5 right-4 lg:right-5 bottom-4 flex flex-col ccm-colors ccm-border ccm-rounded ccm-transition">

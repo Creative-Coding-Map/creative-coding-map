@@ -1,9 +1,8 @@
-import { createRoute, useNavigate } from '@tanstack/react-router';
 import { faker } from '@faker-js/faker';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
+import { useLocation } from 'wouter';
 import { ExternalLink } from '@/components/external-link';
 import { Shell } from '@/components/shell';
-import { HomeRoute } from '@/routes';
 import { BREAKDOWN_KEYS } from '@/state/constants';
 import TagIcon from '@/components/icons/Tag';
 import DocumentIcon from '@/components/icons/Document';
@@ -12,6 +11,7 @@ import LanguageIcon from '@/components/icons/Language';
 import PersonIcon from '@/components/icons/Person';
 import MapPinIcon from '@/components/icons/MapPin';
 import CloseIcon from '@/components/icons/Close';
+import { ActionButton } from '@/components/action-button';
 
 interface Breakdown {
     id: string;
@@ -45,24 +45,15 @@ const BRKD: Breakdown = {
     description: faker.lorem.paragraphs(8),
 };
 
-export const BreakdownRoute = createRoute({
-    getParentRoute: () => HomeRoute,
-    path: '/breakdown/$id',
-    component: BreakdownView,
-});
-
-export default function BreakdownView() {
-    const { id } = BreakdownRoute.useParams();
-
+export default function BreakdownView({ id }: { id: string }) {
+    const [_, navigate] = useLocation();
     console.log(id);
-    const navigate = useNavigate();
-
     return (
-        <Shell className="ccm-pt" onOutsideClick={() => navigate({ to: '/' })}>
-            <aside className="max-w-screen-md ml-auto z-20 relative ccm-page ccm-py">
-                <button className="absolute top-4 right-4 btn ccm-invert" onClick={() => navigate({ to: '/' })}>
+        <Shell className="ccm-pt" onOutsideClick={() => navigate('/')}>
+            <aside className="max-w-screen-md ml-auto z-20 relative h-[calc(100vh-5lh)] overflow-y-auto ccm-page">
+                <ActionButton className="absolute top-4 right-4 btn ccm-invert" onClick={() => navigate('/')} label="Close">
                     <CloseIcon />
-                </button>
+                </ActionButton>
                 <div className="w-full flex flex-col gap-2 mt-8">
                     <div>
                         <h3 className="type-window-title">{BRKD.title}</h3>

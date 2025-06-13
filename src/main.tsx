@@ -1,43 +1,44 @@
-import { StrictMode } from 'react';
+import { StrictMode, Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
-// import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Route, Switch } from 'wouter';
+import reportWebVitals from './reportWebVitals.ts';
+
+import { Providers } from './modules/providers.tsx';
+import { Loading } from './components/loading.tsx';
 
 import '@/styles/globals.css';
-import reportWebVitals from './reportWebVitals.ts';
-import { HomeRoute, RootRoute } from './routes.tsx';
-import { AboutRoute } from './modules/about.tsx';
-import { BreakdownRoute } from './modules/breakdown.tsx';
-import { IndexRoute } from './modules/index/index.tsx';
+import { Navbar } from './modules/navigation.tsx';
 
-const routeTree = RootRoute.addChildren([HomeRoute, AboutRoute, BreakdownRoute, IndexRoute]);
-
-const router = createRouter({
-    routeTree,
-    context: {},
-    defaultPreload: 'intent',
-    scrollRestoration: true,
-    defaultStructuralSharing: true,
-    defaultPreloadStaleTime: 0,
-});
-
-declare module '@tanstack/react-router' {
-    interface Register {
-        router: typeof router;
-    }
-}
+const IndexView = lazy(() => import('./views/index-view.tsx'));
+const Home = lazy(() => import('./home.tsx'));
 
 const rootElement = document.getElementById('app');
+
+function App() {
+    return (
+        <main className="w-full h-screen relative antialiased">
+            <Navbar />
+            <Switch>
+                <Route path="/index">
+                    <Suspense fallback={<Loading />}>
+                        <IndexView />
+                    </Suspense>
+                </Route>
+                <Route path="/" component={Home} nest />
+            </Switch>
+        </main>
+    );
+}
+
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
         <StrictMode>
-            <RouterProvider router={router} />
+            <Providers>
+                <App />
+            </Providers>
         </StrictMode>
     );
 }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
