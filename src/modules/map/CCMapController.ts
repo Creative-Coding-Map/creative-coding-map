@@ -10,6 +10,7 @@ import type { TypedEventEmitter } from '@/lib/EventEmitter';
 import type { ForceGraphMethods, ForceGraphProps } from 'react-force-graph-2d';
 import type { CCMData, CCMGraphData, CCMGraphLink, CCMGraphNode, NodesCollection } from '@/types/ccmap';
 import { EventEmitter } from '@/lib/EventEmitter';
+import { linkWeights } from '@/modules/map/link-weights.ts';
 
 interface CCMapControllerEvents {
     'graph-data:updated': (graphData: CCMGraphData | null) => void;
@@ -79,39 +80,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
         const subtree = findAdjacentSubtree(graphData.links, node.id);
 
-        const weight = (link: any): number => {
-            const t = `${link.source.type}-${link.target.type}`;
-
-            switch (t) {
-                case 'root-domain':
-                    return 1;
-                case 'domain-domain':
-                case 'tag-tag':
-                    return 0;
-                case 'domain-tool':
-                case 'tool-domain':
-                case 'domain-technique':
-                case 'technique-domain':
-                    return 8;
-                case 'domain-tag':
-                case 'tag-domain':
-                    return 4;
-                case 'tag-tool':
-                case 'tool-tag':
-                case 'tag-technique':
-                case 'technique-tag':
-                    return 5;
-                case 'tool-tool':
-                case 'technique-tool':
-                case 'tool-technique':
-                    return 10;
-                default:
-                    console.warn(`Unknown link type ${t}`);
-                    return 10;
-            }
-        };
-
-        const mst = minimumSpanningTreeFromSubtree(graphData.links, subtree, weight);
+        const mst = minimumSpanningTreeFromSubtree(graphData.links, subtree, linkWeights);
         const nextGraph = this.localBuildGraph(mst.mstEdges);
         blendGraphs(graphData, nextGraph);
 
