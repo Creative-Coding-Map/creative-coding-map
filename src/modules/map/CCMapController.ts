@@ -18,6 +18,8 @@ interface CCMapControllerEvents {
 }
 
 export class CCMapController extends (EventEmitter as new () => TypedEventEmitter<CCMapControllerEvents>) {
+    private selectedNodeId: any | null = null;
+
     private ccmData: CCMData | null = null;
     private nodes: NodesCollection | null = null;
     private domainGraph: CCMGraphData | null = null;
@@ -28,7 +30,6 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     constructor() {
         super();
     }
-
 
     /**
      * Centers the graph view on the specified node.
@@ -51,7 +52,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         if (this.graphRef != null) {
             this.graphRef.centerAt(node.x, node.y, 1000);
         }
-        return node
+        return node;
     }
 
     nodeForId: (nodeId: string) => CCMGraphNode | undefined = (nodeId) => {
@@ -113,9 +114,8 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
                 clearInterval(interval);
             }
             this.graphRef.d3Force('link', linkForce);
-
         }, 100);
-        return node
+        return node;
     }
 
     initialize(ccmData: CCMData): void {
@@ -172,7 +172,10 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     }
 
     getNodeClickHandler = (node: any, _?: MouseEvent) => {
-        this.focusOnNode(node);
+        if (node.id === this.selectedNodeId) {
+            this.focusOnNode(node);
+        }
+        this.selectedNodeId = node.id;
     };
 
     getNodeCanvasObject = (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
@@ -221,14 +224,14 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
         // Draw labels if zoomed in enough
         if (scale >= minScale) {
-            const label = node.name;
+            const label = node.name + ' [0]';
 
             const fontSizes = {
-                'domain': 14 / globalScale,
-                'tag' : 12 / globalScale,
-                'tool': 12 / globalScale,
-                'technique': 9 / globalScale,
-            }
+                domain: 14 / globalScale,
+                tag: 12 / globalScale,
+                tool: 12 / globalScale,
+                technique: 9 / globalScale,
+            };
 
             const fontSize = fontSizes[node.type] as number;
             ctx.font = `${fontSize}px Space Mono`;
@@ -236,46 +239,87 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
             const hmargin = 10.0 / globalScale;
 
             const vmargins = {
-                'domain': 16 / globalScale,
-                'tag' : 8 / globalScale,
-                'tool': 6 / globalScale,
-                'technique': 2 / globalScale,
-            }
+                domain: 16 / globalScale,
+                tag: 8 / globalScale,
+                tool: 6 / globalScale,
+                technique: 2 / globalScale,
+            };
             const vmargin = vmargins[node.type] as number;
 
             const radii = {
-                'domain': 10 / globalScale,
-                'tag' : 5 / globalScale,
-                'tool': 2.5 / globalScale,
-                'technique': 2.5 / globalScale,
-            }
+                domain: 10 / globalScale,
+                tag: 5 / globalScale,
+                tool: 2.5 / globalScale,
+                technique: 2.5 / globalScale,
+            };
             const radius = radii[node.type] as number;
-            const bckgDimensions: [number, number] = [textWidth + 2*hmargin, fontSize + vmargin].map((n) => n + fontSize * 0.2) as [
-                number,
-                number,
-            ];
+
+            const labelWidth = textWidth + 2 * hmargin + fontSize * 0.2;
+
+            const bckgDimensions: [number, number] = [textWidth + 2 * hmargin, fontSize + vmargin].map(
+                (n) => n + fontSize * 0.2
+            ) as [number, number];
+
+            const isSelected = node.id === this.selectedNodeId;
+
+            const nodeColor = 'red';
 
             // TODO: implement labels per design
             ctx.fillStyle = 'orange';
             ctx.beginPath();
-            ctx.roundRect(
-                node.x! - bckgDimensions[0] / 2,
-                node.y! - bckgDimensions[1] / 2,
-                ...bckgDimensions, radius)
+            ctx.roundRect(node.x! - bckgDimensions[0] / 2, node.y! - bckgDimensions[1] / 2, ...bckgDimensions, radius);
 
-            ctx.fillStyle = 'white'
-            ctx.fill()
-            ctx.strokeStyle = 'red'
-            ctx.lineWidth = 0.5 / globalScale
+            ctx.fillStyle = isSelected ? nodeColor : 'white';
+            ctx.fill();
+            ctx.strokeStyle = isSelected ? 'white' : nodeColor;
+            ctx.lineWidth = 0.5 / globalScale;
             ctx.stroke();
 
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = 'red'; //node.color || '#000000';
+            ctx.fillStyle = isSelected ? 'white' : nodeColor;
             ctx.fillText(label, node.x, node.y!);
             node.__bckgDimensions = bckgDimensions;
 
             // TODO: add focus widget right from the label
+
+            if (node.id === this.selectedNodeId) {
+                ctx.beginPath();
+                ctx.roundRect(
+                    node.x! + bckgDimensions[0] / 2 + 2.0 / globalScale,
+                    node.y! - bckgDimensions[1] / 2,
+                    bckgDimensions[1],
+                    bckgDimensions[1],
+                    radius
+                );
+
+                ctx.fillStyle = isSelected ? nodeColor : 'white';
+                ctx.fill();
+                ctx.strokeStyle = isSelected ? 'white' : nodeColor;
+                ctx.lineWidth = 0.5 / globalScale;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(
+                    node.x + bckgDimensions[0] / 2 + 2.0 / globalScale + bckgDimensions[1] / 2.0,
+                    node.y,
+                    4 / globalScale,
+                    0,
+                    2 * Math.PI,
+                    false
+                );
+
+                const cx = node.x + bckgDimensions[0] / 2 + 2.0 / globalScale + bckgDimensions[1] / 2.0
+                const cy = node.y
+                ctx.moveTo(cx, cy + 6.0 / globalScale)
+                ctx.lineTo(cx, cy - 6.0 / globalScale)
+                ctx.moveTo(cx - 6.0 / globalScale, cy)
+                ctx.lineTo(cx + 6.0 / globalScale, cy)
+
+                ctx.lineWidth = 1.0 / globalScale;
+                ctx.strokeStyle = isSelected ? 'white' : nodeColor;
+                ctx.stroke();
+            }
         }
     };
 
