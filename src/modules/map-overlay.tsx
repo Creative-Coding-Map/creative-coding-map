@@ -3,15 +3,17 @@ import { AnimatePresence } from 'motion/react';
 import { NodeData } from './node-data';
 import { ShortestPath } from './shortest-path';
 import { InfoOverlay } from './info-overlay';
-import { selectedNodeAtom, showInfoAtom } from '@/state/model';
+import { SearchOverlay } from './search';
+import { selectedNodeAtom, showInfoAtom, showSearchAtom } from '@/state/model';
 import { store } from '@/state/store';
 
 export function MapOverlay() {
     const showInfo = useAtomValue(showInfoAtom);
-
+    const showSearch = useAtomValue(showSearchAtom);
     return (
         <>
             <AnimatePresence>{showInfo && <InfoOverlay />}</AnimatePresence>
+            <AnimatePresence>{showSearch && <SearchOverlay />}</AnimatePresence>
             <ShortestPath />
             <SelectedNode />
         </>

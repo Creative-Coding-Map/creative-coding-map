@@ -11,7 +11,6 @@ import { pathEndNodeAtom, pathStartNodeAtom, shortestPathNodesAtom, showCreatePa
 import CreatePathIcon from '@/components/icons/CreatePath';
 import CloseIcon from '@/components/icons/Close';
 import { ActionButton } from '@/components/action-button';
-import { Input } from '@/components/input';
 
 export function ShortestPath() {
     const createPath = useAtomValue(showCreatePathAtom, { store });
@@ -79,10 +78,8 @@ function Path() {
                     </p>
                     <div className="flex items-center justify-baseline w-full gap-2">
                         <ConnectionPath connections={connections} />
-                        <div className="flex flex-col gap-2 w-full">
-                            <div className="flex flex-col gap-2 max-w-[320px] relative">
-                                <div className="flex flex-col gap-2 max-w-[320px] relative">
-                                    {/* <Input
+                        <div className="flex flex-col gap-2 max-w-[320px] relative">
+                            {/* <Input
                                         ref={startInputRef}
                                         id="start-node-input"
                                         type="text"
@@ -93,12 +90,12 @@ function Path() {
                                         onBlur={handleBlur}
                                         onKeyDown={handleKeyDown}
                                     /> */}
-                                    {shortestPathNodes.map((node) => (
-                                        <Input key={node.id} className="type-body" value={node.id}>
-                                            {node.id}
-                                        </Input>
-                                    ))}
-                                    {/* <Input
+                            {shortestPathNodes.map((node) => (
+                                <div key={node.id} className="type-body h-6">
+                                    {node.id}
+                                </div>
+                            ))}
+                            {/* <Input
                                         ref={endInputRef}
                                         id="end-node-input"
                                         type="text"
@@ -108,8 +105,6 @@ function Path() {
                                         onChange={(e) => handleInputChange(e.target.value, 'end')}
                                         onKeyDown={handleKeyDown}
                                     /> */}
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

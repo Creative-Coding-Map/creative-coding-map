@@ -15,3 +15,7 @@ export const updateArray = <T, K extends T>(item: K): SetStateAction<T[]> => {
 export const pick = <T>(collection: T[]): T => {
     return collection[Math.floor(Math.random() * collection.length)];
 };
+
+export function map(v: number, min: number, max: number, minOut: number, maxOut: number) {
+    return ((v - min) / (max - min)) * (maxOut - minOut) + minOut;
+}

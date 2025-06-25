@@ -1,12 +1,11 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import throttle from 'just-throttle';
 import clsx from 'clsx';
 import * as m from 'motion/react-m';
 import { AnimatePresence } from 'motion/react';
-import { Suggestions } from './suggestions';
+import { Suggestions } from '../suggestions';
 import type { CCMNode } from '@/types/ccmap';
-import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom, showCreatePathAtom } from '@/state/model';
+import { pathEndNodeAtom, pathStartNodeAtom, showCreatePathAtom } from '@/state/model';
 import { store } from '@/state/store';
 import CreatePathIcon from '@/components/icons/CreatePath';
 import CloseIcon from '@/components/icons/Close';
@@ -14,62 +13,20 @@ import { Input } from '@/components/input';
 import ConnectionIcon from '@/components/symbols/Connection';
 import { ActionButton } from '@/components/action-button';
 import { useMitt } from '@/hooks/useMitt';
-
-const MIN_CHAR_SUGGESTIONS = 2;
+import { useSuggestions } from '@/hooks/useSuggestions';
 
 export function CreatePath() {
     const setShowCreatePath = useSetAtom(showCreatePathAtom, { store });
-    const database = useAtomValue(databaseAtom, { store });
     const [startNode, setStartNode] = useAtom(pathStartNodeAtom, { store });
     const [endNode, setEndNode] = useAtom(pathEndNodeAtom, { store });
 
     const [startNodeInput, setStartNodeInput] = useState('');
     const [endNodeInput, setEndNodeInput] = useState('');
-    const [suggestions, setSuggestions] = useState<CCMNode[]>([]);
     const [activeInput, setActiveInput] = useState<'start' | 'end' | null>(null);
-    const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
     const startInputRef = useRef<HTMLInputElement>(null);
     const endInputRef = useRef<HTMLInputElement>(null);
     const [suggestionsPosition, setSuggestionsPosition] = useState({ top: 0, left: 0 });
-    const suggestionsRef = useRef<HTMLUListElement>(null);
     const { emitter } = useMitt();
-
-    const getSuggestions = useCallback(
-        (value: string) => {
-            if (value.length < MIN_CHAR_SUGGESTIONS) {
-                return [];
-            }
-            const regex = new RegExp(value, 'i');
-            return database.values.filter((node) => regex.test(node.id));
-        },
-        [database.nodeIds]
-    );
-
-    const throttledSetSuggestions = useCallback(
-        throttle((value: string) => {
-            const newSuggestions = getSuggestions(value);
-            setSuggestions(newSuggestions);
-        }, 300),
-        [getSuggestions]
-    );
-
-    const handleInputChange = useCallback(
-        (value: string, inputType: 'start' | 'end') => {
-            if (inputType === 'start') {
-                setStartNodeInput(value);
-            } else {
-                setEndNodeInput(value);
-            }
-
-            if (value.length >= MIN_CHAR_SUGGESTIONS) {
-                throttledSetSuggestions(value);
-            } else {
-                setSuggestions([]);
-            }
-            setSelectedSuggestionIndex(-1);
-        },
-        [throttledSetSuggestions]
-    );
 
     const selectSuggestion = useCallback(
         (suggestion: CCMNode) => {
@@ -83,8 +40,7 @@ export function CreatePath() {
                 endInputRef.current?.focus();
             }
 
-            setSuggestions([]);
-            setSelectedSuggestionIndex(-1);
+            emitter.emit('suggestions:reset');
             setActiveInput(null);
 
             if (activeInput === 'end') {
@@ -99,60 +55,48 @@ export function CreatePath() {
         [activeInput, setStartNode, setEndNode, startNode]
     );
 
-    const handleFocus = useCallback((inputType: 'start' | 'end') => {
-        setActiveInput(inputType);
-        // setSuggestions([]);
+    const {
+        handleInputChange,
+        handleKeyDown,
+        handleBlur,
+        suggestions,
+        suggestionsRef,
+        selectedSuggestionIndex,
+        setSelectedSuggestionIndex,
+        reset,
+    } = useSuggestions({
+        selectSuggestion,
+    });
 
-        const inputRef = inputType === 'start' ? startInputRef : endInputRef;
-        if (inputRef.current) {
-            const rect = inputRef.current.getBoundingClientRect();
-            setSuggestionsPosition({
-                top: rect.top,
-                left: rect.left,
-            });
-        }
-    }, []);
+    const handleFocus = useCallback(
+        (inputType: 'start' | 'end') => {
+            setActiveInput(inputType);
+            // setSuggestions([]);
 
-    const handleKeyDown = useCallback(
-        (e: React.KeyboardEvent<HTMLInputElement>) => {
-            switch (e.key) {
-                case 'ArrowDown':
-                    if (suggestions.length > 0) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setSelectedSuggestionIndex(0);
-                    }
-                    break;
-                case 'Enter':
-                    if (selectedSuggestionIndex !== -1) {
-                        e.preventDefault();
-                        selectSuggestion(suggestions[selectedSuggestionIndex]);
-                    }
-                    break;
-                case 'Escape':
-                    setSuggestions([]);
-                    break;
-                case 'Tab':
-                    if (suggestions.length > 0 && selectedSuggestionIndex === -1) {
-                        e.preventDefault();
-                        setSelectedSuggestionIndex(0);
-                    } else if (selectedSuggestionIndex > -1) {
-                        e.preventDefault();
-                        suggestionsRef.current?.focus();
-                    }
-                    break;
+            const inputRef = inputType === 'start' ? startInputRef : endInputRef;
+
+            if (inputRef.current) {
+                const rect = inputRef.current.getBoundingClientRect();
+                setSuggestionsPosition({
+                    top: rect.top,
+                    left: rect.left,
+                });
             }
         },
-        [suggestions, selectedSuggestionIndex, selectSuggestion, setSelectedSuggestionIndex, setSuggestions]
+        [setSuggestionsPosition, startInputRef, endInputRef]
     );
 
-    const handleBlur = useCallback(
-        (event: React.FocusEvent<HTMLInputElement>) => {
-            if (event.target.nodeName === event.relatedTarget?.nodeName) {
-                setSuggestions([]);
+    const onInputChange = useCallback(
+        (value: string, inputType: 'start' | 'end') => {
+            if (inputType === 'start') {
+                setStartNodeInput(value);
+            } else {
+                setEndNodeInput(value);
             }
+
+            handleInputChange(value);
         },
-        [suggestions]
+        [handleInputChange, setStartNodeInput, setEndNodeInput]
     );
 
     useLayoutEffect(() => {
@@ -204,7 +148,7 @@ export function CreatePath() {
                                 placeholder="CLICK OR TYPE FIRST NODE"
                                 value={startNodeInput}
                                 onFocus={() => handleFocus('start')}
-                                onChange={(e) => handleInputChange(e.target.value, 'start')}
+                                onChange={(e) => onInputChange(e.target.value, 'start')}
                                 onBlur={handleBlur}
                                 onKeyDown={handleKeyDown}
                             />
@@ -215,12 +159,13 @@ export function CreatePath() {
                                 placeholder="CLICK OR TYPE SECOND NODE"
                                 value={endNodeInput}
                                 onFocus={() => handleFocus('end')}
-                                onChange={(e) => handleInputChange(e.target.value, 'end')}
+                                onChange={(e) => onInputChange(e.target.value, 'end')}
                                 onKeyDown={handleKeyDown}
                             />
                             <AnimatePresence>
                                 {suggestions.length > 0 && (
                                     <Suggestions
+                                        fixed
                                         ref={suggestionsRef}
                                         suggestions={suggestions}
                                         selectSuggestion={selectSuggestion}
@@ -234,7 +179,7 @@ export function CreatePath() {
                                             }
 
                                             if (suggestions.length > 0) {
-                                                setSuggestions([]);
+                                                reset();
                                             }
                                         }}
                                     />

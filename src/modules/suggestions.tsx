@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as m from 'motion/react-m';
 import type { CCMNode } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
@@ -11,13 +11,20 @@ import Tools from '@/components/symbols/Tools';
 interface SuggestionsProps {
     suggestions: CCMNode[];
     activeInputRef: React.RefObject<HTMLInputElement | null>;
-    position: { top: number; left: number };
     selectedIndex: number;
     setSelectedIndex: (index: number) => void;
     selectSuggestion: (suggestion: CCMNode) => void;
     onBlur: (event: React.FocusEvent<HTMLUListElement>) => void;
     ref: React.RefObject<HTMLUListElement | null>;
+    fixed?: boolean;
+    position?: { top: number; left: number };
 }
+
+type MousePos = { x: number; y: number };
+
+const hasMouseMovedSignificantly = (prev: MousePos, current: MousePos) => {
+    return Math.abs(current.x - prev.x) > 10 || Math.abs(current.y - prev.y) > 10 || prev.x === Infinity || prev.y === Infinity;
+};
 
 export function Suggestions({
     suggestions,
@@ -28,18 +35,17 @@ export function Suggestions({
     onBlur,
     position,
     ref,
+    fixed = false,
 }: SuggestionsProps) {
-    useEffect(() => {
-        if (selectedIndex !== -1) {
-            ref.current?.focus();
-        }
-    }, [selectedIndex]);
+    const mousePosRef = useRef<{ x: number; y: number }>({ x: Infinity, y: Infinity });
 
     useEffect(() => {
         if (selectedIndex > -1 && ref.current?.children[selectedIndex]) {
             ref.current.children[selectedIndex].scrollIntoView({
                 block: 'nearest',
             });
+        } else if (selectedIndex !== -1) {
+            ref.current?.focus();
         }
     }, [selectedIndex]);
 
@@ -78,17 +84,18 @@ export function Suggestions({
         }
     };
 
+    const style = position ? { top: `${position.top}px`, left: `${position.left}px`, transform: 'translateY(-100%)' } : {};
+
     return (
         <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={clsx('fixed z-10 ccm-colors ccm-border p-2 rounded-md -mt-2 w-[320px] ccm-transition')}
-            style={{
-                top: `${position.top}px`,
-                left: `${position.left}px`,
-                transform: 'translateY(-100%)',
-            }}
+            className={clsx(
+                'z-10 ccm-colors p-2 rounded-md ccm-transition',
+                fixed ? 'fixed w-[320px] -mt-2 ccm-border' : 'w-full'
+            )}
+            style={style}
         >
             <p className="type-hint text-gray mb-1">SUGGESTED NODES</p>
             <ul
@@ -101,16 +108,23 @@ export function Suggestions({
                 {suggestions.map((suggestion, index) => (
                     <li
                         key={suggestion.id}
-                        className={clsx('hover:invert ccm-colors cursor-pointer flex items-center p-1', {
+                        className={clsx('ccm-colors cursor-pointer flex items-center p-1', {
                             'group-focus:invert group-not-focus:bg-light-gray': selectedIndex === index,
                         })}
                         onClick={() => selectSuggestion(suggestion)}
-                        onMouseOver={(evt) => {
+                        onMouseEnter={(evt) => {
                             evt.preventDefault();
+                            const hasMouseMoved = hasMouseMovedSignificantly(mousePosRef.current, {
+                                x: evt.clientX,
+                                y: evt.clientY,
+                            });
+
                             // if the focus element isn't an input, set the selected index
-                            if (document.activeElement !== activeInputRef.current) {
+                            if (document.activeElement !== activeInputRef.current && hasMouseMoved) {
+                                console.log('setting selected index', index);
                                 setSelectedIndex(index);
                             }
+                            mousePosRef.current = { x: evt.clientX, y: evt.clientY };
                         }}
                     >
                         <div className="w-5 flex items-center">{renderIcon(suggestion.type, 'w-[12px] h-[12px]')}</div>

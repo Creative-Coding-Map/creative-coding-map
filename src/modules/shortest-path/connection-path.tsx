@@ -9,10 +9,6 @@ export interface ConnectionPathProps {
     className?: string;
 }
 
-function map(v: number, min: number, max: number, minOut: number, maxOut: number) {
-    return ((v - min) / (max - min)) * (maxOut - minOut) + minOut;
-}
-
 const CIRCLE_RADIUS = 3; // px
 const SVG_WIDTH = 8; // px, for some padding
 
@@ -34,10 +30,12 @@ export const ConnectionPath: React.FC<ConnectionPathProps> = ({ connections, cla
     const shapes = useMemo(() => {
         if (height === 0) return [];
 
-        const minY = 15;
-        const maxY = height - minY;
+        const gap = 8;
+        const elementHeight = 24;
+        const minY = elementHeight / 2;
+        let cursor = minY - CIRCLE_RADIUS / 2;
 
-        return connections.map((conn, index) => {
+        return connections.map((conn) => {
             const shape: Shape = {
                 ...conn,
                 y0: 0,
@@ -45,10 +43,11 @@ export const ConnectionPath: React.FC<ConnectionPathProps> = ({ connections, cla
             };
 
             if (conn.type === 'node') {
-                shape.y0 = map(index, 0, connections.length - 1, minY, maxY);
+                shape.y0 = cursor;
             } else {
-                shape.y0 = map(index - 1, 0, connections.length - 1, minY, maxY) + CIRCLE_RADIUS;
-                shape.y1 = map(index + 1, 0, connections.length - 1, minY, maxY) - CIRCLE_RADIUS;
+                shape.y0 = cursor;
+                shape.y1 = cursor + elementHeight + gap;
+                cursor += elementHeight + gap;
             }
             return shape;
         });

@@ -22,3 +22,5 @@ export const BREAKDOWN_KEYS = {
     updatedAt: 'LAST EDITED',
     country: 'COUNTRY',
 };
+
+export const MIN_CHAR_SUGGESTIONS = 2;
