@@ -16,7 +16,7 @@ const removeCommentRules = (root) => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    base: '/',
+    base: '/creative-coding-map/',
     plugins: [
         viteReact(),
         svgr(),
