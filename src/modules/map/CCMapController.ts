@@ -10,6 +10,7 @@ import type { TypedEventEmitter } from '@/lib/EventEmitter';
 import type { ForceGraphMethods, ForceGraphProps } from 'react-force-graph-2d';
 import type { CCMData, CCMGraphData, CCMGraphLink, CCMGraphNode, NodesCollection } from '@/types/ccmap';
 import { EventEmitter } from '@/lib/EventEmitter';
+
 import { linkWeights } from '@/modules/map/link-weights.ts';
 
 interface CCMapControllerEvents {
@@ -60,6 +61,9 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     };
 
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
+
+        // TODO figure out why so many nodes detach from the tree
+
         if (typeof node === 'string') {
             node = this.#graphData?.nodes.find((n) => n.id === node) as CCMGraphNode;
         }
@@ -131,7 +135,13 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         colorGraph(ogGraph, COLOR_SETS);
 
         this.graphData = this.localBuildGraph();
+
+
+        // TODO figure out how to do this without setTimeout
+        setTimeout(() => {this.focusOnNode("___root")}, 1000)
+
         this.#runtimeProps = {};
+
     }
 
     get graphData(): CCMGraphData | null {
@@ -278,7 +288,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = isSelected ? 'white' : nodeColor;
-            ctx.fillText(label, node.x, node.y!);
+            ctx.fillText(label, node.x, node.y);
             node.__bckgDimensions = bckgDimensions;
 
             // TODO: add focus widget right from the label
