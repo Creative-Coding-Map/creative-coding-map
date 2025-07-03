@@ -2,10 +2,10 @@ import * as d3 from 'd3';
 
 import { blendGraphs } from './blend';
 import { colorGraph } from './coloring';
-import { findAdjacentSubtree, minimumSpanningTreeFromSubtree } from './dijkstra';
+import { findAdjacentSubtree, minimumSpanningTreeFromSubtree, findAllShortestPaths } from './dijkstra';
 import { buildGraph, buildNodesFromCcmData } from './build-graph';
 import { buildDomainGraph } from './domain-sets';
-import { COLOR_SETS, DOMAIN_SETS } from './data';
+import { VIEW_CONFIGURATIONS } from './data';
 import type { TypedEventEmitter } from '@/lib/EventEmitter';
 import type { ForceGraphMethods, ForceGraphProps } from 'react-force-graph-2d';
 import type { CCMData, CCMGraphData, CCMGraphLink, CCMGraphNode, NodesCollection } from '@/types/ccmap';
@@ -61,9 +61,6 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     };
 
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
-
-        // TODO figure out why so many nodes detach from the tree
-
         if (typeof node === 'string') {
             node = this.#graphData?.nodes.find((n) => n.id === node) as CCMGraphNode;
         }
@@ -95,6 +92,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         let s = 0.0;
         this.graphRef.d3ReheatSimulation();
 
+        this.centerOnNode(node.id)
         const interval = setInterval(() => {
             if (!this.graphRef) return;
 
@@ -129,10 +127,10 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
         const ogGraph = buildGraph(this.ccmData, this.nodes);
 
-        this.domainGraph = buildDomainGraph(ogGraph, DOMAIN_SETS) as CCMGraphData;
+        this.domainGraph = buildDomainGraph(ogGraph, VIEW_CONFIGURATIONS[0].domainSets) as CCMGraphData;
         this.nodes.domainNodes = this.domainGraph.nodes;
-        this.nodes.allNodes = this.domainGraph.nodes.concat(ogGraph.nodes);
-        colorGraph(ogGraph, COLOR_SETS);
+        this.nodes.allNodes = ogGraph.nodes.concat(this.domainGraph.nodes);
+        colorGraph(ogGraph, VIEW_CONFIGURATIONS[0].colorSets);
 
         this.graphData = this.localBuildGraph();
 
