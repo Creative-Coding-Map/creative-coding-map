@@ -1,5 +1,8 @@
 import type { CCMGraphLink } from '@/types/ccmap';
-import { noop } from '@/lib/utils';
+
+function nodeId(node) {
+    return node.id || node;
+}
 
 /**
  * Find adjacent nodes for a given node
@@ -12,10 +15,10 @@ export function findAdjacentSubtree(links: CCMGraphLink[], node: string) {
     const subLinks = [];
 
     for (const link of links) {
-        if ((link.source?.id || link.source) === node) {
+        if (nodeId(link.source) === node) {
             adjacentNodes.add(link.target);
             subLinks.push({ source: node, target: link.target });
-        } else if ((link.target?.id || link.target) === node) {
+        } else if (nodeId(link.target) === node) {
             adjacentNodes.add(link.source);
             subLinks.push({ source: node, target: link.source });
         }
@@ -310,8 +313,8 @@ export function minimumSpanningTreeFromSubtree(edges, initialSubtree, weightFunc
 
     // Add all nodes from the initial subtree to the included set
     for (const edge of initialSubtree) {
-        included.add(edge.source);
-        included.add(edge.target);
+        included.add(nodeId(edge.source));
+        included.add(nodeId(edge.target));
     }
 
     // If the initial subtree is empty, we need to select a starting node
@@ -424,24 +427,24 @@ export function isValidSubtree(subtreeEdges) {
  * @param {function(edge:{}, source: string, target: string)} weightFunction - A function that computes the weight for each edge, or undefined for default behavior
  * @returns {Object} Adjacency list for an undirected graph
  */
-export function buildUndirectedGraph(edges: any[], weightFunction: (edge: any, source: string, target: string) => number) {
+export function buildUndirectedGraph(edges: any[],
+                                     weightFunction: ((edge: any, source: string, target: string) => number) | undefined = undefined,
+
+) {
     const graph = {};
 
     // Initialize graph with empty adjacency lists
     for (const edge of edges) {
-        const source = edge.source.id || edge.source;
-        const target = edge.target.id || edge.target;
-
-        if (!graph[source]) graph[source] = {};
-        if (!graph[target]) graph[target] = {};
+        if (!graph[nodeId(edge.source)]) graph[nodeId(edge.source)] = {};
+        if (!graph[nodeId(edge.target)]) graph[nodeId(edge.target)] = {};
     }
 
     // Fill adjacency lists with weights (bidirectional)
     for (const edge of edges) {
         const type = edge.type;
         let defaultWeight = 1;
-        const source = edge.source.id || edge.source;
-        const target = edge.target.id || edge.target;
+        const source = nodeId(edge.source)
+        const target = nodeId(edge.target)
 
         let weight = 0.0;
         if (!weightFunction) {
@@ -494,8 +497,8 @@ export function findAllDegreesOfSeparation(links: CCMGraphLink[], startNode: str
     links.forEach((link) => {
         const { source, target } = link;
 
-        const sourceId = source.id || source;
-        const targetId = target.id || target;
+        const sourceId = nodeId(source)
+        const targetId = nodeId(target)
 
         // Track all nodes
         allNodes.add(source);
@@ -527,11 +530,11 @@ export function findAllDegreesOfSeparation(links: CCMGraphLink[], startNode: str
 
     // BFS to find shortest paths to all reachable nodes
     const queue = [startNode];
-    const visited = new Set([startNode]);
+    const visited = new Set<string>([startNode]);
     distances[startNode] = 0;
 
     while (queue.length > 0) {
-        const current = queue.shift();
+        const current = queue.shift()!;
 
         // Check all neighbors
         for (const neighbor of graph[current]) {
