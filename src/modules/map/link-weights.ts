@@ -1,7 +1,6 @@
 export function linkWeights(link: any): number {
-    const t = `${link.source.type}-${link.target.type}`;
-
-    switch (t) {
+    const t = `${link.source.type}-${link.target.type}`
+    switch(t) {
         case 'root-domain':
             return 1;
         case 'domain-domain':
@@ -25,7 +24,6 @@ export function linkWeights(link: any): number {
         case 'tool-technique':
             return 10;
         default:
-            console.warn(`Unknown link type ${t}`);
-            return 10;
+            throw new Error(`unknown link type ${t}`)
     }
 }

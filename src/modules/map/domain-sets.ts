@@ -11,14 +11,14 @@ export function buildDomainGraph(graph: CCMGraphData, domainSets: CCMDomainSet[]
         degreesOfSeparation[nodeId] = findAllDegreesOfSeparation(graph.links, nodeId);
     }
 
-    const rootNode = { id: '___root', name: 'root', type: 'root', color: '#ffffff' };
+    const rootNode = { id: '___root', name: 'root', type: 'root', color: '#000000' };
 
     const domainNodes = domainSets.map((set) => {
         return {
             id: `domain:${set.name}`,
             name: `${set.name}`,
             type: 'domain',
-            color: '#ffffff',
+            color: '#000000',
         };
     });
 

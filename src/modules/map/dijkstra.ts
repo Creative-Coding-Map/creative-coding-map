@@ -293,7 +293,7 @@ export function minimumSpanningTree(edges, startNode) {
  * @param {(any)=>number} weightFunction
  * @returns {Object} - Object containing the total weight and edges of the MST
  */
-export function minimumSpanningTreeFromSubtree(edges, initialSubtree, weightFunction: (linkType: any) => number = () => 1.0) {
+export function minimumSpanningTreeFromSubtree(edges, initialSubtree, weightFunction: (linkType: any) => number) {
     // Build adjacency list from all edges (bidirectional)
     const graph = buildUndirectedGraph(edges, weightFunction);
 

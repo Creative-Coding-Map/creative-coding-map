@@ -24,16 +24,16 @@ export function LegendOverlay() {
             <h4 className="mt-4 text-gray">DOMAINS MODE - COLOR</h4>
             <ul className="flex flex-col gap-1">
                 <li className="flex items-center gap-2">
-                    <Tools className="fill-red" /> <span>GAMES</span>
+                    <Tools className="fill-red" /> <span>3D GRAPHICS</span>
                 </li>
                 <li className="flex items-center gap-2">
-                    <Tools className="fill-green" /> <span>TOOLS</span>
+                    <Tools className="fill-green" /> <span>FILE FORMATS</span>
                 </li>
                 <li className="flex items-center gap-2">
-                    <Tools className="fill-blue" /> <span>GRAPHICS</span>
+                    <Tools className="fill-blue" /> <span>PROCESSING</span>
                 </li>
                 <li className="flex items-center gap-2">
-                    <Tools className="fill-salmon" /> <span>SOFTWARE TECHNOLOGY</span>
+                    <Tools className="fill-salmon" /> <span>OPENRNDR</span>
                 </li>
                 <li className="flex items-center gap-2">
                     <Tools /> <span>other</span>

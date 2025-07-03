@@ -117,6 +117,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         const subtree = findAdjacentSubtree(graphData.links, node.id);
 
         const mst = minimumSpanningTreeFromSubtree(graphData.links, subtree, linkWeights);
+        console.log(mst)
         const nextGraph = this.localBuildGraph(mst.mstEdges);
         blendGraphs(graphData, nextGraph);
 
@@ -266,7 +267,18 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
         // Draw labels if zoomed in enough
         if (scale >= minScale) {
-            const label = node.name + ' [0]';
+
+            const suffix = (() => {
+                switch (node.type) {
+                    case 'domain':
+                        return ' [0]'
+                    case 'tag':
+                        return ' [0]'
+                    default:
+                        return ''
+                }
+            })()
+            const label = node.name + suffix
 
             const fontSizes = {
                 domain: 14 / globalScale,
@@ -304,10 +316,10 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
             const isSelected = node.id === this.selectedNodeId;
 
-            const nodeColor = 'red';
+            const nodeColor = node.color || '#000000';
 
             // TODO: implement labels per design
-            ctx.fillStyle = 'orange';
+            ctx.fillStyle = nodeColor
             ctx.beginPath();
             ctx.roundRect(node.x! - bckgDimensions[0] / 2, node.y! - bckgDimensions[1] / 2, ...bckgDimensions, radius);
 
