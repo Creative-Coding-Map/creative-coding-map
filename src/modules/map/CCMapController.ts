@@ -8,7 +8,14 @@ import { buildDomainGraph } from './domain-sets';
 import { VIEW_CONFIGURATIONS } from './data';
 import type { TypedEventEmitter } from '@/lib/EventEmitter';
 import type { ForceGraphMethods, ForceGraphProps } from 'react-force-graph-2d';
-import type { CCMData, CCMGraphData, CCMGraphLink, CCMGraphNode, NodesCollection } from '@/types/ccmap';
+import type {
+    CCMData,
+    CCMGraphData,
+    CCMGraphLink,
+    CCMGraphNode,
+    CCMViewConfiguration,
+    NodesCollection,
+} from '@/types/ccmap';
 import { EventEmitter } from '@/lib/EventEmitter';
 
 import { linkWeights } from '@/modules/map/link-weights.ts';
@@ -16,6 +23,7 @@ import { linkWeights } from '@/modules/map/link-weights.ts';
 interface CCMapControllerEvents {
     'graph-data:updated': (graphData: CCMGraphData | null) => void;
     'runtime-props:updated': (runtimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => void;
+    'view-configuration:changed': (viewConfiguration: CCMViewConfiguration) => void;
 }
 
 export class CCMapController extends (EventEmitter as new () => TypedEventEmitter<CCMapControllerEvents>) {
@@ -27,6 +35,10 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     private graphRef: ForceGraphMethods<CCMGraphNode, CCMGraphLink> | null = null; // Reference to the ForceGraph2D component
     #graphData: CCMGraphData | null = null;
     #runtimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink> = {};
+
+    public viewConfiguration = VIEW_CONFIGURATIONS[0];
+
+    private skipPathNodes: Set<string> = new Set()
 
     constructor() {
         super();
@@ -59,6 +71,28 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     nodeForId: (nodeId: string) => CCMGraphNode | undefined = (nodeId) => {
         return this.#graphData?.nodes.find((n) => n.id === nodeId);
     };
+
+    setViewConfiguration(viewConfiguration:CCMViewConfiguration) {
+
+        if (this.viewConfiguration != viewConfiguration) {
+            this.viewConfiguration = viewConfiguration;
+            this.emit('view-configuration:changed', this.viewConfiguration);
+        }
+    }
+
+    findShortestPath(source: string, target: string){
+        const filteredLinks: Array<CCMGraphLink> = []
+        this.graphData!.links.forEach(link => {
+
+            const source = (link.source as CCMGraphNode).id || (link.source as string)
+            const target = (link.target as CCMGraphNode).id || (link.target as string)
+
+            if (!this.skipPathNodes.has(source) && !this.skipPathNodes.has(target)) {
+                filteredLinks.push(link)
+            }
+        })
+        const shortestPaths = findAllShortestPaths(filteredLinks, source, target)
+    }
 
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
         if (typeof node === 'string') {
@@ -127,7 +161,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
         const ogGraph = buildGraph(this.ccmData, this.nodes);
 
-        this.domainGraph = buildDomainGraph(ogGraph, VIEW_CONFIGURATIONS[0].domainSets) as CCMGraphData;
+        this.domainGraph = buildDomainGraph(ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
         this.nodes.domainNodes = this.domainGraph.nodes;
         this.nodes.allNodes = ogGraph.nodes.concat(this.domainGraph.nodes);
         colorGraph(ogGraph, VIEW_CONFIGURATIONS[0].colorSets);
