@@ -24,6 +24,7 @@ interface CCMapControllerEvents {
     'graph-data:updated': (graphData: CCMGraphData | null) => void;
     'runtime-props:updated': (runtimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => void;
     'view-configuration:changed': (viewConfiguration: CCMViewConfiguration) => void;
+    'selected-node:changed': (nodeId: string | null) => void;
 }
 
 export class CCMapController extends (EventEmitter as new () => TypedEventEmitter<CCMapControllerEvents>) {
@@ -218,7 +219,10 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         if (node.id === this.selectedNodeId) {
             this.focusOnNode(node);
         }
-        this.selectedNodeId = node.id;
+        if (node.id != this.selectedNodeId) {
+            this.selectedNodeId = node.id;
+            this.emit("selected-node:changed", this.selectedNodeId);
+        }
     };
 
     getNodeCanvasObject = (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
