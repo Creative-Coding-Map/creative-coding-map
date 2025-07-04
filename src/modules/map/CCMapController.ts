@@ -8,14 +8,7 @@ import { buildDomainGraph } from './domain-sets';
 import { VIEW_CONFIGURATIONS } from './data';
 import type { TypedEventEmitter } from '@/lib/EventEmitter';
 import type { ForceGraphMethods, ForceGraphProps } from 'react-force-graph-2d';
-import type {
-    CCMData,
-    CCMGraphData,
-    CCMGraphLink,
-    CCMGraphNode,
-    CCMViewConfiguration,
-    NodesCollection,
-} from '@/types/ccmap';
+import type { CCMData, CCMGraphData, CCMGraphLink, CCMGraphNode, CCMViewConfiguration, NodesCollection } from '@/types/ccmap';
 import { EventEmitter } from '@/lib/EventEmitter';
 
 import { linkWeights } from '@/modules/map/link-weights.ts';
@@ -25,6 +18,9 @@ interface CCMapControllerEvents {
     'runtime-props:updated': (runtimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => void;
     'view-configuration:changed': (viewConfiguration: CCMViewConfiguration) => void;
     'selected-node:changed': (nodeId: string | null) => void;
+    'focus-node:changed': (node: string | null) => void;
+    'path-ends:changed': (nodes: Array<string | null>) => void;
+    'shortest-paths:changed': (shortestPaths: Array<Array<string>>) => void;
 }
 
 export class CCMapController extends (EventEmitter as new () => TypedEventEmitter<CCMapControllerEvents>) {
@@ -39,10 +35,25 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
     public viewConfiguration = VIEW_CONFIGURATIONS[0];
 
-    private skipPathNodes: Set<string> = new Set()
+    private skipPathNodes: Set<string> = new Set();
+
+    pathEnds: Array<string | null> = [null, null];
+    private _shortestPaths: Array<Array<string>> = [];
+    public set shortestPaths(shortestPaths: Array<Array<string>>) {
+        if (shortestPaths != this._shortestPaths) {
+            this._shortestPaths = shortestPaths;
+            this.emit('shortest-paths:changed', shortestPaths);
+        }
+    }
 
     constructor() {
         super();
+        this.on('path-ends:changed', (p: Array<string | null>) => {
+            if (p[0] != null && p[1] != null) {
+                console.log('finding shortest path between: ', p[0], p[1]);
+                this.findShortestPath(p[0], p[1]);
+            }
+        });
     }
 
     /**
@@ -73,26 +84,24 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         return this.#graphData?.nodes.find((n) => n.id === nodeId);
     };
 
-    setViewConfiguration(viewConfiguration:CCMViewConfiguration) {
-
+    setViewConfiguration(viewConfiguration: CCMViewConfiguration) {
         if (this.viewConfiguration != viewConfiguration) {
             this.viewConfiguration = viewConfiguration;
             this.emit('view-configuration:changed', this.viewConfiguration);
         }
     }
 
-    findShortestPath(source: string, target: string){
-        const filteredLinks: Array<CCMGraphLink> = []
-        this.graphData!.links.forEach(link => {
-
-            const source = (link.source as CCMGraphNode).id || (link.source as string)
-            const target = (link.target as CCMGraphNode).id || (link.target as string)
+    findShortestPath(source: string, target: string) {
+        const filteredLinks: Array<CCMGraphLink> = [];
+        this.graphData!.links.forEach((link) => {
+            const source = (link.source as CCMGraphNode).id || (link.source as string);
+            const target = (link.target as CCMGraphNode).id || (link.target as string);
 
             if (!this.skipPathNodes.has(source) && !this.skipPathNodes.has(target)) {
-                filteredLinks.push(link)
+                filteredLinks.push(link);
             }
-        })
-        const shortestPaths = findAllShortestPaths(filteredLinks, source, target)
+        });
+        this.shortestPaths = findAllShortestPaths(filteredLinks, source, target).paths;
     }
 
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
@@ -118,17 +127,18 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         const subtree = findAdjacentSubtree(graphData.links, node.id);
 
         const mst = minimumSpanningTreeFromSubtree(graphData.links, subtree, linkWeights);
-        console.log(mst)
+        console.log(mst);
         const nextGraph = this.localBuildGraph(mst.mstEdges);
         blendGraphs(graphData, nextGraph);
 
         // Update the graph data
         this.emit('graph-data:updated', graphData);
+        this.emit('focus-node:changed', node.id);
 
         let s = 0.0;
         this.graphRef.d3ReheatSimulation();
 
-        this.centerOnNode(node.id)
+        this.centerOnNode(node.id);
         const interval = setInterval(() => {
             if (!this.graphRef) return;
 
@@ -170,12 +180,12 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
         this.graphData = this.localBuildGraph();
 
-
         // TODO figure out how to do this without setTimeout
-        setTimeout(() => {this.focusOnNode("___root")}, 1000)
+        setTimeout(() => {
+            this.focusOnNode('___root');
+        }, 1000);
 
         this.#runtimeProps = {};
-
     }
 
     get graphData(): CCMGraphData | null {
@@ -215,13 +225,24 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         return (link.strengthDelta || 0) >= 0.0;
     }
 
-    getNodeClickHandler = (node: any, _?: MouseEvent) => {
-        if (node.id === this.selectedNodeId) {
-            this.focusOnNode(node);
-        }
-        if (node.id != this.selectedNodeId) {
-            this.selectedNodeId = node.id;
-            this.emit("selected-node:changed", this.selectedNodeId);
+    getNodeClickHandler = (node: any, e: MouseEvent) => {
+        if (!e.shiftKey) {
+            if (node.id === this.selectedNodeId) {
+                this.focusOnNode(node);
+            }
+            if (node.id != this.selectedNodeId) {
+                this.selectedNodeId = node.id;
+                this.emit('selected-node:changed', this.selectedNodeId);
+            }
+            if (this.pathEnds[0] != node.id) {
+                this.pathEnds[0] = node.id;
+                this.emit('path-ends:changed', this.pathEnds);
+            }
+        } else {
+            if (this.pathEnds[1] != node.id) {
+                this.pathEnds[1] = node.id;
+                this.emit('path-ends:changed', this.pathEnds);
+            }
         }
     };
 
@@ -271,18 +292,17 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
         // Draw labels if zoomed in enough
         if (scale >= minScale) {
-
             const suffix = (() => {
                 switch (node.type) {
                     case 'domain':
-                        return ' [0]'
+                        return ' [0]';
                     case 'tag':
-                        return ' [0]'
+                        return ' [0]';
                     default:
-                        return ''
+                        return '';
                 }
-            })()
-            const label = node.name + suffix
+            })();
+            const label = node.name + suffix;
 
             const fontSizes = {
                 domain: 14 / globalScale,
@@ -323,7 +343,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
             const nodeColor = node.color || '#000000';
 
             // TODO: implement labels per design
-            ctx.fillStyle = nodeColor
+            ctx.fillStyle = nodeColor;
             ctx.beginPath();
             ctx.roundRect(node.x! - bckgDimensions[0] / 2, node.y! - bckgDimensions[1] / 2, ...bckgDimensions, radius);
 
@@ -367,12 +387,12 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
                     false
                 );
 
-                const cx = node.x + bckgDimensions[0] / 2 + 2.0 / globalScale + bckgDimensions[1] / 2.0
-                const cy = node.y
-                ctx.moveTo(cx, cy + 6.0 / globalScale)
-                ctx.lineTo(cx, cy - 6.0 / globalScale)
-                ctx.moveTo(cx - 6.0 / globalScale, cy)
-                ctx.lineTo(cx + 6.0 / globalScale, cy)
+                const cx = node.x + bckgDimensions[0] / 2 + 2.0 / globalScale + bckgDimensions[1] / 2.0;
+                const cy = node.y;
+                ctx.moveTo(cx, cy + 6.0 / globalScale);
+                ctx.lineTo(cx, cy - 6.0 / globalScale);
+                ctx.moveTo(cx - 6.0 / globalScale, cy);
+                ctx.lineTo(cx + 6.0 / globalScale, cy);
 
                 ctx.lineWidth = 1.0 / globalScale;
                 ctx.strokeStyle = isSelected ? 'white' : nodeColor;
