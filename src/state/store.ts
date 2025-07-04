@@ -1,5 +1,5 @@
 import { createStore } from 'jotai';
-import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom, shortestPathNodesAtom } from './model';
+import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom, selectedNodeIdAtom, shortestPathNodesAtom } from './model';
 import { emitter } from '@/hooks/useMitt';
 
 export const store = createStore();
@@ -18,4 +18,8 @@ emitter.on('shortest-path:create', () => {
 
     // get the shortest path between the start and end nodes
     store.set(shortestPathNodesAtom, [startNode, ...randomNodes, endNode]);
+});
+
+emitter.on('selected-node:changed', (nodeId: string | null) => {
+    store.set(selectedNodeIdAtom, nodeId);
 });

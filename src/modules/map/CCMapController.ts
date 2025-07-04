@@ -2,28 +2,25 @@ import * as d3 from 'd3';
 
 import { blendGraphs } from './blend';
 import { colorGraph } from './coloring';
-import { findAdjacentSubtree, minimumSpanningTreeFromSubtree, findAllShortestPaths } from './dijkstra';
+import { findAdjacentSubtree, findAllShortestPaths, minimumSpanningTreeFromSubtree } from './dijkstra';
 import { buildGraph, buildNodesFromCcmData } from './build-graph';
 import { buildDomainGraph } from './domain-sets';
 import { VIEW_CONFIGURATIONS } from './data';
-import type { TypedEventEmitter } from '@/lib/EventEmitter';
 import type { ForceGraphMethods, ForceGraphProps } from 'react-force-graph-2d';
-import type { CCMData, CCMGraphData, CCMGraphLink, CCMGraphNode, CCMViewConfiguration, NodesCollection } from '@/types/ccmap';
-import { EventEmitter } from '@/lib/EventEmitter';
+import type {
+    CCMData,
+    CCMGraphData,
+    CCMGraphLink,
+    CCMGraphNode,
+    CCMPathEnds,
+    CCMViewConfiguration,
+    NodesCollection,
+} from '@/types/ccmap';
 
 import { linkWeights } from '@/modules/map/link-weights.ts';
+import { emitter } from '@/hooks/useMitt';
 
-interface CCMapControllerEvents {
-    'graph-data:updated': (graphData: CCMGraphData | null) => void;
-    'runtime-props:updated': (runtimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => void;
-    'view-configuration:changed': (viewConfiguration: CCMViewConfiguration) => void;
-    'selected-node:changed': (nodeId: string | null) => void;
-    'focus-node:changed': (node: string | null) => void;
-    'path-ends:changed': (nodes: Array<string | null>) => void;
-    'shortest-paths:changed': (shortestPaths: Array<Array<string>>) => void;
-}
-
-export class CCMapController extends (EventEmitter as new () => TypedEventEmitter<CCMapControllerEvents>) {
+export class CCMapController {
     private selectedNodeId: any | null = null;
 
     private ccmData: CCMData | null = null;
@@ -36,22 +33,22 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     public viewConfiguration = VIEW_CONFIGURATIONS[0];
 
     private skipPathNodes: Set<string> = new Set();
+    private emitter = emitter;
 
-    pathEnds: Array<string | null> = [null, null];
+    pathEnds: CCMPathEnds = { start: null, end: null };
     private _shortestPaths: Array<Array<string>> = [];
     public set shortestPaths(shortestPaths: Array<Array<string>>) {
         if (shortestPaths != this._shortestPaths) {
             this._shortestPaths = shortestPaths;
-            this.emit('shortest-paths:changed', shortestPaths);
+            this.emitter.emit('shortest-paths:changed', shortestPaths);
         }
     }
 
     constructor() {
-        super();
-        this.on('path-ends:changed', (p: Array<string | null>) => {
-            if (p[0] != null && p[1] != null) {
-                console.log('finding shortest path between: ', p[0], p[1]);
-                this.findShortestPath(p[0], p[1]);
+        this.emitter.on('path-ends:changed', (p: CCMPathEnds) => {
+            if (p.start != null && p.end != null) {
+                console.log('finding shortest path between: ', p.start, p.end);
+                this.findShortestPath(p.start, p.end);
             }
         });
     }
@@ -87,7 +84,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
     setViewConfiguration(viewConfiguration: CCMViewConfiguration) {
         if (this.viewConfiguration != viewConfiguration) {
             this.viewConfiguration = viewConfiguration;
-            this.emit('view-configuration:changed', this.viewConfiguration);
+            this.emitter.emit('view-configuration:changed', this.viewConfiguration);
         }
     }
 
@@ -132,8 +129,8 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         blendGraphs(graphData, nextGraph);
 
         // Update the graph data
-        this.emit('graph-data:updated', graphData);
-        this.emit('focus-node:changed', node.id);
+        this.emitter.emit('graph-data:updated', graphData);
+        this.emitter.emit('focus-node:changed', node.id);
 
         let s = 0.0;
         this.graphRef.d3ReheatSimulation();
@@ -194,7 +191,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
 
     set graphData(graphData: CCMGraphData | null) {
         this.#graphData = graphData;
-        this.emit('graph-data:updated', graphData);
+        this.emitter.emit('graph-data:updated', graphData);
     }
 
     setRuntimeProps<TKey extends keyof ForceGraphProps<CCMGraphNode, CCMGraphLink>>(
@@ -202,7 +199,7 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
         value: ForceGraphProps<CCMGraphNode, CCMGraphLink>[TKey]
     ) {
         this.#runtimeProps[key] = value;
-        this.emit('runtime-props:updated', this.#runtimeProps);
+        this.emitter.emit('runtime-props:updated', this.#runtimeProps);
     }
 
     setGraphRef(graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) {
@@ -232,16 +229,16 @@ export class CCMapController extends (EventEmitter as new () => TypedEventEmitte
             }
             if (node.id != this.selectedNodeId) {
                 this.selectedNodeId = node.id;
-                this.emit('selected-node:changed', this.selectedNodeId);
+                this.emitter.emit('selected-node:changed', this.selectedNodeId);
             }
-            if (this.pathEnds[0] != node.id) {
-                this.pathEnds[0] = node.id;
-                this.emit('path-ends:changed', this.pathEnds);
+            if (this.pathEnds.start != node.id) {
+                this.pathEnds.start = node.id;
+                this.emitter.emit('path-ends:changed', this.pathEnds);
             }
         } else {
-            if (this.pathEnds[1] != node.id) {
-                this.pathEnds[1] = node.id;
-                this.emit('path-ends:changed', this.pathEnds);
+            if (this.pathEnds.end != node.id) {
+                this.pathEnds.end = node.id;
+                this.emitter.emit('path-ends:changed', this.pathEnds);
             }
         }
     };

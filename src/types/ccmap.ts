@@ -9,6 +9,7 @@ export enum CCMNodeType {
 }
 
 export interface CCMNode {
+    id: string;
     type: CCMNodeType;
     name?: string;
     tags?: string[];
@@ -66,12 +67,10 @@ export interface ColorSet {
 }
 
 export interface CCMViewConfiguration {
-    name: string,
+    name: string;
     colorSets: ColorSet[];
     domainSets: CCMDomainSet[];
 }
-
-
 
 export interface NodesCollection {
     toolNodes: CCMGraphNode[];
@@ -79,4 +78,9 @@ export interface NodesCollection {
     tagNodes: CCMGraphNode[];
     allNodes: CCMGraphNode[];
     domainNodes?: CCMGraphNode[];
+}
+
+export interface CCMPathEnds {
+    start: string | null;
+    end: string | null;
 }

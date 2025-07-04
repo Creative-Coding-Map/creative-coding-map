@@ -8,6 +8,7 @@ import { CCMapController } from './CCMapController';
 import type { ForceGraphProps } from 'react-force-graph-2d';
 import type { CCMGraphData, CCMGraphLink, CCMGraphNode } from '@/types/ccmap';
 import '@/styles/ccmap.css';
+import { useMitt } from '@/hooks/useMitt';
 
 interface CCMapProps {
     className?: string;
@@ -20,6 +21,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const [error, setError] = useState<string | null>(null);
     const [graphData, setGraphData] = useState<CCMGraphData | null>(null);
     const [runtimeProps, setRuntimeProps] = useState<ForceGraphProps<CCMGraphNode, CCMGraphLink>>({});
+    const { emitter } = useMitt();
 
     useLayoutEffect(() => {
         const initializeGraph = async () => {
@@ -32,11 +34,11 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 controllerRef.current = controller;
 
                 // Listen for graph data updates
-                controller.on('graph-data:updated', (newGraphData: CCMGraphData | null) => {
+                emitter.on('graph-data:updated', (newGraphData: CCMGraphData | null) => {
                     setGraphData(newGraphData);
                 });
 
-                controller.on('runtime-props:updated', (newRuntimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => {
+                emitter.on('runtime-props:updated', (newRuntimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => {
                     setRuntimeProps(newRuntimeProps);
                 });
 
@@ -62,7 +64,8 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         // Cleanup on unmount
         return () => {
             if (controllerRef.current) {
-                controllerRef.current.unsubscribeAll();
+                emitter.off('graph-data:updated');
+                emitter.off('runtime-props:updated');
                 controllerRef.current.destroy();
             }
         };
