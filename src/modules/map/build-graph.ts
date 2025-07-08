@@ -35,7 +35,11 @@ export function buildNodesFromCcmData(ccmData: CCMData): NodesCollection {
     };
 }
 
-export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array<any>): CCMGraphData {
+export function buildGraph(
+    ccmData: CCMData,
+    nodes: NodesCollection,
+    mst?: Array<any>,
+): CCMGraphData {
     const { toolNodes, techniqueNodes, tagNodes, allNodes } = nodes;
 
     // TODO: remove this once we have a proper config

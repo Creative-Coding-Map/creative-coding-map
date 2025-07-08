@@ -123,8 +123,7 @@ export class CCMapController {
 
         const subtree = findAdjacentSubtree(graphData.links, node.id);
 
-        const mst = minimumSpanningTreeFromSubtree(graphData.links, subtree, linkWeights);
-        console.log(mst);
+        const mst = minimumSpanningTreeFromSubtree(graphData.nodes, graphData.links, subtree, linkWeights);
         const nextGraph = this.localBuildGraph(mst.mstEdges);
         blendGraphs(graphData, nextGraph);
 
@@ -164,6 +163,7 @@ export class CCMapController {
     }
 
     initialize(ccmData: CCMData): void {
+        console.log("initializing")
         this.ccmData = ccmData;
 
         this.nodes = buildNodesFromCcmData(this.ccmData);
@@ -175,12 +175,18 @@ export class CCMapController {
         this.nodes.allNodes = ogGraph.nodes.concat(this.domainGraph.nodes);
         colorGraph(ogGraph, VIEW_CONFIGURATIONS[0].colorSets);
 
-        this.graphData = this.localBuildGraph();
+        const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
 
-        // TODO figure out how to do this without setTimeout
-        setTimeout(() => {
-            this.focusOnNode('___root');
-        }, 1000);
+
+        const mstNamed = minimumSpanningTreeFromSubtree(
+            this.nodes.allNodes,
+            ogGraph.links.concat(this.domainGraph.links),
+            subTree,
+            linkWeights);
+
+
+        this.graphData = this.localBuildGraph(mstNamed.mstEdges)
+        this.graphData.links = mstNamed.mstEdges;
 
         this.#runtimeProps = {};
     }
@@ -211,6 +217,7 @@ export class CCMapController {
             throw new Error('Controller not initialized');
         }
 
+        // at this point this.nodes contains the domain nodes
         const graph = buildGraph(this.ccmData, this.nodes, mstEdges);
         if (this.domainGraph) {
             graph.links = graph.links.concat(this.domainGraph.links);

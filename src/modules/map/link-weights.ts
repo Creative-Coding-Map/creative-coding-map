@@ -1,11 +1,13 @@
-export function linkWeights(link: any): number {
-    const t = `${link.source.type}-${link.target.type}`
-    switch(t) {
+import type { CCMGraphLink, CCMGraphNode } from '@/types/ccmap.ts';
+
+export function linkWeights(link: CCMGraphLink, source: CCMGraphNode, target: CCMGraphNode): number {
+    const t = `${source.type}-${target.type}`;
+    switch (t) {
         case 'root-domain':
             return 1;
         case 'domain-domain':
         case 'tag-tag':
-            return 0;
+            return 2;
         case 'domain-tool':
         case 'tool-domain':
         case 'domain-technique':
@@ -13,7 +15,7 @@ export function linkWeights(link: any): number {
             return 8;
         case 'domain-tag':
         case 'tag-domain':
-            return 4;
+            return 1;
         case 'tag-tool':
         case 'tool-tag':
         case 'tag-technique':
@@ -24,6 +26,7 @@ export function linkWeights(link: any): number {
         case 'tool-technique':
             return 10;
         default:
-            throw new Error(`unknown link type ${t}`)
+            console.log(link);
+            throw new Error(`unknown link type ${t} ${link.source} ${link.target}`);
     }
 }

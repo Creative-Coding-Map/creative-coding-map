@@ -1,4 +1,4 @@
-import type { CCMGraphLink } from '@/types/ccmap';
+import type { CCMGraphLink, CCMGraphNode } from '@/types/ccmap';
 
 function nodeId(node) {
     return node.id || node;
@@ -293,15 +293,23 @@ export function minimumSpanningTree(edges, startNode) {
  * @param {(any)=>number} weightFunction
  * @returns {Object} - Object containing the total weight and edges of the MST
  */
-export function minimumSpanningTreeFromSubtree(edges, initialSubtree, weightFunction: (linkType: any) => number) {
+export function minimumSpanningTreeFromSubtree(
+    nodes: Array<CCMGraphNode>,
+    edges: Array<CCMGraphLink>,
+    initialSubtree: Array<any>,
+    weightFunction: (linkType: any) => number
+) {
     // Build adjacency list from all edges (bidirectional)
-    const graph = buildUndirectedGraph(edges, weightFunction);
+
+    const graph = buildUndirectedGraph(nodes, edges, weightFunction);
 
     // Set of nodes included in MST (start with all nodes from the initial subtree)
-    const included = new Set();
+    const included = new Set<string>();
 
     // Edges in the MST (start with the initial subtree edges)
     const mstEdges = [...initialSubtree];
+
+    console.debug(mstEdges);
 
     // Total weight of the MST (start with the weight of the initial subtree)
     let totalWeight = initialSubtree.reduce((sum, edge) => sum + 1, 0);
@@ -336,7 +344,12 @@ export function minimumSpanningTreeFromSubtree(edges, initialSubtree, weightFunc
 
         // Find the minimum weight edge connecting an included node to a non-included node
         for (const node of included) {
-            for (const neighbor in graph[node]) {
+            const neighbors = graph[node]
+            if (!neighbors) {
+                throw new Error(`no neighbors for ${node}`)
+            }
+
+            for (const neighbor in neighbors) {
                 if (!included.has(neighbor) && graph[node][neighbor] < minWeight) {
                     minWeight = graph[node][neighbor];
                     minEdge = { source: node, target: neighbor, weight: minWeight };
@@ -347,6 +360,7 @@ export function minimumSpanningTreeFromSubtree(edges, initialSubtree, weightFunc
 
         // If no edge is found, the graph is disconnected
         if (!nextNode) {
+            console.error('no next node');
             break;
         }
 
@@ -427,9 +441,10 @@ export function isValidSubtree(subtreeEdges) {
  * @param {function(edge:{}, source: string, target: string)} weightFunction - A function that computes the weight for each edge, or undefined for default behavior
  * @returns {Object} Adjacency list for an undirected graph
  */
-export function buildUndirectedGraph(edges: any[],
-                                     weightFunction: ((edge: any, source: string, target: string) => number) | undefined = undefined,
-
+export function buildUndirectedGraph(
+    nodes: Array<CCMGraphNode>,
+    edges: any[],
+    weightFunction: ((edge: any, source: CCMGraphNode, target: CCMGraphNode) => number) | undefined = undefined
 ) {
     const graph = {};
 
@@ -443,8 +458,10 @@ export function buildUndirectedGraph(edges: any[],
     for (const edge of edges) {
         const type = edge.type;
         let defaultWeight = 1;
-        const source = nodeId(edge.source)
-        const target = nodeId(edge.target)
+        const source = nodeId(edge.source);
+        const target = nodeId(edge.target);
+
+
 
         let weight = 0.0;
         if (!weightFunction) {
@@ -469,7 +486,9 @@ export function buildUndirectedGraph(edges: any[],
             // Assuming the weight property exists, otherwise default to 1
             weight = edge.weight !== undefined ? edge.weight : defaultWeight;
         } else {
-            weight = weightFunction(edge, source, target);
+            const sourceNode = nodes.find(node => node.id === source);
+            const targetNode = nodes.find(node => node.id === target);
+            weight = weightFunction(edge, sourceNode!, targetNode!);
         }
 
         // Add edge in both directions
@@ -497,8 +516,8 @@ export function findAllDegreesOfSeparation(links: CCMGraphLink[], startNode: str
     links.forEach((link) => {
         const { source, target } = link;
 
-        const sourceId = nodeId(source)
-        const targetId = nodeId(target)
+        const sourceId = nodeId(source);
+        const targetId = nodeId(target);
 
         // Track all nodes
         allNodes.add(source);
