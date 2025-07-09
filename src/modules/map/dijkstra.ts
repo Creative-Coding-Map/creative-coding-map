@@ -1,7 +1,24 @@
-import type { CCMGraphLink, CCMGraphNode } from '@/types/ccmap';
+import type { CCMGraphData, CCMGraphLink, CCMGraphNode } from '@/types/ccmap';
 
-function nodeId(node) {
+function nodeId(node: any) {
     return node.id || node;
+}
+
+export function updateLinkCounts(graph: CCMGraphData) {
+    const nodesById = new Map<string, CCMGraphNode>()
+
+    for (const node of graph.nodes) {
+        nodesById.set(node.id, node)
+        node.count = 0;
+    }
+    for (const link of graph.links) {
+        const sourceNode = nodesById.get(nodeId(link.source))
+        const targetNode = nodesById.get(nodeId(link.target))
+        if (sourceNode && targetNode) {
+            sourceNode.count! += 1
+            targetNode.count! += 1
+        }
+    }
 }
 
 /**

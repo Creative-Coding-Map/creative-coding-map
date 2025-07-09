@@ -2,6 +2,15 @@ import type { CCMGraphLink, CCMGraphNode } from '@/types/ccmap.ts';
 
 export function linkWeights(link: CCMGraphLink, source: CCMGraphNode, target: CCMGraphNode): number {
     const t = `${source.type}-${target.type}`;
+    if (source.count === undefined) {
+        throw new Error(`source node ${source.id} has no count`);
+    }
+    if (target.count === undefined) {
+        throw new Error(`target node ${target.id} has no count`);
+    }
+
+    const tagCountPenalty =  Math.log(1+ (source.type === 'tag' ? source.count : 0) + (target.type === 'tag' ? target.count : 0));
+
     switch (t) {
         case 'root-domain':
             return 1;
@@ -12,7 +21,7 @@ export function linkWeights(link: CCMGraphLink, source: CCMGraphNode, target: CC
         case 'tool-domain':
         case 'domain-technique':
         case 'technique-domain':
-            return 8;
+            return 20;
         case 'domain-tag':
         case 'tag-domain':
             return 1;
@@ -20,11 +29,11 @@ export function linkWeights(link: CCMGraphLink, source: CCMGraphNode, target: CC
         case 'tool-tag':
         case 'tag-technique':
         case 'technique-tag':
-            return 5;
+            return 5 + Math.min(5, tagCountPenalty);
         case 'tool-tool':
         case 'technique-tool':
         case 'tool-technique':
-            return 10;
+            return 7;
         default:
             console.log(link);
             throw new Error(`unknown link type ${t} ${link.source} ${link.target}`);

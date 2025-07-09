@@ -33,6 +33,7 @@ export type CCMGraphNode = NodeObject<{
     color?: string;
     ccmData?: [string, CCMNode];
     __bckgDimensions?: [number, number];
+    count?: number
 }>;
 
 export type CCMGraphLink = LinkObject<CCMGraphNode> & {

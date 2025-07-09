@@ -2,7 +2,12 @@ import * as d3 from 'd3';
 
 import { blendGraphs } from './blend';
 import { colorGraph } from './coloring';
-import { findAdjacentSubtree, findAllShortestPaths, minimumSpanningTreeFromSubtree } from './dijkstra';
+import {
+    findAdjacentSubtree,
+    findAllShortestPaths,
+    minimumSpanningTreeFromSubtree,
+    updateLinkCounts,
+} from './dijkstra';
 import { buildGraph, buildNodesFromCcmData } from './build-graph';
 import { buildDomainGraph } from './domain-sets';
 import { VIEW_CONFIGURATIONS } from './data';
@@ -34,6 +39,8 @@ export class CCMapController {
 
     private skipPathNodes: Set<string> = new Set();
     private emitter = emitter;
+
+    ogGraph: CCMGraphData | null = null
 
     pathEnds: CCMPathEnds = { start: null, end: null };
     private _shortestPaths: Array<Array<string>> = [];
@@ -121,10 +128,28 @@ export class CCMapController {
         node.fx = node.x;
         node.fy = node.y;
 
-        const subtree = findAdjacentSubtree(graphData.links, node.id);
+        const subtree = (() => {
+            if (node.type != 'domain') {
+                return findAdjacentSubtree(this.ogGraph!.links, node.id);
+            } else {
+                return findAdjacentSubtree(this.domainGraph!.links, '___root');
+            }
+        })()
+        if (subtree.length === 0) {
+            throw Error('No subtree found for node ' + node.id);
+        }
 
-        const mst = minimumSpanningTreeFromSubtree(graphData.nodes, graphData.links, subtree, linkWeights);
+        const mst = minimumSpanningTreeFromSubtree(
+            this.ogGraph!.nodes.concat(this.domainGraph!.nodes),
+            this.ogGraph!.links.concat(this.domainGraph!.links),
+            subtree, linkWeights);
+        console.log("number of links in mst: ", mst.mstEdges.length)
         const nextGraph = this.localBuildGraph(mst.mstEdges);
+
+        console.log("number of links in new graph: ", nextGraph.links.length)
+
+        graphData.links = mst.mstEdges
+
         blendGraphs(graphData, nextGraph);
 
         // Update the graph data
@@ -168,19 +193,20 @@ export class CCMapController {
 
         this.nodes = buildNodesFromCcmData(this.ccmData);
 
-        const ogGraph = buildGraph(this.ccmData, this.nodes);
+        this.ogGraph = buildGraph(this.ccmData, this.nodes)
+        updateLinkCounts(this.ogGraph)
 
-        this.domainGraph = buildDomainGraph(ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
+        this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
         this.nodes.domainNodes = this.domainGraph.nodes;
-        this.nodes.allNodes = ogGraph.nodes.concat(this.domainGraph.nodes);
-        colorGraph(ogGraph, VIEW_CONFIGURATIONS[0].colorSets);
+        this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
+        colorGraph(this.ogGraph, VIEW_CONFIGURATIONS[0].colorSets);
 
         const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
 
 
         const mstNamed = minimumSpanningTreeFromSubtree(
             this.nodes.allNodes,
-            ogGraph.links.concat(this.domainGraph.links),
+            this.ogGraph.links.concat(this.domainGraph.links),
             subTree,
             linkWeights);
 
@@ -298,10 +324,8 @@ export class CCMapController {
         if (scale >= minScale) {
             const suffix = (() => {
                 switch (node.type) {
-                    case 'domain':
-                        return ' [0]';
                     case 'tag':
-                        return ' [0]';
+                        return ` [${node.count}]`;
                     default:
                         return '';
                 }
