@@ -51,19 +51,19 @@ export interface CCMGraphData {
 export interface CCMDomainSet {
     name: string;
     tags?: string[];
-    nodes: Array<{
+    nodes: {
         id: string;
         degree: number;
-    }>;
+    }[];
 }
 
 export interface ColorSet {
     name: string;
     tags?: string[];
-    nodes?: Array<{
+    nodes?: {
         id: string;
         degree: number;
-    }>;
+    }[];
     color: string;
 }
 
@@ -84,4 +84,22 @@ export interface NodesCollection {
 export interface CCMPathEnds {
     start: string | null;
     end: string | null;
+}
+
+export interface CCMBreakdown {
+    id: string;
+    title: string;
+    tags: string[];
+    useCases: string[];
+    addedBy: string;
+    language: string;
+    createdAt: string;
+    updatedAt: string;
+    country: string;
+    media: {
+        type: string;
+        url: string;
+        caption: string;
+    }[];
+    description: string;
 }

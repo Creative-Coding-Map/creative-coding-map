@@ -24,9 +24,9 @@ export function useSuggestions({ selectSuggestion }: UseSuggestionsProps) {
     }, [setSuggestions, setSelectedSuggestionIndex]);
 
     useEffect(() => {
-        emitter.on('suggestions:reset', reset);
+        emitter.on('app:suggestions:reset', reset);
         return () => {
-            emitter.off('suggestions:reset', reset);
+            emitter.off('app:suggestions:reset', reset);
         };
     }, [reset]);
 
@@ -69,6 +69,7 @@ export function useSuggestions({ selectSuggestion }: UseSuggestionsProps) {
                         e.preventDefault();
                         e.stopPropagation();
                         setSelectedSuggestionIndex(0);
+                        suggestionsRef.current?.focus();
                     }
                     break;
                 case 'Enter':

@@ -23,7 +23,7 @@ interface SuggestionsProps {
 type MousePos = { x: number; y: number };
 
 const hasMouseMovedSignificantly = (prev: MousePos, current: MousePos) => {
-    return Math.abs(current.x - prev.x) > 10 || Math.abs(current.y - prev.y) > 10 || prev.x === Infinity || prev.y === Infinity;
+    return Math.abs(current.x - prev.x) > 1 || Math.abs(current.y - prev.y) > 1 || prev.x === Infinity || prev.y === Infinity;
 };
 
 export function Suggestions({

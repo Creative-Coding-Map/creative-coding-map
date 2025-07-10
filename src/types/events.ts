@@ -2,13 +2,14 @@ import type { ForceGraphProps } from 'react-force-graph-2d';
 import type { CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds, CCMViewConfiguration } from './ccmap';
 
 export type CCMEvents = {
-    'graph-data:updated': CCMGraphData | null;
-    'runtime-props:updated': ForceGraphProps<CCMGraphNode, CCMGraphLink>;
-    'view-configuration:changed': CCMViewConfiguration;
-    'shortest-path:create': undefined;
-    'suggestions:reset': undefined;
-    'selected-node:changed': string | null;
-    'focus-node:changed': string | null;
-    'path-ends:changed': CCMPathEnds;
-    'shortest-paths:changed': Array<Array<string>>;
+    'app:shortest-path:create': undefined;
+    'app:suggestions:reset': undefined;
+    'app:selected-node:changed': string | null;
+    'map:graph-data:updated': CCMGraphData | null;
+    'map:runtime-props:updated': ForceGraphProps<CCMGraphNode, CCMGraphLink>;
+    'map:view-configuration:changed': CCMViewConfiguration;
+    'map:selected-node:changed': string | null;
+    'map:focus-node:changed': string | null;
+    'map:path-ends:changed': CCMPathEnds;
+    'map:shortest-path:changed': Array<Array<string>>;
 };

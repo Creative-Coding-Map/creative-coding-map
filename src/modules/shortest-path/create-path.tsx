@@ -40,14 +40,14 @@ export function CreatePath() {
                 endInputRef.current?.focus();
             }
 
-            emitter.emit('suggestions:reset');
+            emitter.emit('app:suggestions:reset');
             setActiveInput(null);
 
             if (activeInput === 'end') {
                 setTimeout(() => {
                     if (startNode) {
                         setShowCreatePath(false);
-                        emitter.emit('shortest-path:create');
+                        emitter.emit('app:shortest-path:create');
                     }
                 }, 100);
             }
@@ -111,10 +111,7 @@ export function CreatePath() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             key="create-path"
-            className={clsx(
-                'max-w-xl z-10 absolute p-3.5 right-4 lg:right-5 bottom-4 flex flex-col',
-                'ccm-colors ccm-border rounded-md'
-            )}
+            className={clsx('relative z-10 p-3.5 flex flex-col', 'ccm-colors ccm-border rounded-md')}
         >
             <ActionButton
                 className="absolute top-4 right-4"

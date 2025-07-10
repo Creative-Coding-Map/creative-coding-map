@@ -1,7 +1,8 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { faker } from '@faker-js/faker';
 import { atom, useAtom } from 'jotai';
+import { useInView } from 'motion/react';
 import { NodeData } from '../modules/node-data';
 import type { CCMNode } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
@@ -135,8 +136,17 @@ const RenderLetterCollection = memo(function RenderLetterCollection({ data }: { 
 });
 
 function NodeListItem({ node }: { node: IndexNode }) {
+    const ref = useRef<HTMLLIElement>(null);
+    const isInView = useInView(ref);
+
+    useEffect(() => {
+        if (isInView) {
+            console.log('in view', node.id);
+        }
+    }, [isInView]);
+
     return (
-        <li key={node.id}>
+        <li key={node.id} ref={ref} className={clsx(isInView ? 'visible' : 'invisible')}>
             <details className="group/details">
                 <summary className={clsx('flex items-center gap-2 ccm-transition', node.type)}>
                     <span className="w-4">{renderIcon(node.type)}</span>{' '}

@@ -34,11 +34,11 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 controllerRef.current = controller;
 
                 // Listen for graph data updates
-                emitter.on('graph-data:updated', (newGraphData: CCMGraphData | null) => {
+                emitter.on('map:graph-data:updated', (newGraphData: CCMGraphData | null) => {
                     setGraphData(newGraphData);
                 });
 
-                emitter.on('runtime-props:updated', (newRuntimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => {
+                emitter.on('map:runtime-props:updated', (newRuntimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => {
                     setRuntimeProps(newRuntimeProps);
                 });
 
@@ -64,8 +64,8 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         // Cleanup on unmount
         return () => {
             if (controllerRef.current) {
-                emitter.off('graph-data:updated');
-                emitter.off('runtime-props:updated');
+                emitter.off('map:graph-data:updated');
+                emitter.off('map:runtime-props:updated');
                 controllerRef.current.destroy();
             }
         };

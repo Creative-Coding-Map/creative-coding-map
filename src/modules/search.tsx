@@ -1,42 +1,43 @@
 import * as m from 'motion/react-m';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { Search } from 'lucide-react';
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
+import { useSetAtom } from 'jotai';
 import { Suggestions } from './suggestions';
 import type { CCMNode } from '@/types/ccmap';
 import { useSuggestions } from '@/hooks/useSuggestions';
 import { useMitt } from '@/hooks/useMitt';
+import Search from '@/components/icons/Search';
+import { selectedNodeIdAtom, showSearchAtom } from '@/state/model';
 
 export function SearchOverlay() {
-    const [searchNode, setSearchNode] = useState<CCMNode | null>(null);
-    const [selectedIndex, setSelectedIndex] = useState(0);
+    const setShowSearch = useSetAtom(showSearchAtom);
+    const setSelectedNodeId = useSetAtom(selectedNodeIdAtom);
     const inputRef = useRef<HTMLInputElement>(null);
-    const suggestionsRef = useRef<HTMLUListElement>(null);
     const [search, setSearch] = useState('');
 
     const { emitter } = useMitt();
 
     const selectSuggestion = useCallback(
         (suggestion: CCMNode) => {
-            setSearchNode(suggestion);
-            inputRef.current?.focus();
+            setShowSearch(false);
+            setSelectedNodeId(suggestion.id);
 
-            emitter.emit('suggestions:reset');
-
-            // if (activeInput === 'end') {
-            //     setTimeout(() => {
-            //         if (startNode) {
-            //             setShowCreatePath(false);
-            //             emitter.emit('shortest-path:create');
-            //         }
-            //     }, 100);
-            // }
+            emitter.emit('app:suggestions:reset');
         },
-        [emitter, setSearchNode, inputRef]
+        [emitter, setSelectedNodeId]
     );
 
-    const { handleInputChange, handleKeyDown, handleBlur, suggestions, setSuggestions } = useSuggestions({
+    const {
+        handleInputChange,
+        handleKeyDown,
+        handleBlur,
+        suggestions,
+        suggestionsRef,
+        selectedSuggestionIndex,
+        setSelectedSuggestionIndex,
+        reset,
+    } = useSuggestions({
         selectSuggestion,
     });
 
@@ -66,8 +67,8 @@ export function SearchOverlay() {
                         <Suggestions
                             suggestions={suggestions}
                             selectSuggestion={selectSuggestion}
-                            selectedIndex={selectedIndex}
-                            setSelectedIndex={setSelectedIndex}
+                            selectedIndex={selectedSuggestionIndex}
+                            setSelectedIndex={setSelectedSuggestionIndex}
                             activeInputRef={inputRef}
                             onBlur={(evt) => {
                                 if (evt.relatedTarget?.nodeName === 'INPUT') {
@@ -75,28 +76,32 @@ export function SearchOverlay() {
                                 }
 
                                 if (suggestions.length > 0) {
-                                    setSuggestions([]);
+                                    reset();
                                 }
                             }}
                             ref={suggestionsRef}
                         />
                     )}
                 </AnimatePresence>
-                <div className="flex justify-between gap-2">
-                    <Search className="size-6 ccm-invert stroke-gray" />
+                <div className="flex items-center justify-between gap-2 p-1">
+                    <Search className="size-4 ccm-invert stroke-gray" />
                     <input
                         ref={inputRef}
                         type="text"
-                        className={clsx(
-                            'type-filter w-full px-1',
-                            'ccm-colors ccm-invert border-b-2 border-gray-200 focus:border-gray-400',
-                            'placeholder:uppercase outline-none'
-                        )}
+                        className={clsx('type-filter w-full px-1 font-mono', 'ccm-colors ccm-invert', 'outline-none')}
                         value={search}
-                        onKeyDown={handleKeyDown}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Escape') {
+                                setSearch('');
+                                reset();
+                                setShowSearch(false);
+                            } else {
+                                handleKeyDown(e);
+                            }
+                        }}
                         onBlur={handleBlur}
                         onChange={(e) => onInputChange(e.target.value)}
-                        placeholder="Search for a node"
+                        placeholder="Search"
                     />
                 </div>
             </div>

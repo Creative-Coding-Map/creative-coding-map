@@ -4,8 +4,7 @@ import { emitter } from '@/hooks/useMitt';
 
 export const store = createStore();
 
-emitter.on('shortest-path:create', () => {
-    const database = store.get(databaseAtom);
+emitter.on('app:shortest-path:create', () => {
     const startNode = store.get(pathStartNodeAtom);
     const endNode = store.get(pathEndNodeAtom);
 
@@ -13,13 +12,18 @@ emitter.on('shortest-path:create', () => {
         return;
     }
 
-    // get 3 to 5 random nodes from the database
-    const randomNodes = database.values.sort(() => Math.random() - 0.5).slice(0, 3);
-
-    // get the shortest path between the start and end nodes
-    store.set(shortestPathNodesAtom, [startNode, ...randomNodes, endNode]);
+    emitter.emit('map:path-ends:changed', { start: startNode.id, end: endNode.id });
 });
 
-emitter.on('selected-node:changed', (nodeId: string | null) => {
+emitter.on('map:shortest-path:changed', (shortestPath: Array<Array<string>>) => {
+    console.log('shortest path changed', shortestPath);
+    const database = store.get(databaseAtom);
+    const head = shortestPath[0];
+    const path = head.map((nodeId) => database.getNode(nodeId)).filter((node) => node != null);
+
+    store.set(shortestPathNodesAtom, path);
+});
+
+emitter.on('map:selected-node:changed', (nodeId: string | null) => {
     store.set(selectedNodeIdAtom, nodeId);
 });

@@ -1,10 +1,14 @@
 import { atom } from 'jotai';
 import { Database } from './database';
 import type { CCMNode } from '@/types/ccmap';
+import { emitter } from '@/hooks/useMitt';
 
 export const databaseAtom = atom<Database>(new Database());
 
-export const selectedNodeIdAtom = atom<string | null>(null);
+export const selectedNodeIdAtom = atom('Processing', (_, set, newNodeId: string | null) => {
+    set(selectedNodeIdAtom, newNodeId);
+    emitter.emit('app:selected-node:changed', newNodeId);
+});
 
 export const selectedNodeAtom = atom<CCMNode | null>((get) => {
     const db = get(databaseAtom);

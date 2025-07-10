@@ -5,11 +5,13 @@ export const ActionButton = ({
     onClick,
     label,
     className,
+    borderless = false,
 }: {
     children: React.ReactNode;
     onClick: () => void;
     label: string;
     className?: string;
+    borderless?: boolean;
 }) => {
     return (
         <button
@@ -19,14 +21,15 @@ export const ActionButton = ({
                 onClick();
             }}
             className={clsx(
-                'btn ccm-action ccm-colors flex items-center group overflow-hidden transition-all duration-300',
+                'btn ccm-colors flex items-center group overflow-hidden transition-all duration-300',
+                borderless ? '' : 'ccm-action',
                 className
             )}
         >
             {children}
             <span
                 className={clsx(
-                    'type-hint uppercase whitespace-nowrap overflow-hidden align-middle',
+                    'type-hint uppercase whitespace-nowrap overflow-hidden flex-auto leading-[1em]',
                     'max-w-0 opacity-0',
                     'group-hover:max-w-xs group-hover:opacity-100 group-hover:px-2',
                     'transition-all duration-300 ease-out'

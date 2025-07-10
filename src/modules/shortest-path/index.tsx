@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import clsx from 'clsx';
@@ -7,7 +7,7 @@ import { CreatePath } from './create-path';
 import { ConnectionPath } from './connection-path';
 import type { ConnectionItem } from './connection-path';
 import { store } from '@/state/store';
-import { pathEndNodeAtom, pathStartNodeAtom, shortestPathNodesAtom, showCreatePathAtom } from '@/state/model';
+import { pathEndNodeAtom, pathStartNodeAtom, selectedNodeIdAtom, shortestPathNodesAtom, showCreatePathAtom } from '@/state/model';
 import CreatePathIcon from '@/components/icons/CreatePath';
 import CloseIcon from '@/components/icons/Close';
 import { ActionButton } from '@/components/action-button';
@@ -26,6 +26,7 @@ export function ShortestPath() {
 
 function Path() {
     const [shortestPathNodes, setShortestPathNodes] = useAtom(shortestPathNodesAtom, { store });
+    const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
     const startNode = useAtomValue(pathStartNodeAtom, { store });
     const endNode = useAtomValue(pathEndNodeAtom, { store });
 
@@ -43,6 +44,13 @@ function Path() {
             .flat() as ConnectionItem[];
     }, [shortestPathNodes]);
 
+    const selectNode = (nodeId: string) => {
+        return (event: React.MouseEvent<HTMLButtonElement>) => {
+            event.preventDefault();
+            setSelectedNodeId(nodeId);
+        };
+    };
+
     console.log(connections);
 
     return (
@@ -51,10 +59,7 @@ function Path() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             key="create-path"
-            className={clsx(
-                'max-w-xl z-10 absolute p-3.5 right-4 lg:right-5 bottom-4 flex flex-col',
-                'ccm-colors ccm-border rounded-md'
-            )}
+            className={clsx('max-w-xl z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md basis-1/3')}
         >
             <ActionButton
                 className="absolute top-4 right-4"
@@ -78,7 +83,7 @@ function Path() {
                     </p>
                     <div className="flex items-center justify-baseline w-full gap-2">
                         <ConnectionPath connections={connections} />
-                        <div className="flex flex-col gap-2 max-w-[320px] relative">
+                        <div className="flex flex-col gap-2 w-[320px] relative ccm-colors">
                             {/* <Input
                                         ref={startInputRef}
                                         id="start-node-input"
@@ -90,11 +95,40 @@ function Path() {
                                         onBlur={handleBlur}
                                         onKeyDown={handleKeyDown}
                                     /> */}
-                            {shortestPathNodes.map((node) => (
-                                <div key={node.id} className="type-body h-6">
-                                    {node.id}
-                                </div>
-                            ))}
+                            {shortestPathNodes.map((node, index) => {
+                                const isLast = index === shortestPathNodes.length - 1;
+                                const isFirst = index === 0;
+
+                                if (isLast || isFirst) {
+                                    return (
+                                        <div key={node.id} className="border border-transparent type-body h-6 px-1.5 w-full ">
+                                            <button onClick={selectNode(node.id)} className="w-full h-full text-left">
+                                                {node.id}
+                                            </button>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <div
+                                        key={node.id}
+                                        className="type-body h-6 rounded-md w-full flex group gap-1 hover:dark ccm-colors ccm-transition-fast"
+                                    >
+                                        <button
+                                            onClick={selectNode(node.id)}
+                                            className={clsx(
+                                                'flex-1 rounded-md px-1.5 text-left cursor-pointer ccm-transition-fast',
+                                                'ccm-border-hover hover:bg-black hover:text-white'
+                                            )}
+                                        >
+                                            {node.id}
+                                        </button>
+                                        <button className="h-6 w-6 rounded-md cursor-pointer ccm-transition-fast">
+                                            <CloseIcon className="opacity-0 group-hover:opacity-100 border border-black h-6 w-6 rounded-md hover:bg-black hover:stroke-white ccm-transition-fast" />
+                                        </button>
+                                    </div>
+                                );
+                            })}
                             {/* <Input
                                         ref={endInputRef}
                                         id="end-node-input"

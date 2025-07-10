@@ -28,6 +28,16 @@ function App() {
                 const showSearch = store.get(showSearchAtom);
                 store.set(showSearchAtom, !showSearch);
             }
+
+            if (event.key === 'Escape') {
+                const showSearch = store.get(showSearchAtom);
+
+                if (showSearch) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    store.set(showSearchAtom, false);
+                }
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
@@ -38,7 +48,7 @@ function App() {
     }, []);
 
     return (
-        <main className="w-full h-screen relative antialiased">
+        <main className="w-full h-screen max-h-screen overflow-hidden relative antialiased">
             <Navbar />
             <Switch>
                 <Route path="/index">

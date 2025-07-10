@@ -1,8 +1,7 @@
-import { faker } from '@faker-js/faker';
 import { format } from 'date-fns/format';
-import { useLocation } from 'wouter';
+import { useState } from 'react';
+import type { CCMBreakdown } from '@/types/ccmap';
 import { ExternalLink } from '@/components/external-link';
-import { Shell } from '@/components/shell';
 import { BREAKDOWN_KEYS } from '@/state/constants';
 import TagIcon from '@/components/icons/Tag';
 import DocumentIcon from '@/components/icons/Document';
@@ -12,81 +11,79 @@ import PersonIcon from '@/components/icons/Person';
 import MapPinIcon from '@/components/icons/MapPin';
 import CloseIcon from '@/components/icons/Close';
 import { ActionButton } from '@/components/action-button';
+import ExpandIcon from '@/components/icons/Expand';
 
-interface Breakdown {
-    id: string;
-    title: string;
-    tags: string[];
-    useCases: string[];
-    addedBy: string;
-    language: string;
-    createdAt: string;
-    updatedAt: string;
-    country: string;
-    media: {
-        type: string;
-        url: string;
-        caption: string;
-    }[];
-    description: string;
+export default function BreakdownView({ breakdown }: { breakdown: CCMBreakdown }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    return isExpanded ? (
+        <ExpandedContent breakdown={breakdown} onClose={() => setIsExpanded(false)} />
+    ) : (
+        <CollapsedContent breakdown={breakdown} setIsExpanded={setIsExpanded} />
+    );
 }
 
-const BRKD: Breakdown = {
-    id: faker.string.uuid(),
-    title: faker.lorem.sentence(),
-    tags: [faker.word.noun(), faker.word.noun()],
-    useCases: [faker.word.noun(), faker.word.noun()],
-    addedBy: faker.person.fullName(),
-    language: faker.word.noun(),
-    createdAt: faker.date.past().toISOString(),
-    updatedAt: faker.date.past().toISOString(),
-    country: faker.location.country(),
-    media: [{ type: 'image', url: 'https://picsum.photos/seed/picsum/800/600', caption: faker.lorem.sentence() }],
-    description: faker.lorem.paragraphs(8),
-};
-
-export default function BreakdownView({ id }: { id: string }) {
-    const [_, navigate] = useLocation();
-    console.log(id);
+function CollapsedContent({
+    breakdown,
+    setIsExpanded,
+}: {
+    breakdown: CCMBreakdown;
+    setIsExpanded: (isExpanded: boolean) => void;
+}) {
     return (
-        <Shell className="ccm-pt" onOutsideClick={() => navigate('/')}>
-            <aside className="max-w-screen-md ml-auto z-20 relative h-[calc(100vh-5lh)] overflow-y-auto ccm-page">
-                <ActionButton className="absolute top-4 right-4 btn ccm-invert" onClick={() => navigate('/')} label="Close">
-                    <CloseIcon />
-                </ActionButton>
-                <div className="w-full flex flex-col gap-2 mt-8">
-                    <div>
-                        <h3 className="type-window-title">{BRKD.title}</h3>
-                        <p className="type-hint flex items-center gap-1">SELECTED ARTWORK</p>
+        <aside className="relative ccm-card h-64 overflow-hidden flex flex-col" style={{ flex: '0 0 300px' }}>
+            <button className="absolute top-4 right-4 btn" onClick={() => setIsExpanded(true)}>
+                <ExpandIcon className="ccm-invert size-5" />
+            </button>
+            <div className="ccm-card-px mb-4 w-5/6">
+                <h3 className="type-window-title">{breakdown.title}</h3>
+                <p className="type-hint flex items-center gap-1">MATCHING ARTWORK</p>
+            </div>
+            <img src={breakdown.media[0].url} className="object-cover object-center" alt={breakdown.title} />
+        </aside>
+    );
+}
+
+function ExpandedContent({ breakdown, onClose }: { breakdown: CCMBreakdown; onClose: () => void }) {
+    return (
+        <aside className="max-w-3xl ml-auto z-20 absolute top-0 right-0 ccm-card h-full overflow-hidden mr-4">
+            <ActionButton className="absolute top-4 right-4 btn" onClick={onClose} label="Close">
+                <CloseIcon className="ccm-invert" />
+            </ActionButton>
+            <div className="w-full flex flex-col gap-2 mt-8 h-full overflow-hidden">
+                <div className="ccm-card-px flex-shrink-0">
+                    <h3 className="type-window-title">{breakdown.title}</h3>
+                    <p className="type-hint flex items-center gap-1">SELECTED ARTWORK</p>
+                </div>
+                <div className="flex border-b-2 border-gray-200 pb-4 ccm-card-px flex-shrink-0">
+                    <div className="w-2/3 flex flex-col gap-y-2 mt-4">
+                        {renderNodeData(breakdown, 'tags')}
+                        {renderNodeData(breakdown, 'useCases')}
+                        {renderNodeData(breakdown, 'addedBy')}
+                        {renderNodeData(breakdown, 'language')}
+                        {renderNodeData(breakdown, 'createdAt')}
+                        {renderNodeData(breakdown, 'updatedAt')}
+                        {renderNodeData(breakdown, 'country')}
                     </div>
-                    <div className="flex">
-                        <div className="w-2/3 flex flex-col gap-y-2 mt-4">
-                            {renderNodeData(BRKD, 'tags')}
-                            {renderNodeData(BRKD, 'useCases')}
-                            {renderNodeData(BRKD, 'addedBy')}
-                            {renderNodeData(BRKD, 'language')}
-                            {renderNodeData(BRKD, 'createdAt')}
-                            {renderNodeData(BRKD, 'updatedAt')}
-                            {renderNodeData(BRKD, 'country')}
-                            <p className="type-body mt-4">{BRKD.description}</p>
-                        </div>
-                        <div className="w-1/3 ">
-                            <img src={BRKD.media[0].url} alt={BRKD.title} />
-                        </div>
+                    <div className="w-1/3 ">
+                        <img src={breakdown.media[0].url} alt={breakdown.title} />
                     </div>
+                </div>
+                <div id="breakdown-description" className="ccm-card-px overflow-y-auto pb-8 flex-1 min-h-0">
+                    <p className="type-body mt-4">{breakdown.description}</p>
                     <figure className="mt-4">
-                        <img src={BRKD.media[0].url} alt={BRKD.title} className="w-full" />
-                        <figcaption className="type-caption mt-2">{BRKD.media[0].caption}</figcaption>
+                        <img src={breakdown.media[0].url} alt={breakdown.title} className="w-full" />
+                        <figcaption className="type-caption mt-2">{breakdown.media[0].caption}</figcaption>
                     </figure>
                 </div>
-            </aside>
-        </Shell>
+            </div>
+        </aside>
     );
 }
 
 export type BreakdownKey = keyof typeof BREAKDOWN_KEYS;
 
-function renderIcon(key: BreakdownKey, className?: string) {
+function renderIcon(key: keyof CCMBreakdown, className?: string) {
     switch (key) {
         case 'tags':
             return <TagIcon className={className} />;
@@ -107,7 +104,7 @@ function renderIcon(key: BreakdownKey, className?: string) {
     }
 }
 
-function renderNodeData(breakdown: Breakdown, key: BreakdownKey) {
+function renderNodeData(breakdown: CCMBreakdown, key: BreakdownKey) {
     if (!breakdown[key]) return null;
     return (
         <div className="flex-1 flex">

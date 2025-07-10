@@ -2,12 +2,7 @@ import * as d3 from 'd3';
 
 import { blendGraphs } from './blend';
 import { colorGraph } from './coloring';
-import {
-    findAdjacentSubtree,
-    findAllShortestPaths,
-    minimumSpanningTreeFromSubtree,
-    updateLinkCounts,
-} from './dijkstra';
+import { findAdjacentSubtree, findAllShortestPaths, minimumSpanningTreeFromSubtree, updateLinkCounts } from './dijkstra';
 import { buildGraph, buildNodesFromCcmData } from './build-graph';
 import { buildDomainGraph } from './domain-sets';
 import { VIEW_CONFIGURATIONS } from './data';
@@ -40,22 +35,25 @@ export class CCMapController {
     private skipPathNodes: Set<string> = new Set();
     private emitter = emitter;
 
-    ogGraph: CCMGraphData | null = null
+    ogGraph: CCMGraphData | null = null;
 
     pathEnds: CCMPathEnds = { start: null, end: null };
-    private _shortestPaths: Array<Array<string>> = [];
-    public set shortestPaths(shortestPaths: Array<Array<string>>) {
-        if (shortestPaths != this._shortestPaths) {
-            this._shortestPaths = shortestPaths;
-            this.emitter.emit('shortest-paths:changed', shortestPaths);
-        }
-    }
+    #shortestPaths: Array<Array<string>> = [];
 
     constructor() {
-        this.emitter.on('path-ends:changed', (p: CCMPathEnds) => {
+        this.emitter.on('map:path-ends:changed', (p: CCMPathEnds) => {
             if (p.start != null && p.end != null) {
+                console.log('path ends changed: ', p);
                 console.log('finding shortest path between: ', p.start, p.end);
                 this.findShortestPath(p.start, p.end);
+            }
+        });
+
+        this.emitter.on('app:selected-node:changed', (nodeId: string | null) => {
+            if (nodeId) {
+                console.log('focusing on node: ', nodeId);
+                this.selectedNodeId = nodeId;
+                this.focusOnNode(nodeId);
             }
         });
     }
@@ -91,12 +89,20 @@ export class CCMapController {
     setViewConfiguration(viewConfiguration: CCMViewConfiguration) {
         if (this.viewConfiguration != viewConfiguration) {
             this.viewConfiguration = viewConfiguration;
-            this.emitter.emit('view-configuration:changed', this.viewConfiguration);
+            this.emitter.emit('map:view-configuration:changed', this.viewConfiguration);
+        }
+    }
+
+    set shortestPaths(shortestPaths: Array<Array<string>>) {
+        if (shortestPaths != this.#shortestPaths) {
+            this.#shortestPaths = shortestPaths;
+            this.emitter.emit('map:shortest-path:changed', shortestPaths);
         }
     }
 
     findShortestPath(source: string, target: string) {
         const filteredLinks: Array<CCMGraphLink> = [];
+
         this.graphData!.links.forEach((link) => {
             const source = (link.source as CCMGraphNode).id || (link.source as string);
             const target = (link.target as CCMGraphNode).id || (link.target as string);
@@ -105,6 +111,7 @@ export class CCMapController {
                 filteredLinks.push(link);
             }
         });
+
         this.shortestPaths = findAllShortestPaths(filteredLinks, source, target).paths;
     }
 
@@ -134,7 +141,7 @@ export class CCMapController {
             } else {
                 return findAdjacentSubtree(this.domainGraph!.links, '___root');
             }
-        })()
+        })();
         if (subtree.length === 0) {
             throw Error('No subtree found for node ' + node.id);
         }
@@ -142,19 +149,20 @@ export class CCMapController {
         const mst = minimumSpanningTreeFromSubtree(
             this.ogGraph!.nodes.concat(this.domainGraph!.nodes),
             this.ogGraph!.links.concat(this.domainGraph!.links),
-            subtree, linkWeights);
-        console.log("number of links in mst: ", mst.mstEdges.length)
+            subtree,
+            linkWeights
+        );
+        console.log('number of links in mst: ', mst.mstEdges.length);
         const nextGraph = this.localBuildGraph(mst.mstEdges);
 
-        console.log("number of links in new graph: ", nextGraph.links.length)
+        console.log('number of links in new graph: ', nextGraph.links.length);
 
-        graphData.links = mst.mstEdges
+        graphData.links = mst.mstEdges;
 
         blendGraphs(graphData, nextGraph);
 
         // Update the graph data
-        this.emitter.emit('graph-data:updated', graphData);
-        this.emitter.emit('focus-node:changed', node.id);
+        this.emitter.emit('map:graph-data:updated', graphData);
 
         let s = 0.0;
         this.graphRef.d3ReheatSimulation();
@@ -188,13 +196,13 @@ export class CCMapController {
     }
 
     initialize(ccmData: CCMData): void {
-        console.log("initializing")
+        console.log('initializing');
         this.ccmData = ccmData;
 
         this.nodes = buildNodesFromCcmData(this.ccmData);
 
-        this.ogGraph = buildGraph(this.ccmData, this.nodes)
-        updateLinkCounts(this.ogGraph)
+        this.ogGraph = buildGraph(this.ccmData, this.nodes);
+        updateLinkCounts(this.ogGraph);
 
         this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
         this.nodes.domainNodes = this.domainGraph.nodes;
@@ -203,15 +211,14 @@ export class CCMapController {
 
         const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
 
-
         const mstNamed = minimumSpanningTreeFromSubtree(
             this.nodes.allNodes,
             this.ogGraph.links.concat(this.domainGraph.links),
             subTree,
-            linkWeights);
+            linkWeights
+        );
 
-
-        this.graphData = this.localBuildGraph(mstNamed.mstEdges)
+        this.graphData = this.localBuildGraph(mstNamed.mstEdges);
         this.graphData.links = mstNamed.mstEdges;
 
         this.#runtimeProps = {};
@@ -223,7 +230,7 @@ export class CCMapController {
 
     set graphData(graphData: CCMGraphData | null) {
         this.#graphData = graphData;
-        this.emitter.emit('graph-data:updated', graphData);
+        this.emitter.emit('map:graph-data:updated', graphData);
     }
 
     setRuntimeProps<TKey extends keyof ForceGraphProps<CCMGraphNode, CCMGraphLink>>(
@@ -231,7 +238,7 @@ export class CCMapController {
         value: ForceGraphProps<CCMGraphNode, CCMGraphLink>[TKey]
     ) {
         this.#runtimeProps[key] = value;
-        this.emitter.emit('runtime-props:updated', this.#runtimeProps);
+        this.emitter.emit('map:runtime-props:updated', this.#runtimeProps);
     }
 
     setGraphRef(graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) {
@@ -259,19 +266,20 @@ export class CCMapController {
         if (!e.shiftKey) {
             if (node.id === this.selectedNodeId) {
                 this.focusOnNode(node);
+                this.emitter.emit('map:selected-node:changed', this.selectedNodeId);
             }
             if (node.id != this.selectedNodeId) {
                 this.selectedNodeId = node.id;
-                this.emitter.emit('selected-node:changed', this.selectedNodeId);
+                this.emitter.emit('map:selected-node:changed', this.selectedNodeId);
             }
             if (this.pathEnds.start != node.id) {
                 this.pathEnds.start = node.id;
-                this.emitter.emit('path-ends:changed', this.pathEnds);
+                this.emitter.emit('map:path-ends:changed', this.pathEnds);
             }
         } else {
             if (this.pathEnds.end != node.id) {
                 this.pathEnds.end = node.id;
-                this.emitter.emit('path-ends:changed', this.pathEnds);
+                this.emitter.emit('map:path-ends:changed', this.pathEnds);
             }
         }
     };
