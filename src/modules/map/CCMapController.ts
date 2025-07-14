@@ -112,7 +112,7 @@ export class CCMapController {
             }
         });
 
-        this.shortestPaths = findAllShortestPaths(filteredLinks, source, target).paths;
+        this.shortestPaths = findAllShortestPaths(this.graphData!.nodes, filteredLinks, source, target).paths;
     }
 
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {

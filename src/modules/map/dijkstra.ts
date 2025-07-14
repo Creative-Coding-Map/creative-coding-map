@@ -120,19 +120,13 @@ export function findAdjacentSubtree(links: CCMGraphLink[], node: string) {
 //     };
 // }
 
-/**
- * Find all shortest paths between two nodes using Dijkstra's algorithm for undirected graphs
- * @param {Array<{source: string, target: string, weight: number}>} edges - Array of edge objects
- * @param {string} start - Starting node
- * @param {string} end - Ending node
- * @returns {Object} - Object containing the distance and array of all shortest paths
- */
-export function findAllShortestPaths(edges, start, end) {
+
+export function findAllShortestPaths(nodes: Array<CCMGraphNode>, edges: Array<CCMGraphLink>, start: string, end: string) {
     // Build adjacency list from edges (bidirectional)
-    const graph = buildUndirectedGraph(edges);
+    const graph = buildUndirectedGraph(nodes, edges);
 
     // Distance from start to each node
-    const distances = {};
+    const distances = new Map<string, number>();
 
     // Keep track of all nodes with the same minimum distance
     const previous = {};
@@ -460,7 +454,7 @@ export function isValidSubtree(subtreeEdges) {
  */
 export function buildUndirectedGraph(
     nodes: Array<CCMGraphNode>,
-    edges: any[],
+    edges: Array<any>,
     weightFunction: ((edge: any, source: CCMGraphNode, target: CCMGraphNode) => number) | undefined = undefined
 ) {
     const graph = {};
