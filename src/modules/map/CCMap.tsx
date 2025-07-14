@@ -121,6 +121,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 nodeCanvasObject={controllerRef.current.getNodeCanvasObject}
                 nodePointerAreaPaint={controllerRef.current.getNodePointerAreaPaint}
                 backgroundColor="white"
+                autoPauseRedraw={false}
                 d3AlphaDecay={0.01}
                 {...runtimeProps}
             />
