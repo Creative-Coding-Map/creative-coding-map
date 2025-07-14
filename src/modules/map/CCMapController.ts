@@ -53,7 +53,6 @@ export class CCMapController {
             if (nodeId) {
                 console.log('focusing on node: ', nodeId);
                 this.selectedNodeId = nodeId;
-                this.focusOnNode(nodeId);
             }
         });
     }
@@ -265,8 +264,14 @@ export class CCMapController {
     getNodeClickHandler = (node: any, e: MouseEvent) => {
         if (!e.shiftKey) {
             if (node.id === this.selectedNodeId) {
-                this.focusOnNode(node);
-                this.emitter.emit('map:selected-node:changed', this.selectedNodeId);
+                // TODO: Fix bounds check
+                const graphCoord = this.graphRef!.screen2GraphCoords(e.clientX, e.clientY)
+                const dx = (graphCoord.x - node.x) - node.__bckgDimensions[0] / 2.0;
+                if (dx > -40.0) {
+                    this.focusOnNode(node);
+                } else {
+                    this.centerOnNode(node);
+                }
             }
             if (node.id != this.selectedNodeId) {
                 this.selectedNodeId = node.id;
@@ -370,9 +375,15 @@ export class CCMapController {
 
             const labelWidth = textWidth + 2 * hmargin + fontSize * 0.2;
 
-            const bckgDimensions: [number, number] = [textWidth + 2 * hmargin, fontSize + vmargin].map(
+            const focusButtonWidth = (node.id === this.selectedNodeId) ? 64.0 / globalScale : 0.0;
+            const labelDimensions: [number, number] = [textWidth + 2 * hmargin, fontSize + vmargin].map(
                 (n) => n + fontSize * 0.2
             ) as [number, number];
+
+            const bckgDimensions: [number, number] = [textWidth + 2 * hmargin + focusButtonWidth, fontSize + vmargin].map(
+                (n) => n + fontSize * 0.2
+            ) as [number, number];
+
 
             const isSelected = node.id === this.selectedNodeId;
 
@@ -381,7 +392,8 @@ export class CCMapController {
             // TODO: implement labels per design
             ctx.fillStyle = nodeColor;
             ctx.beginPath();
-            ctx.roundRect(node.x! - bckgDimensions[0] / 2, node.y! - bckgDimensions[1] / 2, ...bckgDimensions, radius);
+            ctx.roundRect(node.x! - labelDimensions[0] / 2, node.y! - labelDimensions[1] / 2, ...labelDimensions, radius);
+
 
             ctx.fillStyle = isSelected ? nodeColor : 'white';
             ctx.fill();
@@ -395,15 +407,15 @@ export class CCMapController {
             ctx.fillText(label, node.x, node.y);
             node.__bckgDimensions = bckgDimensions;
 
-            // TODO: add focus widget right from the label
-
+            // draw focus widget, when node is selected node
             if (node.id === this.selectedNodeId) {
                 ctx.beginPath();
+                node.focusX = labelDimensions[0] / 2 + 2.0 / globalScale
                 ctx.roundRect(
-                    node.x! + bckgDimensions[0] / 2 + 2.0 / globalScale,
-                    node.y! - bckgDimensions[1] / 2,
-                    bckgDimensions[1],
-                    bckgDimensions[1],
+                    node.x! + labelDimensions[0] / 2 + 2.0 / globalScale,
+                    node.y! - labelDimensions[1] / 2,
+                    labelDimensions[1],
+                    labelDimensions[1],
                     radius
                 );
 
@@ -415,7 +427,7 @@ export class CCMapController {
 
                 ctx.beginPath();
                 ctx.arc(
-                    node.x + bckgDimensions[0] / 2 + 2.0 / globalScale + bckgDimensions[1] / 2.0,
+                    node.x + labelDimensions[0] / 2 + 2.0 / globalScale + labelDimensions[1] / 2.0,
                     node.y,
                     4 / globalScale,
                     0,
@@ -423,7 +435,7 @@ export class CCMapController {
                     false
                 );
 
-                const cx = node.x + bckgDimensions[0] / 2 + 2.0 / globalScale + bckgDimensions[1] / 2.0;
+                const cx = node.x + labelDimensions[0] / 2 + 2.0 / globalScale + labelDimensions[1] / 2.0;
                 const cy = node.y;
                 ctx.moveTo(cx, cy + 6.0 / globalScale);
                 ctx.lineTo(cx, cy - 6.0 / globalScale);
