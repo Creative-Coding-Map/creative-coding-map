@@ -11,17 +11,27 @@ export function linkWeights(link: CCMGraphLink, source: CCMGraphNode, target: CC
 
     const tagCountPenalty =  Math.log(1+ (source.type === 'tag' ? source.count : 0) + (target.type === 'tag' ? target.count : 0));
 
+    if (link.type === 'domain') {
+        if (link.domainDegree === 0) {
+            return 1;
+        } else if (link.domainDegree === 1) {
+            return 2;
+        }
+    }
+
     switch (t) {
         case 'root-domain':
             return 1;
         case 'domain-domain':
         case 'tag-tag':
             return 2;
+
         case 'domain-tool':
         case 'tool-domain':
         case 'domain-technique':
         case 'technique-domain':
             return 20;
+
         case 'domain-tag':
         case 'tag-domain':
             return 1;

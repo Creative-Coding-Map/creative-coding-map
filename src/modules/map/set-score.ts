@@ -35,3 +35,17 @@ export function calculateNodeScore(node: CCMGraphNode, set: CCMDomainSet | Color
 
     return tagScore + nodeScore * 2;
 }
+
+export function calculateNodeDegree(node: CCMGraphNode, set: CCMDomainSet, degreesOfSeparation: any) {
+    if (!node.ccmData) {
+        node.ccmData = [node.id, { tags: [node.id] }];
+    }
+
+    const degrees = (set.nodes || [])
+        .map((setNode) => {
+            const degree = degreesOfSeparation[setNode.id][node.id];
+            return degree >= 0 ? degree : 1E32
+        })
+
+    return Math.min(...degrees);
+}

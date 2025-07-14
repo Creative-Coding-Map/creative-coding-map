@@ -1,5 +1,5 @@
 import { findAllDegreesOfSeparation } from './dijkstra';
-import { calculateNodeScore } from './set-score';
+import { calculateNodeDegree, calculateNodeScore } from './set-score';
 import type { CCMDomainSet, CCMGraphData } from '@/types/ccmap';
 
 export function buildDomainGraph(graph: CCMGraphData, domainSets: CCMDomainSet[]) {
@@ -25,8 +25,8 @@ export function buildDomainGraph(graph: CCMGraphData, domainSets: CCMDomainSet[]
 
     const domainLinks: any[] = [];
     for (const node of graph.nodes) {
+        const degrees = domainSets.map((set) => calculateNodeDegree(node, set, degreesOfSeparation));
         const scores = domainSets.map((set) => calculateNodeScore(node, set, degreesOfSeparation));
-
         scores.forEach((scr, idx) => {
             if (scr > 0) {
                 domainLinks.push({
@@ -34,6 +34,7 @@ export function buildDomainGraph(graph: CCMGraphData, domainSets: CCMDomainSet[]
                     target: domainNodes[idx].id,
                     strengthDelta: 1.0,
                     type: 'domain',
+                    domainDegree: degrees[idx],
                 });
             }
         });
