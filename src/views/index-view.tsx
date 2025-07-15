@@ -1,8 +1,7 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { faker } from '@faker-js/faker';
 import { atom, useAtom } from 'jotai';
-import { useInView } from 'motion/react';
 import { NodeData } from '../modules/node-data';
 import type { CCMNode } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
@@ -15,6 +14,7 @@ import { pick, updateArray } from '@/lib/utils';
 import Tooltip from '@/components/tooltip';
 import { fetchCCMData } from '@/modules/map/fetch-data';
 import { store } from '@/state/store';
+import { Details, DetailsProvider } from '@/components/Details';
 
 type IndexNode = CCMNode & { category: string; description: string };
 
@@ -57,8 +57,11 @@ export default function IndexView() {
         return Array.from(map.entries());
     }, [database]);
 
+    // console.log('Entries:', dataByLetter.flatMap(([_, nodes]) => nodes).length);
+    console.log('IndexView render');
+
     return (
-        <main className="w-full h-screen relative ccm-pt ccm-px">
+        <main id="index-view" className="w-full h-screen relative ccm-pt ccm-px overflow-y-auto">
             <section className={clsx('w-full h-full ccm-filters', addActiveFilters(filters))}>
                 <section className="pt-[80px] ml-auto z-10 relative ccm-colors transition-all duration-300">
                     <ul className="flex flex-col gap-0.5 type-hint">
@@ -119,58 +122,55 @@ function addActiveFilters(filters: CCMNodeType[]) {
 }
 
 const RenderLetterCollection = memo(function RenderLetterCollection({ data }: { data: [string, IndexNode[]][] }) {
+    console.log('RenderLetterCollection', data[0]);
+
     return (
         <section className="mosaic mt-8">
-            {data.map(([letter, nodes]) => (
-                <div key={letter} className="mosaic-item">
-                    <p className="type-filter uppercase border-b-2 border-gray-200 pb-4 w-full">{letter}</p>
-                    <ul className="flex flex-col gap-0.5 mt-6">
-                        {nodes.map((node) => {
-                            return <NodeListItem key={node.id} node={node} />;
-                        })}
-                    </ul>
-                </div>
-            ))}
+            <DetailsProvider>
+                {data.map(([letter, nodes]) => (
+                    <div key={letter} className="mosaic-item">
+                        <p className="type-filter uppercase border-b-2 border-gray-200 pb-4 w-full">{letter}</p>
+                        <ul className="flex flex-col gap-0.5 mt-6">
+                            {nodes.map((node) => {
+                                return <NodeListItem key={node.id} node={node} />;
+                            })}
+                        </ul>
+                    </div>
+                ))}
+            </DetailsProvider>
         </section>
     );
 });
 
-function NodeListItem({ node }: { node: IndexNode }) {
-    const ref = useRef<HTMLLIElement>(null);
-    const isInView = useInView(ref);
-
-    useEffect(() => {
-        if (isInView) {
-            console.log('in view', node.id);
-        }
-    }, [isInView]);
-
+const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
     return (
-        <li key={node.id} ref={ref} className={clsx(isInView ? 'visible' : 'invisible')}>
-            <details className="group/details">
-                <summary className={clsx('flex items-center gap-2 ccm-transition', node.type)}>
+        <li key={node.id}>
+            <Details.Root id={node.id} context="index-view">
+                <Details.Summary className={clsx('flex items-center gap-2 ccm-transition', node.type)}>
                     <span className="w-4">{renderIcon(node.type)}</span>{' '}
                     <Tooltip
-                        className="type-filter cursor-pointer group-open/details:hidden"
+                        className="type-filter cursor-pointer group-[.show-content]:hidden"
                         message={<span className="type-hint">{node.description}</span>}
                     >
                         <span className="group-open:font-bold ellipsis">{node.id}</span>
                     </Tooltip>
-                    <span className="hidden group-open/details:block group-open:font-bold ellipsis type-filter">{node.id}</span>
+                    <span className="hidden group-[.show-content]:block group-[.show-content]:font-bold ellipsis type-filter">
+                        {node.id}
+                    </span>
                     <span className={clsx('ml-auto type-hint ellipsis category')}>[{node.category}]</span>
-                </summary>
-                <div className="ml-6 flex flex-col gap-2 pb-5 mt-2">
+                </Details.Summary>
+                <Details.Content className="flex flex-col gap-2 pl-6 pb-5 ">
                     <p className="type-hint flex items-center gap-1">NODE SELECTED ({node.type.toUpperCase()})</p>
                     <p className="type-body mb-4 line-clamp-4">{node.description}</p>
                     <NodeData node={node} prop="tags" />
                     <NodeData node={node} prop="dependsOn" />
                     <NodeData node={node} prop="supports" />
                     <NodeData node={node} prop="references" />
-                </div>
-            </details>
+                </Details.Content>
+            </Details.Root>
         </li>
     );
-}
+});
 
 function renderIcon(type: CCMNodeType) {
     switch (type) {

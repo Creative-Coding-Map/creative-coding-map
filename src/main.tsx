@@ -51,7 +51,7 @@ function App() {
         <main className="w-full h-screen max-h-screen overflow-hidden relative antialiased">
             <Navbar />
             <Switch>
-                <Route path="/index">
+                <Route path="/creative-coding-map/index">
                     <Suspense fallback={<Loading />}>
                         <IndexView />
                     </Suspense>
