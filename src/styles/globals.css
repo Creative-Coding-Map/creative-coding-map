@@ -179,14 +179,6 @@
         @apply whitespace-nowrap overflow-hidden text-ellipsis;
     }
 
-    .mosaic {
-        @apply columns-[350px] gap-8;
-    }
-
-    .mosaic-item {
-        @apply h-full w-full mb-12 break-inside-avoid;
-    }
-
     .clip-bottom {
         clip-path: polygon(50% 0, 100% 100%, 0 100%);
     }
@@ -273,6 +265,10 @@
         } */
     }
 
+    .ccm-scrollbar {
+        scrollbar-gutter: stable;
+    }
+
     .ccm-scrollbar::-webkit-scrollbar {
         @apply w-2;
     }
@@ -283,6 +279,17 @@
 
     .ccm-scrollbar::-webkit-scrollbar-thumb {
         @apply bg-gray dark:bg-light-gray;
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .hide-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
     }
 }
 

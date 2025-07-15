@@ -33,25 +33,26 @@ function DetailsRoot({
     children: React.ReactNode;
     className?: string;
 }) {
-    const [showContent, setShowContent] = useState(false);
+    const [showContent] = useState(false);
 
     const onShowContent = useCallback(() => {
         const element = document.getElementById(context);
 
         if (element) {
             if (element.dataset.details === id) {
-                element.dataset.details = undefined;
-                setShowContent(false);
+                element.removeAttribute('data-details');
+                document.getElementById(`details-${id}`)?.classList.remove('show-content');
             } else {
+                document.getElementById(`details-${element.dataset.details}`)?.classList.remove('show-content');
                 element.dataset.details = id;
-                setShowContent(true);
+                document.getElementById(`details-${id}`)?.classList.add('show-content');
             }
         }
     }, [context, id]);
 
     return (
         <DetailsLocalContext.Provider value={{ id, showContent, onShowContent }}>
-            <div className={clsx('relative group ccm-transition overflow-visible', showContent && 'show-content', className)}>
+            <div id={`details-${id}`} className={clsx('group ccm-transition overflow-visible', className)}>
                 {children}
             </div>
         </DetailsLocalContext.Provider>
@@ -75,17 +76,15 @@ function DetailsSummary({ children, className }: { children: React.ReactNode; cl
 const DetailsContent = memo(function DetailsContent({ children, className }: { children: ReactNode; className?: string }) {
     const context = useContext(DetailsLocalContext);
 
-    console.log('DetailsContent', context);
-
     if (!context) {
         throw new Error('Details.Content must be used within Details.Root');
     }
 
-    if (!context.showContent) {
-        return null;
-    }
-
-    return <div className={clsx('absolute top-full left-0 w-full bg-white pt-2 z-50', className)}>{children}</div>;
+    return (
+        <div className={clsx('absolute top-full left-0 w-full bg-white pt-2 z-50 hidden group-[.show-content]:block', className)}>
+            {children}
+        </div>
+    );
 });
 
 export function Details({ children }: { children: React.ReactNode }) {

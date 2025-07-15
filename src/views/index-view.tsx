@@ -1,7 +1,10 @@
+/* eslint-disable no-shadow */
 import { memo, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { faker } from '@faker-js/faker';
 import { atom, useAtom } from 'jotai';
+import { VariableSizeList as List } from 'react-window';
+import useResizeObserver from 'use-resize-observer';
 import { NodeData } from '../modules/node-data';
 import type { CCMNode } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
@@ -17,6 +20,14 @@ import { store } from '@/state/store';
 import { Details, DetailsProvider } from '@/components/Details';
 
 type IndexNode = CCMNode & { category: string; description: string };
+
+type ColumnItem = { type: 'header'; letter: string } | { type: 'node'; node: IndexNode };
+
+interface ListCellProps {
+    index: number;
+    style: React.CSSProperties;
+    data: ColumnItem[];
+}
 
 const asyncDatabase = atom(async (get) => {
     const database = get(databaseAtom);
@@ -35,6 +46,7 @@ export default function IndexView() {
     const [database] = useAtom(asyncDatabase, { store });
     const [filters, setFilters] = useState<CCMNodeType[]>([]);
 
+    // IMPORTANT: dataByLetter only runs once on mount, so it doesn't need to be optimized
     const dataByLetter = useMemo(() => {
         const data = database.values;
 
@@ -54,6 +66,7 @@ export default function IndexView() {
                 description: faker.lorem.paragraph(),
             });
         }
+
         return Array.from(map.entries());
     }, [database]);
 
@@ -61,7 +74,7 @@ export default function IndexView() {
     console.log('IndexView render');
 
     return (
-        <main id="index-view" className="w-full h-screen relative ccm-pt ccm-px overflow-y-auto">
+        <main id="index-view" className="w-full h-screen relative ccm-pt ccm-px overflow-hidden">
             <section className={clsx('w-full h-full ccm-filters', addActiveFilters(filters))}>
                 <section className="pt-[80px] ml-auto z-10 relative ccm-colors transition-all duration-300">
                     <ul className="flex flex-col gap-0.5 type-hint">
@@ -108,11 +121,201 @@ export default function IndexView() {
                         </li>
                     </ul>
                 </section>
-                <RenderLetterCollection data={dataByLetter} />
+                <article className="flex w-full h-full pb-20">
+                    <IndexColumns dataByLetter={dataByLetter} />
+                </article>
             </section>
         </main>
     );
 }
+
+const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter: [string, IndexNode[]][] }) {
+    const { ref, width } = useResizeObserver();
+
+    const { columns, columnWidth, maxHeight } = useMemo(() => {
+        if (!width) return { columns: [], columnWidth: 0, columnsHeights: [], maxHeight: 0 };
+
+        // Calculate number of columns based on width
+        const minColumnWidth = 280;
+        const gutter = 16;
+        const columnCount = Math.max(2, Math.min(6, Math.floor(width / minColumnWidth)));
+
+        // Keep letters in alphabetical order
+        const sortedDataByLetter = [...dataByLetter].sort(([a], [b]) => a.localeCompare(b));
+
+        // Initialize columns
+        const columns: ColumnItem[][] = Array.from({ length: columnCount }, () => []);
+
+        // Calculate items per column for roughly equal distribution
+        const totalLetters = sortedDataByLetter.length;
+        const nodesCount = sortedDataByLetter.reduce((acc, [_, nodes]) => acc + nodes.length, 0);
+        let itemsPerColumn = Math.ceil((totalLetters + nodesCount) / columnCount);
+        itemsPerColumn += Math.floor(itemsPerColumn * 0.25);
+
+        // Distribute letters: fill columns top-to-bottom, then left-to-right
+        let columnIndex = 0;
+        let insertedItemsCount = 0;
+
+        // Distribute letters with nodes evenly across columns
+        for (const [letter, nodes] of sortedDataByLetter) {
+            if (insertedItemsCount + nodes.length > itemsPerColumn && columnIndex < columnCount - 1) {
+                columnIndex++;
+                insertedItemsCount = 0;
+            }
+
+            columns[columnIndex].push({ type: 'header', letter });
+            insertedItemsCount++;
+
+            for (const node of nodes) {
+                columns[columnIndex].push({ type: 'node', node });
+                insertedItemsCount++;
+            }
+        }
+
+        // Rebalancing pass: move letter groups between columns to achieve better balance
+        const getColumnHeight = (col: ColumnItem[]) => col.reduce((acc, item) => acc + getItemSize(item), 0);
+
+        // Find groups (letter + its nodes) for easier manipulation
+        const findLetterGroups = (column: ColumnItem[]) => {
+            const groups: { startIndex: number; endIndex: number; height: number }[] = [];
+            for (let i = 0; i < column.length; i++) {
+                if (column[i].type === 'header') {
+                    const startIndex = i;
+                    let endIndex = i;
+                    let height = getItemSize(column[i]);
+
+                    // Find all nodes belonging to this letter
+                    while (endIndex + 1 < column.length && column[endIndex + 1].type === 'node') {
+                        endIndex++;
+                        height += getItemSize(column[endIndex]);
+                    }
+
+                    groups.push({ startIndex, endIndex, height });
+                    i = endIndex; // Skip to next letter
+                }
+            }
+            return groups;
+        };
+
+        // Rebalance by moving letter groups from heavy columns to light ones
+        for (let iteration = 0; iteration < 2; iteration++) {
+            const columnHeights = columns.map(getColumnHeight);
+            const avgHeight = columnHeights.reduce((a, b) => a + b, 0) / columnHeights.length;
+
+            // Find heaviest and lightest columns
+            const heaviestIndex = columnHeights.indexOf(Math.max(...columnHeights));
+            const lightestIndex = columnHeights.indexOf(Math.min(...columnHeights));
+
+            const heaviestColumn = columns[heaviestIndex];
+            const lightestColumn = columns[lightestIndex];
+
+            // If difference is significant, try to move a letter group
+            if (columnHeights[heaviestIndex] - columnHeights[lightestIndex] > avgHeight * 0.3) {
+                const heavyGroups = findLetterGroups(heaviestColumn);
+
+                // Try to move the last group from heavy to light column (maintains order)
+                if (heavyGroups.length > 1) {
+                    const lastGroup = heavyGroups[heavyGroups.length - 1];
+                    const groupItems = heaviestColumn.splice(lastGroup.startIndex, lastGroup.endIndex - lastGroup.startIndex + 1);
+                    lightestColumn.push(...groupItems);
+                }
+            } else {
+                break; // Good enough balance achieved
+            }
+        }
+
+        const columnWidth = Math.floor((width - gutter * (columns.length - 1)) / columns.length);
+        const columnsHeights = columns.map((col) => col.reduce((acc, item) => acc + getItemSize(item), 0));
+
+        const maxHeight = Math.max(...columnsHeights) + 100;
+
+        return { columns, columnWidth, columnsHeights, maxHeight };
+    }, [dataByLetter, width]);
+
+    return (
+        <DetailsProvider>
+            <div ref={ref} className="flex flex-auto gap-x-4 w-full h-full pb-10 my-8 overflow-y-auto ccm-scrollbar">
+                {width && width > 0
+                    ? columns.map((columnItems, columnIndex) => (
+                          <List
+                              key={columnIndex}
+                              className="hide-scrollbar"
+                              height={maxHeight}
+                              itemCount={columnItems.length}
+                              itemSize={(index) => getItemSize(columnItems[index])}
+                              itemData={columnItems}
+                              width={columnWidth}
+                          >
+                              {ListCell}
+                          </List>
+                      ))
+                    : null}
+            </div>
+        </DetailsProvider>
+    );
+});
+
+function getItemSize(item: ColumnItem): number {
+    if (item.type === 'header') {
+        return 72; // Double the node height for headers
+    }
+
+    return 22; // Base height for nodes
+}
+
+const ListCell = memo(function ListCell({ index, style, data }: ListCellProps) {
+    const item = data[index];
+
+    if (item.type === 'header') {
+        return (
+            <div style={style} className="py-2">
+                <p className="type-filter uppercase border-b-2 border-gray-200 pb-4 w-full font-bold">{item.letter}</p>
+            </div>
+        );
+    }
+
+    // item.type === 'node'
+    return (
+        <div style={style}>
+            <NodeListItem node={item.node} />
+        </div>
+    );
+});
+
+const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
+    return (
+        <Details.Root id={node.id} context="index-view">
+            <Details.Summary
+                className={clsx(
+                    'flex items-center gap-2 ccm-transition px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-900',
+                    node.type
+                )}
+            >
+                <span className="w-4 flex-shrink-0">{renderIcon(node.type)}</span>
+                <Tooltip
+                    className="type-filter cursor-pointer group-[.show-content]:hidden"
+                    message={<span className="type-hint">{node.description}</span>}
+                >
+                    <span className="group-open:font-bold ellipsis text-sm">{node.id}</span>
+                </Tooltip>
+                <span className="hidden group-[.show-content]:block group-[.show-content]:font-bold ellipsis type-filter text-sm">
+                    {node.id}
+                </span>
+                <span className={clsx('ml-auto type-hint ellipsis category text-xs opacity-60')}>[{node.category}]</span>
+            </Details.Summary>
+            <Details.Content className="flex flex-col gap-2 pl-6 pb-3 text-sm">
+                <p className="type-hint flex items-center gap-1 text-xs">NODE SELECTED ({node.type.toUpperCase()})</p>
+                <p className="type-body mb-2 line-clamp-3 text-xs">{node.description}</p>
+                <div className="space-y-1">
+                    <NodeData node={node} prop="tags" />
+                    <NodeData node={node} prop="dependsOn" />
+                    <NodeData node={node} prop="supports" />
+                    <NodeData node={node} prop="references" />
+                </div>
+            </Details.Content>
+        </Details.Root>
+    );
+});
 
 function addActiveFilters(filters: CCMNodeType[]) {
     if (filters.length === 0) {
@@ -120,57 +323,6 @@ function addActiveFilters(filters: CCMNodeType[]) {
     }
     return filters.map((f) => `filter-${f}`).join(' ');
 }
-
-const RenderLetterCollection = memo(function RenderLetterCollection({ data }: { data: [string, IndexNode[]][] }) {
-    console.log('RenderLetterCollection', data[0]);
-
-    return (
-        <section className="mosaic mt-8">
-            <DetailsProvider>
-                {data.map(([letter, nodes]) => (
-                    <div key={letter} className="mosaic-item">
-                        <p className="type-filter uppercase border-b-2 border-gray-200 pb-4 w-full">{letter}</p>
-                        <ul className="flex flex-col gap-0.5 mt-6">
-                            {nodes.map((node) => {
-                                return <NodeListItem key={node.id} node={node} />;
-                            })}
-                        </ul>
-                    </div>
-                ))}
-            </DetailsProvider>
-        </section>
-    );
-});
-
-const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
-    return (
-        <li key={node.id}>
-            <Details.Root id={node.id} context="index-view">
-                <Details.Summary className={clsx('flex items-center gap-2 ccm-transition', node.type)}>
-                    <span className="w-4">{renderIcon(node.type)}</span>{' '}
-                    <Tooltip
-                        className="type-filter cursor-pointer group-[.show-content]:hidden"
-                        message={<span className="type-hint">{node.description}</span>}
-                    >
-                        <span className="group-open:font-bold ellipsis">{node.id}</span>
-                    </Tooltip>
-                    <span className="hidden group-[.show-content]:block group-[.show-content]:font-bold ellipsis type-filter">
-                        {node.id}
-                    </span>
-                    <span className={clsx('ml-auto type-hint ellipsis category')}>[{node.category}]</span>
-                </Details.Summary>
-                <Details.Content className="flex flex-col gap-2 pl-6 pb-5 ">
-                    <p className="type-hint flex items-center gap-1">NODE SELECTED ({node.type.toUpperCase()})</p>
-                    <p className="type-body mb-4 line-clamp-4">{node.description}</p>
-                    <NodeData node={node} prop="tags" />
-                    <NodeData node={node} prop="dependsOn" />
-                    <NodeData node={node} prop="supports" />
-                    <NodeData node={node} prop="references" />
-                </Details.Content>
-            </Details.Root>
-        </li>
-    );
-});
 
 function renderIcon(type: CCMNodeType) {
     switch (type) {
