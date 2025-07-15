@@ -285,12 +285,7 @@ const ListCell = memo(function ListCell({ index, style, data }: ListCellProps) {
 const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
     return (
         <Details.Root id={node.id} context="index-view">
-            <Details.Summary
-                className={clsx(
-                    'flex items-center gap-2 ccm-transition px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-900',
-                    node.type
-                )}
-            >
+            <Details.Summary className={clsx('flex items-center gap-2 ccm-transition px-2 rounded', node.type)}>
                 <span className="w-4 flex-shrink-0">{renderIcon(node.type)}</span>
                 <Tooltip
                     className="type-filter cursor-pointer group-[.show-content]:hidden"
