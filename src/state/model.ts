@@ -5,7 +5,7 @@ import { emitter } from '@/hooks/useMitt';
 
 export const databaseAtom = atom<Database>(new Database());
 
-export const selectedNodeIdAtom = atom('Processing', (_, set, newNodeId: string | null) => {
+export const selectedNodeIdAtom = atom(null as string | null, (_, set, newNodeId: string | null) => {
     set(selectedNodeIdAtom, newNodeId);
     emitter.emit('app:selected-node:changed', newNodeId);
 });

@@ -1,5 +1,5 @@
 import { createStore } from 'jotai';
-import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom, selectedNodeIdAtom, shortestPathNodesAtom } from './model';
+import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom, shortestPathNodesAtom } from './model';
 import { emitter } from '@/hooks/useMitt';
 
 export const store = createStore();
