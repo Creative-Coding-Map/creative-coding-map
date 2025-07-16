@@ -23,7 +23,3 @@ emitter.on('map:shortest-path:changed', (shortestPath: Array<Array<string>>) => 
 
     store.set(shortestPathNodesAtom, path);
 });
-
-emitter.on('map:selected-node:changed', (nodeId: string | null) => {
-    store.set(selectedNodeIdAtom, nodeId);
-});

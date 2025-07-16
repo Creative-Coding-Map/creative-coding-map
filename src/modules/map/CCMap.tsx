@@ -3,6 +3,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import ForceGraph2D from 'react-force-graph-2d';
+import { useLocation } from 'wouter';
 import { fetchCCMData } from './fetch-data';
 import { CCMapController } from './CCMapController';
 import type { ForceGraphProps } from 'react-force-graph-2d';
@@ -16,6 +17,7 @@ interface CCMapProps {
 
 const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const fgRef = useRef<any>(null);
+    const [_, navigate] = useLocation();
     const controllerRef = useRef<CCMapController | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -42,6 +44,13 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                     setRuntimeProps(newRuntimeProps);
                 });
 
+                emitter.on('map:selected-node:changed', (nodeId: string | null) => {
+                    if (nodeId) {
+                        const params = new URLSearchParams({ node: nodeId });
+                        navigate(`/?${params.toString()}`);
+                    }
+                });
+
                 const data = await fetchCCMData();
 
                 // Initialize data
@@ -66,10 +75,11 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
             if (controllerRef.current) {
                 emitter.off('map:graph-data:updated');
                 emitter.off('map:runtime-props:updated');
+                emitter.off('map:selected-node:changed');
                 controllerRef.current.destroy();
             }
         };
-    }, []);
+    }, [navigate]);
 
     // Handle graph ready
     const handleEngineStop = () => {

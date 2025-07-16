@@ -2,21 +2,21 @@ import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import viteReact from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { purgeCSSPlugin } from '@fullhuman/postcss-purgecss';
-import { visualizer } from 'rollup-plugin-visualizer';
+// import { purgeCSSPlugin } from '@fullhuman/postcss-purgecss';
+// import { visualizer } from 'rollup-plugin-visualizer';
 // import legacy from '@vitejs/plugin-legacy';
 import svgr from 'vite-plugin-svgr';
 
 // Custom PostCSS plugin to remove comments
-const removeCommentRules = (root) => {
-    root.walkComments((comment) => {
-        comment.remove();
-    });
-};
+// const removeCommentRules = (root) => {
+//     root.walkComments((comment) => {
+//         comment.remove();
+//     });
+// };
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    base: '/creative-coding-map/',
+    base: '/',
     plugins: [
         viteReact(),
         svgr(),

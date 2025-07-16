@@ -1,6 +1,7 @@
-import { StrictMode, Suspense, lazy, useLayoutEffect } from 'react';
+import { StrictMode, Suspense, lazy, useEffect, useLayoutEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Route, Switch } from 'wouter';
+import { Route, Switch, useSearchParams } from 'wouter';
+import { useSetAtom } from 'jotai';
 import reportWebVitals from './reportWebVitals.ts';
 
 import { Providers } from './modules/providers.tsx';
@@ -8,7 +9,7 @@ import { Loading } from './components/loading.tsx';
 
 import '@/styles/globals.css';
 import { Navbar } from './modules/navigation.tsx';
-import { showSearchAtom } from './state/model.ts';
+import { selectedNodeIdAtom, showSearchAtom } from './state/model.ts';
 import { store } from './state/store.ts';
 
 const IndexView = lazy(() => import('./views/index-view.tsx'));
@@ -17,6 +18,17 @@ const Home = lazy(() => import('./home.tsx'));
 const rootElement = document.getElementById('app');
 
 function App() {
+    const setSelectedNodeId = useSetAtom(selectedNodeIdAtom);
+    const [params] = useSearchParams();
+
+    useEffect(() => {
+        const node = params.get('node');
+
+        if (node) {
+            setSelectedNodeId(node);
+        }
+    }, [params, setSelectedNodeId]);
+
     useLayoutEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === ' ') {
@@ -51,7 +63,7 @@ function App() {
         <main className="w-full h-screen max-h-screen overflow-hidden relative antialiased">
             <Navbar />
             <Switch>
-                <Route path="/creative-coding-map/index">
+                <Route path="/index">
                     <Suspense fallback={<Loading />}>
                         <IndexView />
                     </Suspense>

@@ -10,16 +10,13 @@ export const Navbar = () => {
                 </Link>
             </section>
             <section className="flex items-center gap-4">
-                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/creative-coding-map/index">
+                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/index">
                     Index
                 </Link>
-                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/creative-coding-map/about">
+                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/about">
                     About
                 </Link>
-                <Link
-                    className={(active) => clsx('link type-header z-20', active && 'active')}
-                    href="/creative-coding-map/breakdown/test-breakdown"
-                >
+                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/breakdown/test-breakdown">
                     Breakdown
                 </Link>
                 <button className="link type-header z-20">Search</button>
