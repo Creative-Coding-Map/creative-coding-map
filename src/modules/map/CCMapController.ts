@@ -45,20 +45,21 @@ export class CCMapController {
             if (p.start != null && p.end != null) {
                 console.log('path ends changed: ', p);
                 console.log('finding shortest path between: ', p.start, p.end);
+                this.skipPathNodes.clear()
                 this.findShortestPath(p.start, p.end);
             }
         });
 
         this.emitter.on('app:selected-node:changed', (nodeId: string | null) => {
             if (nodeId) {
-                console.log('focusing on node: ', nodeId);
                 this.selectedNodeId = nodeId;
             }
         });
 
         this.emitter.on('app:shortest-path:changed', (removedId: string) => {
-            // implement
-            console.log('shortest path changed: ', removedId);
+            this.skipPathNodes.add(removedId)
+            this.findShortestPath(this.pathEnds[0], this.pathEnds[1]);
+
         });
     }
 
@@ -98,9 +99,10 @@ export class CCMapController {
     }
 
     set shortestPaths(shortestPaths: Array<Array<string>>) {
+        console.log('setting shortest paths', shortestPaths);
         if (shortestPaths != this.#shortestPaths) {
-            this.#shortestPaths = shortestPaths;
-            this.emitter.emit('map:shortest-path:changed', shortestPaths);
+            this.#shortestPaths = shortestPaths
+            this.emitter.emit('map:shortest-path:changed', shortestPaths)
         }
     }
 

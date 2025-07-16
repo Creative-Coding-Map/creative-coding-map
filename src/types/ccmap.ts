@@ -41,6 +41,7 @@ export type CCMGraphLink = LinkObject<CCMGraphNode> & {
     curvature?: number;
     strengthDelta?: number;
     strength?: number;
+    domainDegree?: number;
 };
 
 export interface CCMGraphData {
