@@ -11,6 +11,7 @@ import { pathEndNodeAtom, pathStartNodeAtom, selectedNodeIdAtom, shortestPathNod
 import CreatePathIcon from '@/components/icons/CreatePath';
 import CloseIcon from '@/components/icons/Close';
 import { ActionButton } from '@/components/action-button';
+import { useMitt } from '@/hooks/useMitt';
 
 export function ShortestPath() {
     const createPath = useAtomValue(showCreatePathAtom, { store });
@@ -29,6 +30,7 @@ function Path() {
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
     const startNode = useAtomValue(pathStartNodeAtom, { store });
     const endNode = useAtomValue(pathEndNodeAtom, { store });
+    const { emitter } = useMitt();
 
     const connections: ConnectionItem[] = useMemo(() => {
         return shortestPathNodes
@@ -115,7 +117,10 @@ function Path() {
                                         className="type-body h-6 rounded-md w-full flex group gap-1 hover:dark ccm-colors ccm-transition-fast"
                                     >
                                         <button
-                                            onClick={selectNode(node.id)}
+                                            onClick={(evt) => {
+                                                evt.preventDefault();
+                                                selectNode(node.id);
+                                            }}
                                             className={clsx(
                                                 'flex-1 rounded-md px-1.5 text-left cursor-pointer ccm-transition-fast',
                                                 'ccm-border-hover hover:bg-black hover:text-white'
@@ -123,7 +128,13 @@ function Path() {
                                         >
                                             {node.id}
                                         </button>
-                                        <button className="h-6 w-6 rounded-md cursor-pointer ccm-transition-fast">
+                                        <button
+                                            className="h-6 w-6 rounded-md cursor-pointer ccm-transition-fast"
+                                            onClick={(evt) => {
+                                                evt.preventDefault();
+                                                emitter.emit('app:shortest-path:changed', node.id);
+                                            }}
+                                        >
                                             <CloseIcon className="opacity-0 group-hover:opacity-100 border border-black h-6 w-6 rounded-md hover:bg-black hover:stroke-white ccm-transition-fast" />
                                         </button>
                                     </div>

@@ -55,6 +55,11 @@ export class CCMapController {
                 this.selectedNodeId = nodeId;
             }
         });
+
+        this.emitter.on('app:shortest-path:changed', (removedId: string) => {
+            // implement
+            console.log('shortest path changed: ', removedId);
+        });
     }
 
     /**
@@ -265,8 +270,8 @@ export class CCMapController {
         if (!e.shiftKey) {
             if (node.id === this.selectedNodeId) {
                 // TODO: Fix bounds check
-                const graphCoord = this.graphRef!.screen2GraphCoords(e.clientX, e.clientY)
-                const dx = (graphCoord.x - node.x) - node.__bckgDimensions[0] / 2.0;
+                const graphCoord = this.graphRef!.screen2GraphCoords(e.clientX, e.clientY);
+                const dx = graphCoord.x - node.x - node.__bckgDimensions[0] / 2.0;
                 if (dx > -40.0) {
                     this.focusOnNode(node);
                 } else {
@@ -375,7 +380,7 @@ export class CCMapController {
 
             const labelWidth = textWidth + 2 * hmargin + fontSize * 0.2;
 
-            const focusButtonWidth = (node.id === this.selectedNodeId) ? 64.0 / globalScale : 0.0;
+            const focusButtonWidth = node.id === this.selectedNodeId ? 64.0 / globalScale : 0.0;
             const labelDimensions: [number, number] = [textWidth + 2 * hmargin, fontSize + vmargin].map(
                 (n) => n + fontSize * 0.2
             ) as [number, number];
@@ -383,7 +388,6 @@ export class CCMapController {
             const bckgDimensions: [number, number] = [textWidth + 2 * hmargin + focusButtonWidth, fontSize + vmargin].map(
                 (n) => n + fontSize * 0.2
             ) as [number, number];
-
 
             const isSelected = node.id === this.selectedNodeId;
 
@@ -393,7 +397,6 @@ export class CCMapController {
             ctx.fillStyle = nodeColor;
             ctx.beginPath();
             ctx.roundRect(node.x! - labelDimensions[0] / 2, node.y! - labelDimensions[1] / 2, ...labelDimensions, radius);
-
 
             ctx.fillStyle = isSelected ? nodeColor : 'white';
             ctx.fill();
@@ -410,7 +413,7 @@ export class CCMapController {
             // draw focus widget, when node is selected node
             if (node.id === this.selectedNodeId) {
                 ctx.beginPath();
-                node.focusX = labelDimensions[0] / 2 + 2.0 / globalScale
+                node.focusX = labelDimensions[0] / 2 + 2.0 / globalScale;
                 ctx.roundRect(
                     node.x! + labelDimensions[0] / 2 + 2.0 / globalScale,
                     node.y! - labelDimensions[1] / 2,

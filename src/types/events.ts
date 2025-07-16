@@ -3,6 +3,7 @@ import type { CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds, CCMViewConf
 
 export type CCMEvents = {
     'app:shortest-path:create': undefined;
+    'app:shortest-path:changed': string;
     'app:suggestions:reset': undefined;
     'app:selected-node:changed': string | null;
     'map:graph-data:updated': CCMGraphData | null;
