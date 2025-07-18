@@ -126,6 +126,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 onEngineStop={handleEngineStop}
                 nodeAutoColorBy={controllerRef.current.getNodeAutoColorBy}
                 linkVisibility={controllerRef.current.getLinkVisibility}
+                linkLineDash={controllerRef.current.getLinkLineDash}
                 onNodeClick={controllerRef.current.getNodeClickHandler}
                 enableNodeDrag={true}
                 nodeCanvasObject={controllerRef.current.getNodeCanvasObject}

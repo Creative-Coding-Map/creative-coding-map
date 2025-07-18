@@ -43,9 +43,7 @@ export class CCMapController {
     constructor() {
         this.emitter.on('map:path-ends:changed', (p: CCMPathEnds) => {
             if (p.start != null && p.end != null) {
-                console.log('path ends changed: ', p);
-                console.log('finding shortest path between: ', p.start, p.end);
-                this.skipPathNodes.clear()
+                this.skipPathNodes.clear();
                 this.findShortestPath(p.start, p.end);
             }
         });
@@ -57,9 +55,8 @@ export class CCMapController {
         });
 
         this.emitter.on('app:shortest-path:changed', (removedId: string) => {
-            this.skipPathNodes.add(removedId)
+            this.skipPathNodes.add(removedId);
             this.findShortestPath(this.pathEnds[0], this.pathEnds[1]);
-
         });
     }
 
@@ -101,24 +98,57 @@ export class CCMapController {
     set shortestPaths(shortestPaths: Array<Array<string>>) {
         console.log('setting shortest paths', shortestPaths);
         if (shortestPaths != this.#shortestPaths) {
-            this.#shortestPaths = shortestPaths
-            this.emitter.emit('map:shortest-path:changed', shortestPaths)
+            this.#shortestPaths = shortestPaths;
+            this.emitter.emit('map:shortest-path:changed', shortestPaths);
         }
     }
 
     findShortestPath(source: string, target: string) {
         const filteredLinks: Array<CCMGraphLink> = [];
 
-        this.graphData!.links.forEach((link) => {
-            const source = (link.source as CCMGraphNode).id || (link.source as string);
-            const target = (link.target as CCMGraphNode).id || (link.target as string);
+        this.ogGraph!.links.forEach((link) => {
+            const source_ = (link.source as CCMGraphNode).id || (link.source as string);
+            const target_ = (link.target as CCMGraphNode).id || (link.target as string);
 
-            if (!this.skipPathNodes.has(source) && !this.skipPathNodes.has(target)) {
+            if (!this.skipPathNodes.has(source_) && !this.skipPathNodes.has(target_)) {
                 filteredLinks.push(link);
             }
         });
 
         this.shortestPaths = findAllShortestPaths(this.graphData!.nodes, filteredLinks, source, target).paths;
+
+        if (this.#shortestPaths.length > 0) {
+            const shortestPath = this.#shortestPaths[0];
+            const subtree: Array<CCMGraphLink> = [];
+
+            for (let i = 0; i < shortestPath.length - 1; ++i) {
+                const link: CCMGraphLink = {
+                    source: shortestPath[i],
+                    target: shortestPath[i + 1],
+                    weight: 1.0,
+                    type: 'shortest-path',
+                };
+                subtree.push(link);
+            }
+
+            const mst = minimumSpanningTreeFromSubtree(
+                this.ogGraph!.nodes.concat(this.domainGraph!.nodes),
+                this.ogGraph!.links.concat(this.domainGraph!.links),
+                subtree,
+                linkWeights
+            );
+            this.graphData = this.localBuildGraph(mst.mstEdges)
+
+            let x = 0.0
+            for (const node of shortestPath) {
+                const node_ = this.nodeForId(node);
+                if (node_) {
+                    node_.fx = x
+                    node_.fy = 0;
+                    x += 30.0
+                }
+            }
+        }
     }
 
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
@@ -137,6 +167,8 @@ export class CCMapController {
             delete graphNode.fy;
         }
 
+        this.pathEnds = { start: null, end: null };
+        this.shortestPaths = []
         // Pin clicked node
         node.fx = node.x;
         node.fy = node.y;
@@ -268,6 +300,14 @@ export class CCMapController {
         return (link.strengthDelta || 0) >= 0.0;
     }
 
+    getLinkLineDash(link: any) {
+        if (link.type === 'shortest-path') {
+            return [0.1, 0.1]
+        } else {
+            return []
+        }
+    }
+
     getNodeClickHandler = (node: any, e: MouseEvent) => {
         if (!e.shiftKey) {
             if (node.id === this.selectedNodeId) {
@@ -279,14 +319,16 @@ export class CCMapController {
                 } else {
                     this.centerOnNode(node);
                 }
+
+                // TODO: Fix shortest path start selection logic
+                if (this.pathEnds.start != node.id && (this.#shortestPaths.length == 0)) {
+                    this.pathEnds.start = node.id;
+                    this.emitter.emit('map:path-ends:changed', this.pathEnds);
+                }
             }
             if (node.id != this.selectedNodeId) {
                 this.selectedNodeId = node.id;
                 this.emitter.emit('map:selected-node:changed', this.selectedNodeId);
-            }
-            if (this.pathEnds.start != node.id) {
-                this.pathEnds.start = node.id;
-                this.emitter.emit('map:path-ends:changed', this.pathEnds);
             }
         } else {
             if (this.pathEnds.end != node.id) {
@@ -314,7 +356,6 @@ export class CCMapController {
                 break;
         }
 
-        // Draw node shape
         ctx.fillStyle = node.color || '#000000';
 
         // TODO: Implement glyphs per design
