@@ -29,6 +29,12 @@
     --size-11px: 0.688rem;
 }
 
+@layer base {
+    .force-graph-container .float-tooltip-kap {
+        @apply !hidden;
+    }
+}
+
 @utility font-roboto {
     font-family: var(--font-roboto-mono);
 }
