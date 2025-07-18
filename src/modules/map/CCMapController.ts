@@ -34,6 +34,7 @@ export class CCMapController {
 
     private skipPathNodes: Set<string> = new Set();
     private emitter = emitter;
+    private hoverNodeId: string | null = null;
 
     ogGraph: CCMGraphData | null = null;
 
@@ -308,6 +309,22 @@ export class CCMapController {
         }
     }
 
+    getNodeHoverHandler = (node: any, _: any) => {
+        if (node !== null) {
+            if (this.hoverNodeId !== node.id) {
+                this.hoverNodeId = node.id;
+                // Remove hovered item from nodes and push it to the back to assure it the hovered over node is drawn
+                // last, making sure the hovered item is visible.
+                const index = this.graphData?.nodes.indexOf(node)
+                if (index !== undefined && index !== -1) {
+                    this.graphData?.nodes.splice(index, 1);
+                }
+                this.graphData?.nodes.push(node);
+            }
+        } else {
+            this.hoverNodeId = null;
+        }
+    }
     getNodeClickHandler = (node: any, e: MouseEvent) => {
         if (!e.shiftKey) {
             if (node.id === this.selectedNodeId) {
@@ -328,6 +345,14 @@ export class CCMapController {
             }
             if (node.id != this.selectedNodeId) {
                 this.selectedNodeId = node.id;
+                // Remove selected item from nodes and push it to the back to assure it the hovered over node is drawn
+                // last, making sure the hovered item is visible.
+                const index = this.graphData?.nodes.indexOf(node)
+                if (index !== undefined && index !== -1) {
+                    this.graphData?.nodes.splice(index, 1);
+                }
+                this.graphData?.nodes.push(node);
+
                 this.emitter.emit('map:selected-node:changed', this.selectedNodeId);
             }
         } else {
@@ -379,10 +404,10 @@ export class CCMapController {
                 break;
         }
 
-        node.__bckgDimensions = [4, 4];
+        node.__bckgDimensions = [8, 8];
 
         // Draw labels if zoomed in enough
-        if (scale >= minScale) {
+        if (scale >= minScale || node.id === this.hoverNodeId || node.id === this.selectedNodeId) {
             const suffix = (() => {
                 switch (node.type) {
                     case 'tag':
