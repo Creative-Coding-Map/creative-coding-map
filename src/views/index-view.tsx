@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import { memo, useMemo, useState } from 'react';
+import { memo, useContext, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { faker } from '@faker-js/faker';
 import { atom, useAtom } from 'jotai';
@@ -14,7 +14,7 @@ import Tools from '@/components/symbols/Tools';
 import Techniques from '@/components/symbols/Techniques';
 import { databaseAtom } from '@/state/model';
 import { pick, updateArray } from '@/lib/utils';
-import Tooltip from '@/components/tooltip';
+import Tooltip, { TooltipContext, TooltipProvider } from '@/components/tooltip';
 import { fetchCCMData } from '@/modules/map/fetch-data';
 import { store } from '@/state/store';
 import { Details, DetailsProvider } from '@/components/Details';
@@ -69,9 +69,6 @@ export default function IndexView() {
 
         return Array.from(map.entries());
     }, [database]);
-
-    // console.log('Entries:', dataByLetter.flatMap(([_, nodes]) => nodes).length);
-    console.log('IndexView render');
 
     return (
         <main id="index-view" className="w-full h-screen relative ccm-pt ccm-px overflow-hidden">
@@ -233,7 +230,7 @@ const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter
     }, [dataByLetter, width]);
 
     return (
-        <DetailsProvider>
+        <TooltipProvider>
             <div ref={ref} className="flex flex-auto gap-x-4 w-full h-full pb-10 my-8 overflow-y-auto ccm-scrollbar">
                 {width && width > 0
                     ? columns.map((columnItems, columnIndex) => (
@@ -251,7 +248,7 @@ const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter
                       ))
                     : null}
             </div>
-        </DetailsProvider>
+        </TooltipProvider>
     );
 });
 
@@ -283,32 +280,51 @@ const ListCell = memo(function ListCell({ index, style, data }: ListCellProps) {
 });
 
 const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
+    const context = useContext(TooltipContext);
+
+    if (!context) {
+        throw new Error('TooltipContext must be used within TooltipProvider');
+    }
+
+    const isOpen = context.openId === node.id;
+
     return (
-        <Details.Root id={node.id} context="index-view">
-            <Details.Summary className={clsx('flex items-center gap-2 ccm-transition px-2 rounded', node.type)}>
-                <span className="w-4 flex-shrink-0">{renderIcon(node.type)}</span>
-                <Tooltip
-                    className="type-filter cursor-pointer group-[.show-content]:hidden"
-                    message={<span className="type-hint">{node.description}</span>}
-                >
-                    <span className="group-open:font-bold ellipsis text-sm">{node.id}</span>
-                </Tooltip>
-                <span className="hidden group-[.show-content]:block group-[.show-content]:font-bold ellipsis type-filter text-sm">
-                    {node.id}
-                </span>
-                <span className={clsx('ml-auto type-hint ellipsis category text-xs opacity-60')}>[{node.category}]</span>
-            </Details.Summary>
-            <Details.Content className="flex flex-col gap-2 pl-6 pb-3 text-sm">
-                <p className="type-hint flex items-center gap-1 text-xs">NODE SELECTED ({node.type.toUpperCase()})</p>
-                <p className="type-body mb-2 line-clamp-3 text-xs">{node.description}</p>
-                <div className="space-y-1">
-                    <NodeData node={node} prop="tags" />
-                    <NodeData node={node} prop="dependsOn" />
-                    <NodeData node={node} prop="supports" />
-                    <NodeData node={node} prop="references" />
-                </div>
-            </Details.Content>
-        </Details.Root>
+        <div
+            key={node.id}
+            className="flex relative items-center gap-2 group"
+            role="button"
+            onClick={() => {
+                if (isOpen) {
+                    context.setOpenId(null);
+                } else {
+                    context.setOpenId(node.id);
+                }
+            }}
+        >
+            <span className="w-4 flex-shrink-0">{renderIcon(node.type)}</span>
+            <Tooltip
+                className="type-filter cursor-pointer "
+                forceShow={isOpen}
+                message={
+                    <div className="flex flex-col gap-2">
+                        <p className="type-hint flex items-center gap-1 text-xs">NODE SELECTED ({node.type.toUpperCase()})</p>
+                        <p className="type-body mb-2 line-clamp-3 text-xs">{node.description}</p>
+                        <div className="space-y-1">
+                            <NodeData node={node} prop="tags" />
+                            <NodeData node={node} prop="dependsOn" />
+                            <NodeData node={node} prop="supports" />
+                            <NodeData node={node} prop="references" />
+                        </div>
+                    </div>
+                }
+            >
+                <span className={clsx('ellipsis text-sm', isOpen && 'font-bold underline')}>{node.id}</span>
+            </Tooltip>
+            <span className="hidden group-[.show-content]:block group-[.show-content]:font-bold ellipsis type-filter text-sm">
+                {node.id}
+            </span>
+            <span className={clsx('ml-auto type-hint ellipsis category text-xs opacity-60')}>[{node.category}]</span>
+        </div>
     );
 });
 

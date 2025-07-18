@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { createContext, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import type { ElementType } from 'react';
+import type { Dispatch, ElementType, ReactNode, SetStateAction } from 'react';
 
 export default function Tooltip({
     as: Component = 'div',
@@ -10,6 +10,7 @@ export default function Tooltip({
     tooltipClassName,
     message,
     children,
+    forceShow = false,
     ...props
 }: {
     as?: ElementType;
@@ -17,6 +18,7 @@ export default function Tooltip({
     tooltipClassName?: string;
     message: React.ReactNode;
     children: React.ReactNode;
+    forceShow?: boolean;
     [key: string]: any;
 }) {
     const containerRef = useRef<HTMLElement>(null);
@@ -63,7 +65,7 @@ export default function Tooltip({
 
     const tooltipPortal = createPortal(
         <AnimatePresence>
-            {isVisible && (
+            {(isVisible || forceShow) && (
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -84,10 +86,27 @@ export default function Tooltip({
 
     return (
         <>
-            <Component ref={containerRef} className={clsx('group/tooltip relative', className)} {...props}>
+            <Component
+                ref={containerRef}
+                className={clsx('group/tooltip relative', isVisible || (forceShow && 'show-content'), className)}
+                {...props}
+            >
                 {children}
             </Component>
             {tooltipPortal}
         </>
     );
+}
+
+// Global context to manage which Details is currently open
+export const TooltipContext = createContext<{
+    openId: string | null;
+    setOpenId: Dispatch<SetStateAction<string | null>>;
+} | null>(null);
+
+// Provider for managing global Details state
+export function TooltipProvider({ children }: { children: ReactNode }) {
+    const [openId, setOpenId] = useState<string | null>(null);
+
+    return <TooltipContext.Provider value={{ openId, setOpenId }}>{children}</TooltipContext.Provider>;
 }
