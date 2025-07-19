@@ -578,3 +578,35 @@ export function findAllDegreesOfSeparation(links: CCMGraphLink[], startNode: str
 
     return distances;
 }
+
+export function pushTerminalTagsUp(nodes: CCMGraphNode[], edges: CCMGraphLink[]) {
+    // edges encodes a tree at this point
+
+    // Find terminal nodes (nodes with only one connection)
+    const adjacencyList = new Map<string, Set<string>>();
+    const nodesById: Map<string, CCMGraphNode> = new Map<string, CCMGraphNode>();
+    nodes.forEach((node) => {
+        nodesById.set(node.id, node);
+    });
+    
+
+    // Build adjacency list
+    edges.forEach((edge) => {
+        const source = nodeId(edge.source);
+        const target = nodeId(edge.target);
+
+        if (!adjacencyList.has(source)) adjacencyList.set(source, new Set());
+        if (!adjacencyList.has(target)) adjacencyList.set(target, new Set());
+
+        adjacencyList.get(source)?.add(target);
+        adjacencyList.get(target)?.add(source);
+    });
+
+    // Identify terminal nodes: nodes with exactly 1 connection
+    const terminalNodes = Array.from(adjacencyList.entries())
+        .filter(([_, neighbors]) => neighbors.size === 1)
+        .map(([node]) => node)
+        .filter((node) => nodesById.get(node)!.type == 'tag')
+
+    console.log('Terminal tag nodes:', terminalNodes);
+}

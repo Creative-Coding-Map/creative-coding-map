@@ -12,9 +12,10 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'vector graphics', degree: 1 },
                     { id: 'geometry', degree: 1 },
                     { id: 'shaders', degree: 1 },
-                    { id: 'graphics api', degree: 1 },
                     { id: 'raster graphics', degree: 1 },
                     { id: 'video', degree: 1 },
+                    { id: 'image processing', degree: 1 },
+                    { id: 'print', degree: 1 },
                 ],
             },
             {
@@ -45,6 +46,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'data visualization', degree: 1 },
                     { id: 'data science', degree: 1 },
                     { id: 'file format', degree: 1 },
+                    { id: 'compression', degree: 1 },
                 ],
             },
             {
@@ -53,12 +55,17 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'hardware', degree: 1 },
                     { id: 'microcontroller', degree: 1 },
                     { id: 'media technology', degree: 1 },
-                    { id: 'print', degree: 1 },
+
                 ],
             },
             {
                 name: 'software technology',
-                nodes: [{ id: 'language', degree: 1 }],
+                nodes: [
+                    { id: 'language', degree: 1 },
+                    { id: 'library', degree: 1 },
+                    { id: 'parsing', degree: 1 },
+                    { id: 'binding', degree: 1 },
+                ],
             },
         ],
         colorSets: [
@@ -89,84 +96,60 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
         domainSets: [
             {
                 name: 'Processing',
-                nodes: [
-                    { id: 'Processing', degree: 1 },
-                ],
+                nodes: [{ id: 'Processing', degree: 1 }],
             },
             {
                 name: 'OpenFrameworks',
-                nodes: [
-                    { id: 'OpenFrameworks', degree: 1 },
-                ],
+                nodes: [{ id: 'OpenFrameworks', degree: 1 }],
             },
             {
                 name: 'p5.js',
-                nodes: [
-                    { id: 'P5Js', degree: 1 },
-                ],
+                nodes: [{ id: 'P5Js', degree: 1 }],
             },
             {
                 name: 'Cinder',
-                nodes: [
-                    { id: 'Cinder', degree: 1 },
-                ],
+                nodes: [{ id: 'Cinder', degree: 1 }],
             },
             {
                 name: 'Three.js',
-                nodes: [
-                    { id: 'ThreeJS', degree: 1 },
-                ],
+                nodes: [{ id: 'ThreeJS', degree: 1 }],
             },
             {
                 name: 'OPENRNDR',
-                nodes: [
-                    { id: 'OPENRNDR', degree: 1 },
-                ],
-            }
+                nodes: [{ id: 'OPENRNDR', degree: 1 }],
+            },
         ],
         colorSets: [
             {
                 name: 'Processing',
-                nodes: [
-                    { id: 'Processing', degree: 1 },
-                ],
+                nodes: [{ id: 'Processing', degree: 1 }],
                 color: '#0000ff',
             },
             {
                 name: 'OpenFrameworks',
-                nodes: [
-                    { id: 'OpenFrameworks', degree: 1 },
-                ],
+                nodes: [{ id: 'OpenFrameworks', degree: 1 }],
                 color: '#00ffff',
             },
             {
                 name: 'p5.js',
-                nodes: [
-                    { id: 'P5Js', degree: 1 },
-                ],
-                color: '#ff00ff'
+                nodes: [{ id: 'P5Js', degree: 1 }],
+                color: '#ff00ff',
             },
             {
                 name: 'Cinder',
-                nodes: [
-                    { id: 'Cinder', degree: 1 },
-                ],
-                color: '#ff7f00'
+                nodes: [{ id: 'Cinder', degree: 1 }],
+                color: '#ff7f00',
             },
             {
                 name: 'Three.js',
-                nodes: [
-                    { id: 'ThreeJS', degree: 1 },
-                ],
-                color: '#7f7f00'
+                nodes: [{ id: 'ThreeJS', degree: 1 }],
+                color: '#7f7f00',
             },
             {
                 name: 'OPENRNDR',
-                nodes: [
-                    { id: 'OPENRNDR', degree: 1 },
-                ],
-                color: '#ffc0cb'
-            }
+                nodes: [{ id: 'OPENRNDR', degree: 1 }],
+                color: '#ffc0cb',
+            },
         ],
-    }
+    },
 ];

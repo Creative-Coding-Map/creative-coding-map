@@ -2,7 +2,13 @@ import * as d3 from 'd3';
 
 import { blendGraphs } from './blend';
 import { colorGraph } from './coloring';
-import { findAdjacentSubtree, findAllShortestPaths, minimumSpanningTreeFromSubtree, updateLinkCounts } from './dijkstra';
+import {
+    findAdjacentSubtree,
+    findAllShortestPaths,
+    minimumSpanningTreeFromSubtree,
+    pushTerminalTagsUp,
+    updateLinkCounts,
+} from './dijkstra';
 import { buildGraph, buildNodesFromCcmData } from './build-graph';
 import { buildDomainGraph } from './domain-sets';
 import { VIEW_CONFIGURATIONS } from './data';
@@ -185,8 +191,10 @@ export class CCMapController {
             throw Error('No subtree found for node ' + node.id);
         }
 
+        const relevantNodes = this.ogGraph!.nodes.concat(this.domainGraph!.nodes)
+
         const mst = minimumSpanningTreeFromSubtree(
-            this.ogGraph!.nodes.concat(this.domainGraph!.nodes),
+            relevantNodes,
             this.ogGraph!.links.concat(this.domainGraph!.links),
             subtree,
             linkWeights
@@ -196,6 +204,8 @@ export class CCMapController {
 
         console.log('number of links in new graph: ', nextGraph.links.length);
 
+
+        pushTerminalTagsUp(relevantNodes, mst.mstEdges)
         graphData.links = mst.mstEdges;
 
         blendGraphs(graphData, nextGraph);
