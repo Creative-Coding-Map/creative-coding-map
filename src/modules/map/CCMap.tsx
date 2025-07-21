@@ -28,6 +28,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
     useLayoutEffect(() => {
         const initializeGraph = async () => {
             try {
+                console.log('CCMap initializing');
                 setIsLoading(true);
                 setError(null);
 
@@ -73,10 +74,15 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         // Cleanup on unmount
         return () => {
             if (controllerRef.current) {
+                // unbind event listeners
                 emitter.off('map:graph-data:updated');
                 emitter.off('map:runtime-props:updated');
                 emitter.off('map:selected-node:changed');
+
+                // destroy controller
                 controllerRef.current.destroy();
+
+                console.log('CCMap unmounted');
             }
         };
     }, [navigate]);

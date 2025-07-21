@@ -28,6 +28,7 @@ import { emitter } from '@/hooks/useMitt';
 
 export class CCMapController {
     private selectedNodeId: any | null = null;
+    private initialized = false;
 
     private ccmData: CCMData | null = null;
     private nodes: NodesCollection | null = null;
@@ -47,25 +48,7 @@ export class CCMapController {
     pathEnds: CCMPathEnds = { start: null, end: null };
     #shortestPaths: Array<Array<string>> = [];
 
-    constructor() {
-        this.emitter.on('map:path-ends:changed', (p: CCMPathEnds) => {
-            if (p.start != null && p.end != null) {
-                this.skipPathNodes.clear();
-                this.findShortestPath(p.start, p.end);
-            }
-        });
-
-        this.emitter.on('app:selected-node:changed', (nodeId: string | null) => {
-            if (nodeId) {
-                this.selectedNodeId = nodeId;
-            }
-        });
-
-        this.emitter.on('app:shortest-path:changed', (removedId: string) => {
-            this.skipPathNodes.add(removedId);
-            this.findShortestPath(this.pathEnds[0], this.pathEnds[1]);
-        });
-    }
+    constructor() {}
 
     /**
      * Centers the graph view on the specified node.
@@ -144,15 +127,15 @@ export class CCMapController {
                 subtree,
                 linkWeights
             );
-            this.graphData = this.localBuildGraph(mst.mstEdges)
+            this.graphData = this.localBuildGraph(mst.mstEdges);
 
-            let x = 0.0
+            let x = 0.0;
             for (const node of shortestPath) {
                 const node_ = this.nodeForId(node);
                 if (node_) {
-                    node_.fx = x
+                    node_.fx = x;
                     node_.fy = 0;
-                    x += 30.0
+                    x += 30.0;
                 }
             }
         }
@@ -175,7 +158,7 @@ export class CCMapController {
         }
 
         this.pathEnds = { start: null, end: null };
-        this.shortestPaths = []
+        this.shortestPaths = [];
         // Pin clicked node
         node.fx = node.x;
         node.fy = node.y;
@@ -191,7 +174,7 @@ export class CCMapController {
             throw Error('No subtree found for node ' + node.id);
         }
 
-        const relevantNodes = this.ogGraph!.nodes.concat(this.domainGraph!.nodes)
+        const relevantNodes = this.ogGraph!.nodes.concat(this.domainGraph!.nodes);
 
         const mst = minimumSpanningTreeFromSubtree(
             relevantNodes,
@@ -204,8 +187,7 @@ export class CCMapController {
 
         console.log('number of links in new graph: ', nextGraph.links.length);
 
-
-        pushTerminalTagsUp(relevantNodes, mst.mstEdges)
+        pushTerminalTagsUp(relevantNodes, mst.mstEdges);
         graphData.links = mst.mstEdges;
 
         blendGraphs(graphData, nextGraph);
@@ -271,7 +253,31 @@ export class CCMapController {
         this.graphData.links = mstNamed.mstEdges;
 
         this.#runtimeProps = {};
+
+        this.emitter.on('map:path-ends:changed', this.onPathEndsChanged);
+        this.emitter.on('app:selected-node:changed', this.onSelectedNodeChanged);
+        this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
+
+        this.initialized = true;
     }
+
+    onPathEndsChanged = (p: CCMPathEnds) => {
+        if (p.start != null && p.end != null) {
+            this.skipPathNodes.clear();
+            this.findShortestPath(p.start, p.end);
+        }
+    };
+
+    onSelectedNodeChanged = (nodeId: string | null) => {
+        if (nodeId) {
+            this.selectedNodeId = nodeId;
+        }
+    };
+
+    onShortestPathChanged = (removedId: string) => {
+        this.skipPathNodes.add(removedId);
+        this.findShortestPath(this.pathEnds[0], this.pathEnds[1]);
+    };
 
     get graphData(): CCMGraphData | null {
         return this.#graphData;
@@ -313,9 +319,9 @@ export class CCMapController {
 
     getLinkLineDash(link: any) {
         if (link.type === 'shortest-path') {
-            return [0.1, 0.1]
+            return [0.1, 0.1];
         } else {
-            return []
+            return [];
         }
     }
 
@@ -325,7 +331,7 @@ export class CCMapController {
                 this.hoverNodeId = node.id;
                 // Remove hovered item from nodes and push it to the back to assure it the hovered over node is drawn
                 // last, making sure the hovered item is visible.
-                const index = this.graphData?.nodes.indexOf(node)
+                const index = this.graphData?.nodes.indexOf(node);
                 if (index !== undefined && index !== -1) {
                     this.graphData?.nodes.splice(index, 1);
                 }
@@ -334,7 +340,7 @@ export class CCMapController {
         } else {
             this.hoverNodeId = null;
         }
-    }
+    };
     getNodeClickHandler = (node: any, e: MouseEvent) => {
         if (!e.shiftKey) {
             if (node.id === this.selectedNodeId) {
@@ -348,7 +354,7 @@ export class CCMapController {
                 }
 
                 // TODO: Fix shortest path start selection logic
-                if (this.pathEnds.start != node.id && (this.#shortestPaths.length == 0)) {
+                if (this.pathEnds.start != node.id && this.#shortestPaths.length == 0) {
                     this.pathEnds.start = node.id;
                     this.emitter.emit('map:path-ends:changed', this.pathEnds);
                 }
@@ -357,7 +363,7 @@ export class CCMapController {
                 this.selectedNodeId = node.id;
                 // Remove selected item from nodes and push it to the back to assure it the hovered over node is drawn
                 // last, making sure the hovered item is visible.
-                const index = this.graphData?.nodes.indexOf(node)
+                const index = this.graphData?.nodes.indexOf(node);
                 if (index !== undefined && index !== -1) {
                     this.graphData?.nodes.splice(index, 1);
                 }
@@ -543,11 +549,26 @@ export class CCMapController {
     };
 
     isInitialized(): boolean {
-        return this.ccmData !== null && this.nodes !== null;
+        return this.initialized;
     }
 
     destroy(): void {
         // Cleanup if needed
+        this.initialized = false;
+
+        // reset all properties
+        this.#graphData = null;
+        this.#runtimeProps = {};
+        this.ccmData = null;
+        this.nodes = null;
+        this.domainGraph = null;
+        this.ogGraph = null;
+        this.pathEnds = { start: null, end: null };
         this.graphRef = null;
+
+        // unbind event listeners
+        this.emitter.off('map:path-ends:changed', this.onPathEndsChanged);
+        this.emitter.off('app:selected-node:changed', this.onSelectedNodeChanged);
+        this.emitter.off('app:shortest-path:changed', this.onShortestPathChanged);
     }
 }
