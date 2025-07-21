@@ -337,7 +337,9 @@ const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
                     </div>
                 }
             >
-                <span className={clsx('ellipsis text-sm', showContent && 'font-bold underline')}>{node.id}</span>
+                <span className={clsx('ellipsis text-sm hover:underline hover:font-bold', showContent && 'font-bold underline')}>
+                    {node.id}
+                </span>
             </Tooltip>
             <span className="hidden group-[.show-content]:block group-[.show-content]:font-bold ellipsis type-filter text-sm">
                 {node.id}
