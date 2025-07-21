@@ -9,7 +9,7 @@ import { CCMapController } from './CCMapController';
 import type { ForceGraphProps } from 'react-force-graph-2d';
 import type { CCMGraphData, CCMGraphLink, CCMGraphNode } from '@/types/ccmap';
 import '@/styles/ccmap.css';
-import { useMitt } from '@/hooks/useMitt';
+import { useEmitter } from '@/hooks/useEmitter';
 
 interface CCMapProps {
     className?: string;
@@ -23,7 +23,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const [error, setError] = useState<string | null>(null);
     const [graphData, setGraphData] = useState<CCMGraphData | null>(null);
     const [runtimeProps, setRuntimeProps] = useState<ForceGraphProps<CCMGraphNode, CCMGraphLink>>({});
-    const { emitter } = useMitt();
+    const { emitter } = useEmitter();
 
     useLayoutEffect(() => {
         const initializeGraph = async () => {

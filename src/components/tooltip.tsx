@@ -1,7 +1,8 @@
 import clsx from 'clsx';
-import { createContext, useLayoutEffect, useRef, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import throttle from 'just-throttle';
 import type { Dispatch, ElementType, ReactNode, SetStateAction } from 'react';
 
 export default function Tooltip({
@@ -10,7 +11,10 @@ export default function Tooltip({
     tooltipClassName,
     message,
     children,
+    scrollContainerId,
     forceShow = false,
+    onlyShowOnClick = false,
+    onClose,
     ...props
 }: {
     as?: ElementType;
@@ -18,14 +22,17 @@ export default function Tooltip({
     tooltipClassName?: string;
     message: React.ReactNode;
     children: React.ReactNode;
+    scrollContainerId?: string;
     forceShow?: boolean;
+    onlyShowOnClick?: boolean;
+    onClose?: () => void;
     [key: string]: any;
 }) {
     const containerRef = useRef<HTMLElement>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0 });
 
-    const updatePosition = () => {
+    useEffect(() => {
         if (!containerRef.current) return;
 
         const rect = containerRef.current.getBoundingClientRect();
@@ -33,16 +40,19 @@ export default function Tooltip({
             top: rect.top + window.scrollY,
             left: rect.right + window.scrollX + 8, // 8px offset to the right
         });
-    };
+    }, [isVisible, forceShow]);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
+        if (onlyShowOnClick) {
+            return;
+        }
+
         const handleMouseEnter = () => {
-            updatePosition();
+            // updatePosition();
             setIsVisible(true);
         };
 
         const hideTooltip = () => {
-            // should hide the tooltip
             setIsVisible(false);
         };
 
@@ -51,20 +61,42 @@ export default function Tooltip({
         if (container) {
             container.addEventListener('mouseenter', handleMouseEnter);
             container.addEventListener('mouseleave', hideTooltip);
-            window.addEventListener('scroll', hideTooltip);
-            window.addEventListener('resize', hideTooltip);
 
             return () => {
                 container.removeEventListener('mouseenter', handleMouseEnter);
                 container.removeEventListener('mouseleave', hideTooltip);
-                window.removeEventListener('scroll', hideTooltip);
+            };
+        }
+    }, [setIsVisible, onlyShowOnClick]);
+
+    useEffect(() => {
+        if ((isVisible || forceShow) && scrollContainerId) {
+            const hideTooltip = throttle(
+                () => {
+                    console.log('Scroll event detected, hiding tooltip');
+                    setIsVisible(false);
+                    onClose?.();
+                },
+                100,
+                { leading: true, trailing: false }
+            );
+            const scrollContainer = document.getElementById(scrollContainerId);
+            if (scrollContainer) {
+                scrollContainer.addEventListener('scroll', hideTooltip);
+            }
+            window.addEventListener('resize', hideTooltip);
+
+            return () => {
+                if (scrollContainer) {
+                    scrollContainer.removeEventListener('scroll', hideTooltip);
+                }
                 window.removeEventListener('resize', hideTooltip);
             };
         }
-    }, [isVisible, setIsVisible]);
+    }, [isVisible, onlyShowOnClick, scrollContainerId, onClose]);
 
     const tooltipPortal = createPortal(
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
             {(isVisible || forceShow) && (
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -102,11 +134,12 @@ export default function Tooltip({
 export const TooltipContext = createContext<{
     openId: string | null;
     setOpenId: Dispatch<SetStateAction<string | null>>;
+    scrollContainerId?: string;
 } | null>(null);
 
 // Provider for managing global Details state
-export function TooltipProvider({ children }: { children: ReactNode }) {
+export function TooltipProvider({ children, scrollContainerId }: { children: ReactNode; scrollContainerId?: string }) {
     const [openId, setOpenId] = useState<string | null>(null);
 
-    return <TooltipContext.Provider value={{ openId, setOpenId }}>{children}</TooltipContext.Provider>;
+    return <TooltipContext.Provider value={{ openId, setOpenId, scrollContainerId }}>{children}</TooltipContext.Provider>;
 }

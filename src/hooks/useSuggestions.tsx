@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import throttle from 'just-throttle';
-import { useMitt } from './useMitt';
+import { useEmitter } from './useEmitter';
 import type { CCMNode } from '@/types/ccmap';
 import { databaseAtom } from '@/state/model';
 import { store } from '@/state/store';
@@ -16,7 +16,7 @@ export function useSuggestions({ selectSuggestion }: UseSuggestionsProps) {
     const [suggestions, setSuggestions] = useState<CCMNode[]>([]);
     const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
     const suggestionsRef = useRef<HTMLUListElement>(null);
-    const { emitter } = useMitt();
+    const { emitter } = useEmitter();
 
     const reset = useCallback(() => {
         setSuggestions([]);

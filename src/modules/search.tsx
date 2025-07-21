@@ -6,7 +6,7 @@ import { useSetAtom } from 'jotai';
 import { Suggestions } from './suggestions';
 import type { CCMNode } from '@/types/ccmap';
 import { useSuggestions } from '@/hooks/useSuggestions';
-import { useMitt } from '@/hooks/useMitt';
+import { useEmitter } from '@/hooks/useEmitter';
 import Search from '@/components/icons/Search';
 import { selectedNodeIdAtom, showSearchAtom } from '@/state/model';
 
@@ -16,7 +16,7 @@ export function SearchOverlay() {
     const inputRef = useRef<HTMLInputElement>(null);
     const [search, setSearch] = useState('');
 
-    const { emitter } = useMitt();
+    const { emitter } = useEmitter();
 
     const selectSuggestion = useCallback(
         (suggestion: CCMNode) => {

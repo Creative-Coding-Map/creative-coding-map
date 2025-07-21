@@ -12,7 +12,7 @@ import CloseIcon from '@/components/icons/Close';
 import { Input } from '@/components/input';
 import ConnectionIcon from '@/components/symbols/Connection';
 import { ActionButton } from '@/components/action-button';
-import { useMitt } from '@/hooks/useMitt';
+import { useEmitter } from '@/hooks/useEmitter';
 import { useSuggestions } from '@/hooks/useSuggestions';
 
 export function CreatePath() {
@@ -26,7 +26,7 @@ export function CreatePath() {
     const startInputRef = useRef<HTMLInputElement>(null);
     const endInputRef = useRef<HTMLInputElement>(null);
     const [suggestionsPosition, setSuggestionsPosition] = useState({ top: 0, left: 0 });
-    const { emitter } = useMitt();
+    const { emitter } = useEmitter();
 
     const selectSuggestion = useCallback(
         (suggestion: CCMNode) => {

@@ -24,7 +24,7 @@ import type {
 } from '@/types/ccmap';
 
 import { linkWeights } from '@/modules/map/link-weights.ts';
-import { emitter } from '@/hooks/useMitt';
+import { emitter } from '@/hooks/useEmitter';
 
 export class CCMapController {
     private selectedNodeId: any | null = null;

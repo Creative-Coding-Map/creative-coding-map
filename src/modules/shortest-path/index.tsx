@@ -11,7 +11,7 @@ import { pathEndNodeAtom, pathStartNodeAtom, selectedNodeIdAtom, shortestPathNod
 import CreatePathIcon from '@/components/icons/CreatePath';
 import CloseIcon from '@/components/icons/Close';
 import { ActionButton } from '@/components/action-button';
-import { useMitt } from '@/hooks/useMitt';
+import { useEmitter } from '@/hooks/useEmitter';
 
 export function ShortestPath() {
     const createPath = useAtomValue(showCreatePathAtom, { store });
@@ -30,7 +30,7 @@ function Path() {
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
     const startNode = useAtomValue(pathStartNodeAtom, { store });
     const endNode = useAtomValue(pathEndNodeAtom, { store });
-    const { emitter } = useMitt();
+    const { emitter } = useEmitter();
 
     const connections: ConnectionItem[] = useMemo(() => {
         return shortestPathNodes

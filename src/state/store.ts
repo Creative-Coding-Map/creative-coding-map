@@ -1,6 +1,6 @@
 import { createStore } from 'jotai';
 import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom, shortestPathNodesAtom } from './model';
-import { emitter } from '@/hooks/useMitt';
+import { emitter } from '@/hooks/useEmitter';
 
 export const store = createStore();
 

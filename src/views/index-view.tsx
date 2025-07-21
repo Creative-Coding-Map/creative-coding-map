@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import { memo, useContext, useMemo, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { faker } from '@faker-js/faker';
 import { atom, useAtom } from 'jotai';
@@ -14,10 +14,10 @@ import Tools from '@/components/symbols/Tools';
 import Techniques from '@/components/symbols/Techniques';
 import { databaseAtom } from '@/state/model';
 import { pick, updateArray } from '@/lib/utils';
-import Tooltip, { TooltipContext, TooltipProvider } from '@/components/tooltip';
+import Tooltip, { TooltipProvider } from '@/components/tooltip';
 import { fetchCCMData } from '@/modules/map/fetch-data';
 import { store } from '@/state/store';
-import { Details, DetailsProvider } from '@/components/Details';
+import { useEmitter } from '@/hooks/useEmitter';
 
 type IndexNode = CCMNode & { category: string; description: string };
 
@@ -73,9 +73,9 @@ export default function IndexView() {
     return (
         <main id="index-view" className="w-full h-screen relative ccm-pt ccm-px overflow-hidden">
             <section className={clsx('w-full h-full ccm-filters', addActiveFilters(filters))}>
-                <section className="pt-[80px] ml-auto z-10 relative ccm-colors transition-all duration-300">
+                <section className="pt-[80px] ml-auto z-10 relative ccm-colors ccm-transition">
                     <ul className="flex flex-col gap-0.5 type-hint">
-                        <li className={clsx(CCMNodeType.Tag)}>
+                        <li className={clsx('ccm-transition', CCMNodeType.Tag)}>
                             <button
                                 onClick={(evt) => {
                                     evt.preventDefault();
@@ -86,7 +86,7 @@ export default function IndexView() {
                                 <Tags /> <span>TAGS</span>
                             </button>
                         </li>
-                        <li className={clsx(CCMNodeType.Tool)}>
+                        <li className={clsx('ccm-transition', CCMNodeType.Tool)}>
                             <button
                                 onClick={(evt) => {
                                     evt.preventDefault();
@@ -97,7 +97,7 @@ export default function IndexView() {
                                 <Tools /> <span>TOOLS</span>
                             </button>
                         </li>
-                        <li className={clsx(CCMNodeType.Technique)}>
+                        <li className={clsx('ccm-transition', CCMNodeType.Technique)}>
                             <button
                                 onClick={() => setFilters(updateArray(CCMNodeType.Technique))}
                                 className="btn flex items-center gap-2"
@@ -105,7 +105,7 @@ export default function IndexView() {
                                 <Techniques /> <span>TECHNIQUES</span>
                             </button>
                         </li>
-                        <li className={clsx(CCMNodeType.Breakdown)}>
+                        <li className={clsx('ccm-transition', CCMNodeType.Breakdown)}>
                             <button
                                 onClick={(evt) => {
                                     evt.preventDefault();
@@ -230,8 +230,12 @@ const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter
     }, [dataByLetter, width]);
 
     return (
-        <TooltipProvider>
-            <div ref={ref} className="flex flex-auto gap-x-4 w-full h-full pb-10 my-8 overflow-y-auto ccm-scrollbar">
+        <TooltipProvider scrollContainerId="index-view-container">
+            <div
+                id="index-view-container"
+                ref={ref}
+                className="flex flex-auto gap-x-4 w-full h-full pb-10 my-8 overflow-y-auto ccm-scrollbar"
+            >
                 {width && width > 0
                     ? columns.map((columnItems, columnIndex) => (
                           <List
@@ -280,31 +284,46 @@ const ListCell = memo(function ListCell({ index, style, data }: ListCellProps) {
 });
 
 const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
-    const context = useContext(TooltipContext);
+    const { emitter } = useEmitter();
+    const [showContent, setShowContent] = useState(false);
 
-    if (!context) {
-        throw new Error('TooltipContext must be used within TooltipProvider');
-    }
+    const onShowContent = useCallback(() => {
+        const element = document.getElementById('index-view-container');
 
-    const isOpen = context.openId === node.id;
+        if (element) {
+            if (element.dataset.details === node.id) {
+                element.removeAttribute('data-details');
+                setShowContent(false);
+            } else {
+                if (element.dataset.details) {
+                    emitter.emit('app:index:close-tooltip', element.dataset.details);
+                }
+                element.dataset.details = node.id;
+                setShowContent(true);
+            }
+        }
+    }, [node.id, setShowContent]);
+
+    useEffect(() => {
+        if (showContent) {
+            emitter.once('app:index:close-tooltip', (id: string) => id === node.id).then(() => setShowContent(false));
+        }
+    }, [node.id, showContent]);
 
     return (
         <div
             key={node.id}
-            className="flex relative items-center gap-2 group"
+            className={clsx('flex relative items-center gap-2 group ccm-transition', node.type)}
             role="button"
-            onClick={() => {
-                if (isOpen) {
-                    context.setOpenId(null);
-                } else {
-                    context.setOpenId(node.id);
-                }
-            }}
+            onClick={onShowContent}
         >
             <span className="w-4 flex-shrink-0">{renderIcon(node.type)}</span>
             <Tooltip
                 className="type-filter cursor-pointer "
-                forceShow={isOpen}
+                forceShow={showContent}
+                onClose={() => setShowContent(false)}
+                onlyShowOnClick
+                scrollContainerId="index-view-container"
                 message={
                     <div className="flex flex-col gap-2">
                         <p className="type-hint flex items-center gap-1 text-xs">NODE SELECTED ({node.type.toUpperCase()})</p>
@@ -318,7 +337,7 @@ const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
                     </div>
                 }
             >
-                <span className={clsx('ellipsis text-sm', isOpen && 'font-bold underline')}>{node.id}</span>
+                <span className={clsx('ellipsis text-sm', showContent && 'font-bold underline')}>{node.id}</span>
             </Tooltip>
             <span className="hidden group-[.show-content]:block group-[.show-content]:font-bold ellipsis type-filter text-sm">
                 {node.id}

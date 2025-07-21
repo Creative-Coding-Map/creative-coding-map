@@ -13,4 +13,5 @@ export type CCMEvents = {
     'map:focus-node:changed': string | null;
     'map:path-ends:changed': CCMPathEnds;
     'map:shortest-path:changed': Array<Array<string>>;
+    'app:index:close-tooltip': string;
 };
