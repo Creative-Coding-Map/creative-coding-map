@@ -1,22 +1,20 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useMemo } from 'react';
 import { AnimatePresence, m } from 'motion/react';
 import { NodeData } from './node-data';
 import { ActionButton } from '@/components/action-button';
 import { store } from '@/state/store';
 import CloseIcon from '@/components/icons/Close';
-import { databaseAtom, selectedNodeAtom, selectedNodeIdAtom } from '@/state/model';
-import BreakdownView from '@/views/breakdown-view';
+import { selectedNodeAtom, selectedNodeIdAtom } from '@/state/model';
 
 export function SelectedNode() {
     const selectedNode = useAtomValue(selectedNodeAtom, { store });
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
 
-    const database = useAtomValue(databaseAtom, { store });
+    // const database = useAtomValue(databaseAtom, { store });
 
-    const breakdowns = useMemo(() => {
-        return selectedNode ? database.getBreakdowns('OPENRNDR') : null;
-    }, [selectedNode]);
+    // const breakdowns = useMemo(() => {
+    //     return selectedNode ? database.getBreakdowns('OPENRNDR') : null;
+    // }, [selectedNode]);
 
     return (
         <AnimatePresence>
@@ -52,13 +50,13 @@ export function SelectedNode() {
                     </div>
                 </m.aside>
             )}
-            {breakdowns && (
+            {/* {breakdowns && (
                 <div className="flex overflow-x-auto gap-2 z-10 pr-4 w-full max-h-full">
                     {breakdowns.map((breakdown) => (
                         <BreakdownView breakdown={breakdown} key={breakdown.id} />
                     ))}
                 </div>
-            )}
+            )} */}
         </AnimatePresence>
     );
 }

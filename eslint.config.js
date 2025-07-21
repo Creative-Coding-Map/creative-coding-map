@@ -8,18 +8,7 @@ export default [
         rules: {
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/array-type': 'off',
-            '@typescript-eslint/no-unused-vars': [
-                'error',
-                {
-                    args: 'all',
-                    argsIgnorePattern: '^_',
-                    caughtErrors: 'all',
-                    caughtErrorsIgnorePattern: '^_',
-                    destructuredArrayIgnorePattern: '^_',
-                    varsIgnorePattern: '^_',
-                    ignoreRestSiblings: true,
-                },
-            ],
+            '@typescript-eslint/no-unused-vars': 'warn',
             'import/order': 'warn',
         },
     },
