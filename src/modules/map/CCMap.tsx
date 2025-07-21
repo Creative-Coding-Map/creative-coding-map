@@ -26,6 +26,20 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const { emitter } = useEmitter();
 
     useLayoutEffect(() => {
+        const onGraphDataUpdated = (newGraphData: CCMGraphData | null) => {
+            setGraphData(newGraphData);
+        };
+        const onRuntimePropsUpdated = (newRuntimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => {
+            setRuntimeProps(newRuntimeProps);
+        };
+
+        const onSelectedNodeChanged = (nodeId: string | null) => {
+            if (nodeId) {
+                const params = new URLSearchParams({ node: nodeId });
+                navigate(`/?${params.toString()}`);
+            }
+        };
+
         const initializeGraph = async () => {
             try {
                 console.log('CCMap initializing');
@@ -37,20 +51,10 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 controllerRef.current = controller;
 
                 // Listen for graph data updates
-                emitter.on('map:graph-data:updated', (newGraphData: CCMGraphData | null) => {
-                    setGraphData(newGraphData);
-                });
 
-                emitter.on('map:runtime-props:updated', (newRuntimeProps: ForceGraphProps<CCMGraphNode, CCMGraphLink>) => {
-                    setRuntimeProps(newRuntimeProps);
-                });
-
-                emitter.on('map:selected-node:changed', (nodeId: string | null) => {
-                    if (nodeId) {
-                        const params = new URLSearchParams({ node: nodeId });
-                        navigate(`/?${params.toString()}`);
-                    }
-                });
+                emitter.on('map:graph-data:updated', onGraphDataUpdated);
+                emitter.on('map:runtime-props:updated', onRuntimePropsUpdated);
+                emitter.on('map:selected-node:changed', onSelectedNodeChanged);
 
                 const data = await fetchCCMData();
 
@@ -75,9 +79,9 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         return () => {
             if (controllerRef.current) {
                 // unbind event listeners
-                emitter.off('map:graph-data:updated');
-                emitter.off('map:runtime-props:updated');
-                emitter.off('map:selected-node:changed');
+                emitter.off('map:graph-data:updated', onGraphDataUpdated);
+                emitter.off('map:runtime-props:updated', onRuntimePropsUpdated);
+                emitter.off('map:selected-node:changed', onSelectedNodeChanged);
 
                 // destroy controller
                 controllerRef.current.destroy();
