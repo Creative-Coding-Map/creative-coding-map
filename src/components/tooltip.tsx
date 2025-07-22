@@ -103,7 +103,7 @@ export default function Tooltip({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className={clsx('fixed min-w-max z-50 pointer-events-none', tooltipClassName)}
+                    className={clsx('fixed min-w-max z-50', tooltipClassName)}
                     style={{
                         top: `${position.top}px`,
                         left: `${position.left}px`,

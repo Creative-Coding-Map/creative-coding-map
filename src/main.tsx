@@ -24,18 +24,23 @@ function App() {
     const [params] = useSearchParams();
     const [isMapInitialized, setIsMapInitialized] = useState(false);
 
-    useEffect(() => {
-        emitter.once('map:initialized').then(() => {
-            const focusNode = params.get('focusNode');
+    const focusNodeParam = params.get('focusNode');
 
-            if (focusNode) {
-                setSelectedNodeId(focusNode);
-                emitter.emit('app:selected-node:focus', focusNode);
+    useEffect(() => {
+        function onMapInitialized() {
+            if (focusNodeParam) {
+                setSelectedNodeId(focusNodeParam);
+                emitter.emit('app:selected-node:focus', focusNodeParam);
             }
 
             setIsMapInitialized(true);
-        });
-    }, [emitter, setSelectedNodeId]);
+        }
+        emitter.on('map:initialized', onMapInitialized);
+
+        return () => {
+            emitter.off('map:initialized', onMapInitialized);
+        };
+    }, [emitter, setSelectedNodeId, focusNodeParam]);
 
     useEffect(() => {
         if (!isMapInitialized) return;
@@ -45,8 +50,6 @@ function App() {
         if (node) {
             setSelectedNodeId(node);
         }
-
-        console.log('main.tsx set selectedNodeId', node);
     }, [params, setSelectedNodeId, emitter, isMapInitialized]);
 
     useLayoutEffect(() => {

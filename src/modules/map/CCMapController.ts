@@ -227,6 +227,7 @@ export class CCMapController {
     }
 
     initialize(ccmData: CCMData): void {
+        if (this.initialized) return;
         console.log('initializing');
         this.ccmData = ccmData;
 

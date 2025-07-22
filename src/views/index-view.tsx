@@ -5,6 +5,8 @@ import { faker } from '@faker-js/faker';
 import { atom, useAtom } from 'jotai';
 import { VariableSizeList as List } from 'react-window';
 import useResizeObserver from 'use-resize-observer';
+import { ArrowRight } from 'lucide-react';
+import { Link } from 'wouter';
 import { NodeData } from '../modules/node-data';
 import type { CCMNode } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
@@ -319,15 +321,21 @@ const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
         >
             <span className="w-4 flex-shrink-0">{renderIcon(node.type)}</span>
             <Tooltip
-                className="type-filter cursor-pointer "
+                className="type-filter cursor-pointer pointer-events-auto"
                 forceShow={showContent}
                 onClose={() => setShowContent(false)}
                 onlyShowOnClick
                 scrollContainerId="index-view-container"
                 message={
-                    <div className="flex flex-col gap-2">
-                        <p className="type-hint flex items-center gap-1 text-xs">NODE SELECTED ({node.type.toUpperCase()})</p>
-                        <p className="type-body mb-2 line-clamp-3 text-xs">{node.description}</p>
+                    <div className="flex flex-col gap-1">
+                        <p className="flex items-center gap-1 type-filter">NODE SELECTED ({node.type.toUpperCase()})</p>
+                        <Link
+                            href={`/?focusNode=${node.id}`}
+                            className="type-hint flex items-center gap-1 text-xs border-b border-transparent hover:border-black ccm-transition w-fit"
+                        >
+                            SHOW IT ON THE MAP <ArrowRight className="size-3" />
+                        </Link>
+                        <p className="type-body mb-2 line-clamp-3 text-xs mt-2">{node.description}</p>
                         <div className="space-y-1">
                             <NodeData node={node} prop="tags" />
                             <NodeData node={node} prop="dependsOn" />
