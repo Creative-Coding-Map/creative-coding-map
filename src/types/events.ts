@@ -6,6 +6,8 @@ export type CCMEvents = {
     'app:shortest-path:changed': string;
     'app:suggestions:reset': undefined;
     'app:selected-node:changed': string | null;
+    'app:selected-node:focus': string | null;
+    'map:initialized': undefined;
     'map:graph-data:updated': CCMGraphData | null;
     'map:runtime-props:updated': ForceGraphProps<CCMGraphNode, CCMGraphLink>;
     'map:view-configuration:changed': CCMViewConfiguration;

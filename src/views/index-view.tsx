@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import { memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { faker } from '@faker-js/faker';
 import { atom, useAtom } from 'jotai';

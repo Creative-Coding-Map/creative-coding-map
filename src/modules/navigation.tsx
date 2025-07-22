@@ -10,7 +10,7 @@ export const Navbar = () => {
                 </Link>
             </section>
             <section className="flex items-center gap-4">
-                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/index">
+                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/index-page">
                     Index
                 </Link>
                 <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/about">

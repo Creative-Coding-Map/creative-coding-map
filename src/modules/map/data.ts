@@ -55,7 +55,6 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'hardware', degree: 1 },
                     { id: 'microcontroller', degree: 1 },
                     { id: 'media technology', degree: 1 },
-
                 ],
             },
             {

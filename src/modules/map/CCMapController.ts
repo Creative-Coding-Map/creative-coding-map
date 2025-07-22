@@ -256,6 +256,7 @@ export class CCMapController {
 
         this.emitter.on('map:path-ends:changed', this.onPathEndsChanged);
         this.emitter.on('app:selected-node:changed', this.onSelectedNodeChanged);
+        this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
         this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
 
         this.initialized = true;
@@ -277,6 +278,15 @@ export class CCMapController {
     onShortestPathChanged = (removedId: string) => {
         this.skipPathNodes.add(removedId);
         this.findShortestPath(this.pathEnds[0], this.pathEnds[1]);
+    };
+
+    onFocusSelectedNode = (nodeId: string | null) => {
+        console.log('is controller initialized', this.initialized);
+        if (nodeId) {
+            console.log('onFocusSelectedNode', nodeId);
+            this.selectedNodeId = nodeId;
+            this.focusOnNode(nodeId);
+        }
     };
 
     get graphData(): CCMGraphData | null {
@@ -570,5 +580,6 @@ export class CCMapController {
         this.emitter.off('map:path-ends:changed', this.onPathEndsChanged);
         this.emitter.off('app:selected-node:changed', this.onSelectedNodeChanged);
         this.emitter.off('app:shortest-path:changed', this.onShortestPathChanged);
+        this.emitter.off('app:selected-node:focus', this.onFocusSelectedNode);
     }
 }

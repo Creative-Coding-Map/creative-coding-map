@@ -66,6 +66,8 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                     controller.setGraphRef(fgRef.current);
                 }
 
+                emitter.emit('map:initialized');
+
                 setIsLoading(false);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to initialize graph');
