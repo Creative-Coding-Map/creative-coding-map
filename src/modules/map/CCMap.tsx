@@ -144,7 +144,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 enableNodeDrag={true}
                 nodeCanvasObject={controllerRef.current.getNodeCanvasObject}
                 nodePointerAreaPaint={controllerRef.current.getNodePointerAreaPaint}
-                backgroundColor="white"
+                backgroundColor="#f9f6fd"
                 autoPauseRedraw={false}
                 d3AlphaDecay={0.01}
                 {...runtimeProps}

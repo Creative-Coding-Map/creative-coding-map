@@ -1,25 +1,36 @@
 import clsx from 'clsx';
-import { useMemo, useState } from 'react';
-import { AnimatePresence, m } from 'framer-motion';
+import { useState } from 'react';
+import { AnimatePresence, m } from 'motion/react';
+import { ChevronDown } from 'lucide-react';
 import { VIEW_CONFIGURATIONS } from './map/data';
 import Breakdowns from '@/components/symbols/Breakdowns';
 import Tags from '@/components/symbols/Tags';
 import Techniques from '@/components/symbols/Techniques';
 import Tools from '@/components/symbols/Tools';
 
-function Sep({ className }: { className?: string }) {
-    return <span className={clsx('w-px h-4 bg-gray', className)} />;
-}
+const viewConfigVariants = {
+    open: {
+        transition: { staggerChildren: 0.07, delayChildren: 0.2 },
+    },
+    closed: {
+        transition: { staggerChildren: 0.05, staggerDirection: -1 },
+    },
+};
+
+const itemVariants = {
+    open: {
+        opacity: 1,
+        transition: { duration: 0.2 },
+    },
+    closed: {
+        opacity: 0,
+        transition: { duration: 0.2 },
+    },
+};
 
 export function LegendOverlay() {
     const [selectedDomain, setSelectedDomain] = useState<string>('Domain mode');
-
-    const domains = useMemo(() => {
-        if (selectedDomain === 'Domain mode') return ['Domain mode', 'Frameworks', 'Use cases'];
-        if (selectedDomain === 'Frameworks') return ['Frameworks', 'Use cases', 'Domain mode'];
-        return ['Use cases', 'Domain mode', 'Frameworks'];
-    }, [selectedDomain]);
-
+    const domains = ['Domain mode', 'Frameworks', 'Use cases'];
     return (
         <aside className="z-10 absolute ccm-px top-1/5 flex flex-col type-hint gap-0.5">
             <h4 className="text-gray">SHAPE</h4>
@@ -37,32 +48,49 @@ export function LegendOverlay() {
                     <Breakdowns /> <span>BREAKDOWNS</span>
                 </li>
             </ul>
-            <div className="flex flex-col gap-1 mt-4">
-                <ul className="flex gap-2 pointer-events-auto relative">
-                    {domains.map((domain, index) => (
-                        <li
-                            key={domain}
-                            className={clsx(
-                                'flex items-center cursor-pointer uppercase',
-                                selectedDomain === domain && 'underline',
-                                index === domains.length - 1 && ''
-                            )}
-                            onClick={() => setSelectedDomain(domain)}
-                        >
-                            {domain}
-                        </li>
-                    ))}
-                    <li className="absolute inset-0 bg-gradient-to-r from-transparent via-10% via-transparent to-70% to-white pointer-events-none" />
-                </ul>
-                {VIEW_CONFIGURATIONS.filter((view) => view.name.includes(selectedDomain)).map((view) => (
-                    <ul key={view.name} className="flex flex-col gap-1">
-                        {view.domainSets.map((domain) => (
-                            <li key={domain.name} className="flex items-center gap-2">
-                                <Tools className="fill-black" /> <span>{domain.name}</span>
-                            </li>
+            <div className="flex flex-col gap-2 mt-4 w-40">
+                <AnimatePresence mode="popLayout" propagate>
+                    <ul className="flex flex-col pointer-events-auto relative">
+                        {domains.map((domain, index) => (
+                            <m.li
+                                key={domain}
+                                className={clsx(
+                                    'flex items-center cursor-pointer uppercase  text-gray p-1 gap-1 ccm-transition',
+                                    selectedDomain !== domain && 'bg-white',
+                                    index === domains.length - 1 && ''
+                                )}
+                                onClick={() => setSelectedDomain(domain)}
+                            >
+                                {domain}
+                                {selectedDomain === domain && (
+                                    <m.span
+                                        initial={{ opacity: 0, scale: 0 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0 }}
+                                    >
+                                        <ChevronDown className="size-4" />
+                                    </m.span>
+                                )}
+                            </m.li>
                         ))}
                     </ul>
-                ))}
+                    <m.ul
+                        key={selectedDomain}
+                        className="flex flex-col gap-1"
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        variants={viewConfigVariants}
+                    >
+                        {VIEW_CONFIGURATIONS.filter((view) => view.name.includes(selectedDomain))
+                            .flatMap((view) => view.domainSets)
+                            .map((domain) => (
+                                <m.li key={domain.name} variants={itemVariants} className="flex items-center gap-2">
+                                    <Tools className="fill-black" /> <span className="capitalize">{domain.name}</span>
+                                </m.li>
+                            ))}
+                    </m.ul>
+                </AnimatePresence>
             </div>
         </aside>
     );
