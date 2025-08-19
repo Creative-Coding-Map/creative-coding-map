@@ -12,6 +12,7 @@ export default function Tooltip({
     message,
     children,
     scrollContainerId,
+    align = 'end',
     forceShow = false,
     onlyShowOnClick = false,
     onClose,
@@ -23,6 +24,7 @@ export default function Tooltip({
     message: React.ReactNode;
     children: React.ReactNode;
     scrollContainerId?: string;
+    align?: 'start' | 'end';
     forceShow?: boolean;
     onlyShowOnClick?: boolean;
     onClose?: () => void;
@@ -38,9 +40,9 @@ export default function Tooltip({
         const rect = containerRef.current.getBoundingClientRect();
         setPosition({
             top: rect.top + window.scrollY,
-            left: rect.right + window.scrollX + 8, // 8px offset to the right
+            left: align === 'start' ? rect.left + window.scrollX - 8 : rect.right + window.scrollX + 8, // 8px offset to the right
         });
-    }, [isVisible, forceShow]);
+    }, [isVisible, forceShow, align]);
 
     useEffect(() => {
         if (onlyShowOnClick) {
@@ -103,7 +105,7 @@ export default function Tooltip({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className={clsx('fixed min-w-max z-50', tooltipClassName)}
+                    className={clsx('fixed min-w-max z-50', align === 'start' && '-translate-x-full', tooltipClassName)}
                     style={{
                         top: `${position.top}px`,
                         left: `${position.left}px`,

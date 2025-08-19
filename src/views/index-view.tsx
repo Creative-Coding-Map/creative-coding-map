@@ -29,6 +29,7 @@ interface ListCellProps {
     index: number;
     style: React.CSSProperties;
     data: ColumnItem[];
+    isLastColumn: boolean;
 }
 
 const asyncDatabase = atom(async (get) => {
@@ -249,7 +250,7 @@ const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter
                               itemData={columnItems}
                               width={columnWidth}
                           >
-                              {ListCell}
+                              {(props) => <ListCell {...props} isLastColumn={columnIndex === columns.length - 1} />}
                           </List>
                       ))
                     : null}
@@ -266,7 +267,7 @@ function getItemSize(item: ColumnItem): number {
     return 22; // Base height for nodes
 }
 
-const ListCell = memo(function ListCell({ index, style, data }: ListCellProps) {
+const ListCell = memo(function ListCell({ index, style, data, isLastColumn }: ListCellProps) {
     const item = data[index];
 
     if (item.type === 'header') {
@@ -280,12 +281,12 @@ const ListCell = memo(function ListCell({ index, style, data }: ListCellProps) {
     // item.type === 'node'
     return (
         <div style={style}>
-            <NodeListItem node={item.node} />
+            <NodeListItem node={item.node} isLastColumn={isLastColumn} />
         </div>
     );
 });
 
-const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
+const NodeListItem = memo(function NodeListItem({ node, isLastColumn }: { node: IndexNode; isLastColumn: boolean }) {
     const { emitter } = useEmitter();
     const [showContent, setShowContent] = useState(false);
 
@@ -326,9 +327,12 @@ const NodeListItem = memo(function NodeListItem({ node }: { node: IndexNode }) {
                 onClose={() => setShowContent(false)}
                 onlyShowOnClick
                 scrollContainerId="index-view-container"
+                align={isLastColumn ? 'start' : 'end'}
                 message={
                     <div className="flex flex-col gap-1">
-                        <p className="flex items-center gap-1 type-filter">NODE SELECTED ({node.type.toUpperCase()})</p>
+                        <p className="flex items-center gap-1 type-filter">
+                            {node.name} ({node.type.toUpperCase()})
+                        </p>
                         <Link
                             href={`/?focusNode=${node.id}`}
                             className="type-hint flex items-center gap-1 text-xs border-b border-transparent hover:border-black ccm-transition w-fit"
