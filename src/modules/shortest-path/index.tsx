@@ -53,15 +53,13 @@ function Path() {
         };
     };
 
-    console.log(connections);
-
     return (
         <m.aside
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             key="create-path"
-            className={clsx('max-w-xl z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md basis-1/3')}
+            className={clsx('relative max-w-xl z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md basis-1/3')}
         >
             <ActionButton
                 className="absolute top-4 right-4"
@@ -154,7 +152,14 @@ function Path() {
                     </div>
                 </div>
                 <div className="flex items-center justify-end mt-8">
-                    <button className="btn type-button ccm-action ccm-transition ease-linear px-2">CLEAR</button>
+                    <button
+                        className="btn type-button ccm-action ccm-transition ease-linear px-2"
+                        onClick={() => {
+                            setShortestPathNodes([]);
+                        }}
+                    >
+                        CLEAR
+                    </button>
                 </div>
             </div>
         </m.aside>

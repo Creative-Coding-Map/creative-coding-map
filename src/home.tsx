@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
-import { Route } from 'wouter';
+import { Route, useRoute } from 'wouter';
 
+import { AnimatePresence, m } from 'motion/react';
 import AboutView from './views/about-view.tsx';
 
 import { Loading } from './components/loading';
@@ -10,6 +11,8 @@ import { ActionsOverlay } from '@/modules/actions-overlay';
 import { MapOverlay } from '@/modules/map-overlay';
 
 export default function Home() {
+    const [isAboutPage] = useRoute('/about');
+
     return (
         <section className="flex flex-col w-screen overflow-hidden">
             <LegendOverlay />
@@ -18,7 +21,18 @@ export default function Home() {
             <Suspense fallback={<Loading />}>
                 <CCMap />
             </Suspense>
-            <Route path="/about" component={AboutView} />
+            <AnimatePresence>
+                {isAboutPage && (
+                    <m.div
+                        initial={{ opacity: 0, x: '100%' }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: '100%' }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <AboutView />
+                    </m.div>
+                )}
+            </AnimatePresence>
         </section>
     );
 }

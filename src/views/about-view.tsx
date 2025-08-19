@@ -6,8 +6,8 @@ export default function AboutView() {
 
     return (
         <Shell className="ccm-pt" onOutsideClick={() => navigate('/')}>
-            <aside className="max-w-screen-md ml-auto z-10 relative py-4  ccm-colors ccm-border ccm-rounded ccm-mx ccm-transition">
-                <div className="overflow-y-auto ccm-scrollbar max-h-[calc(100vh-8rem)] ccm-px pb-10">
+            <aside className="max-w-screen-md ml-auto z-10 relative py-4 ccm-colors ccm-border ccm-rounded ccm-mx ccm-transition">
+                <div className="overflow-y-auto ccm-scrollbar max-h-[calc(100vh-7.9rem)] ccm-px pb-10">
                     <div className="flex flex-col gap-8">
                         <h1 className="type-header mb-10">About Unfolding the creative coding landscape</h1>
                         <p>

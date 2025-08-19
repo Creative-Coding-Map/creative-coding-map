@@ -1,5 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { AnimatePresence, m } from 'motion/react';
+import { useLocation } from 'wouter';
 import { NodeData } from './node-data';
 import { ActionButton } from '@/components/action-button';
 import { store } from '@/state/store';
@@ -9,6 +10,7 @@ import { selectedNodeAtom, selectedNodeIdAtom } from '@/state/model';
 export function SelectedNode() {
     const selectedNode = useAtomValue(selectedNodeAtom, { store });
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
+    const [_, navigate] = useLocation();
 
     // const database = useAtomValue(databaseAtom, { store });
 
@@ -29,7 +31,7 @@ export function SelectedNode() {
                     <ActionButton
                         className="absolute top-4 right-4"
                         onClick={() => {
-                            setSelectedNodeId(null);
+                            navigate('/');
                         }}
                         label="Close"
                     >

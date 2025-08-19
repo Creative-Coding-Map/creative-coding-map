@@ -148,6 +148,8 @@ export class CCMapController {
 
         if (!this.graphRef) return null;
 
+        console.log('focusing on node', node);
+
         const graphData = this.#graphData;
 
         if (!graphData) return null;
@@ -282,7 +284,6 @@ export class CCMapController {
     };
 
     onFocusSelectedNode = (nodeId: string | null) => {
-        console.log('is controller initialized', this.initialized);
         if (nodeId) {
             console.log('onFocusSelectedNode', nodeId);
             this.selectedNodeId = nodeId;
@@ -309,6 +310,7 @@ export class CCMapController {
 
     setGraphRef(graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) {
         this.graphRef = graph;
+        this.emitter.emit('map:initialized');
     }
 
     private localBuildGraph(mstEdges?: Array<any>): CCMGraphData {

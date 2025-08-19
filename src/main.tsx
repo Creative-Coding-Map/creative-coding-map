@@ -25,8 +25,11 @@ function App() {
     const [isMapInitialized, setIsMapInitialized] = useState(false);
 
     const focusNodeParam = params.get('focusNode');
+    const nodeParam = params.get('node');
 
     useEffect(() => {
+        if (isMapInitialized) return;
+
         function onMapInitialized() {
             if (focusNodeParam) {
                 setSelectedNodeId(focusNodeParam);
@@ -40,17 +43,21 @@ function App() {
         return () => {
             emitter.off('map:initialized', onMapInitialized);
         };
-    }, [emitter, setSelectedNodeId, focusNodeParam]);
+    }, [emitter, setSelectedNodeId, focusNodeParam, isMapInitialized]);
 
     useEffect(() => {
         if (!isMapInitialized) return;
 
-        const node = params.get('node');
+        setSelectedNodeId(nodeParam);
+    }, [nodeParam, setSelectedNodeId, isMapInitialized]);
 
-        if (node) {
-            setSelectedNodeId(node);
+    useEffect(() => {
+        if (!isMapInitialized) return;
+
+        if (focusNodeParam) {
+            emitter.emit('app:selected-node:focus', focusNodeParam);
         }
-    }, [params, setSelectedNodeId, emitter, isMapInitialized]);
+    }, [focusNodeParam, emitter, isMapInitialized]);
 
     useLayoutEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
