@@ -505,13 +505,14 @@ export class CCMapController {
             const isSelected = node.id === this.selectedNodeId;
 
             const nodeColor = node.color || '#000000';
+            const backgroundColor = isSelected ? nodeColor : (node.type === 'domain' ? '#F4EBFC' : '#ffffff')
 
             // TODO: implement labels per design
             ctx.fillStyle = nodeColor;
             ctx.beginPath();
             ctx.roundRect(node.x! - labelDimensions[0] / 2, node.y! - labelDimensions[1] / 2, ...labelDimensions, radius);
 
-            ctx.fillStyle = isSelected ? nodeColor : 'white';
+            ctx.fillStyle = backgroundColor
             ctx.fill();
             ctx.strokeStyle = isSelected ? 'white' : nodeColor;
             ctx.lineWidth = 0.5 / globalScale;
