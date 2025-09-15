@@ -209,7 +209,7 @@ export class CCMapController {
                 .id((d: any) => d.id)
                 .distance(10)
                 .strength((link: any) => {
-                    link.strength= 1.0
+                    link.strength = 1.0;
                     if (link.strengthDelta && link.strengthDelta > 0) {
                         return s * (link.strength || 0);
                     } else if (link.strengthDelta && link.strengthDelta < 0) {
@@ -256,20 +256,16 @@ export class CCMapController {
         this.graphData = this.localBuildGraph(mstNamed.mstEdges);
         this.graphData.links = mstNamed.mstEdges;
 
-
         setTimeout(() => {
-
             const linkForce = d3
                 .forceLink(this.graphData.links as any)
                 .id((d: any) => d.id)
                 .distance(30)
-                .strength( link => 1)
+                .strength((link) => 1);
 
-            console.log("graphref", this.graphRef)
-            this.graphRef!.d3Force('link', linkForce)
-
-        }, 5000)
-
+            console.log('graphref', this.graphRef);
+            this.graphRef!.d3Force('link', linkForce);
+        }, 5000);
 
         this.#runtimeProps = {};
 
@@ -505,23 +501,27 @@ export class CCMapController {
             const isSelected = node.id === this.selectedNodeId;
 
             const nodeColor = node.color || '#000000';
-            const backgroundColor = isSelected ? nodeColor : (node.type === 'domain' ? '#F4EBFC' : '#ffffff')
+            const backgroundColor = isSelected ? nodeColor : node.type === 'domain' ? '#F4EBFC' : '#ffffff';
 
-            // TODO: implement labels per design
-            ctx.fillStyle = nodeColor;
-            ctx.beginPath();
-            ctx.roundRect(node.x! - labelDimensions[0] / 2, node.y! - labelDimensions[1] / 2, ...labelDimensions, radius);
+            const labelStyle: string = node.type === 'tool' || node.type === 'technique' ? 'text' : 'pill';
 
-            ctx.fillStyle = backgroundColor
-            ctx.fill();
-            ctx.strokeStyle = isSelected ? 'white' : nodeColor;
-            ctx.lineWidth = 0.5 / globalScale;
-            ctx.stroke();
+            if (labelStyle === 'pill') {
+                ctx.beginPath();
+                ctx.roundRect(node.x! - labelDimensions[0] / 2, node.y! - labelDimensions[1] / 2, ...labelDimensions, radius);
+
+                ctx.fillStyle = backgroundColor;
+                ctx.fill();
+                ctx.strokeStyle = isSelected ? 'white' : nodeColor;
+                ctx.lineWidth = 0.5 / globalScale;
+                ctx.stroke();
+            }
 
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = isSelected ? 'white' : nodeColor;
-            ctx.fillText(label, node.x, node.y);
+            const labelColor: string = labelStyle === 'text' ? 'black' : (isSelected ? 'white' : nodeColor)
+            ctx.fillStyle = labelColor
+            const textY = labelStyle === 'pill' ? node.y : node.y - 16.0 / globalScale;
+            ctx.fillText(label, node.x, textY);
             node.__bckgDimensions = bckgDimensions;
 
             // draw focus widget, when node is selected node
