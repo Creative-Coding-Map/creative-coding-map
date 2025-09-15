@@ -207,8 +207,9 @@ export class CCMapController {
             const linkForce = d3
                 .forceLink(graphData.links as any)
                 .id((d: any) => d.id)
-                .distance(100)
+                .distance(10)
                 .strength((link: any) => {
+                    link.strength= 1.0
                     if (link.strengthDelta && link.strengthDelta > 0) {
                         return s * (link.strength || 0);
                     } else if (link.strengthDelta && link.strengthDelta < 0) {
@@ -254,6 +255,21 @@ export class CCMapController {
 
         this.graphData = this.localBuildGraph(mstNamed.mstEdges);
         this.graphData.links = mstNamed.mstEdges;
+
+
+        setTimeout(() => {
+
+            const linkForce = d3
+                .forceLink(this.graphData.links as any)
+                .id((d: any) => d.id)
+                .distance(30)
+                .strength( link => 1)
+
+            console.log("graphref", this.graphRef)
+            this.graphRef!.d3Force('link', linkForce)
+
+        }, 5000)
+
 
         this.#runtimeProps = {};
 
@@ -406,7 +422,7 @@ export class CCMapController {
                 minScale = 4.0;
                 break;
             case 'tag':
-                minScale = 1.0;
+                minScale = 1.5;
                 break;
         }
 
