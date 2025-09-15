@@ -428,14 +428,32 @@ export class CCMapController {
         switch (node.type) {
             case 'tag':
                 ctx.beginPath();
-                ctx.rect(node.x! - 4 / globalScale, node.y! - 4 / globalScale, 8 / globalScale, 8 / globalScale);
+                //  ctx.rect(node.x! - 4 / globalScale, node.y! - 4 / globalScale, 8 / globalScale, 8 / globalScale);
+                for (let i = 0; i < 10; ++i) {
+                    const x0 = node.x + Math.cos((i * 2 * Math.PI) / 10.0) * 4.0 / globalScale;
+                    const x1 = node.x + Math.cos(( (i * 2 + 1) * Math.PI) / 10.0) * 2.0 / globalScale;
+                    const y0 = node.y + Math.sin((i * 2  * Math.PI) / 10.0) * 4.0 / globalScale;
+                    const y1 = node.y + Math.sin(((i * 2 + 1) * Math.PI) / 10.0) * 2.0 / globalScale;
+                    if (i == 0) {
+                        ctx.moveTo(x0, y0);
+                        ctx.lineTo(x1, y1);
+                    } else {
+                        ctx.lineTo(x0, y0);
+                        ctx.lineTo(x1, y1);
+                    }
+                }
+
                 ctx.fill();
                 break;
             case 'technique':
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, 4 / globalScale, 0, 2 * Math.PI, false);
-                ctx.lineWidth = 2 / globalScale;
+                ctx.lineWidth = 1 / globalScale;
                 ctx.strokeStyle = node.color || '#000000';
+                ctx.arc(node.x, node.y, 4 / globalScale, 0, 2 * Math.PI, false);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 2 / globalScale, 0, 2 * Math.PI, false);
                 ctx.stroke();
                 break;
             case 'tool':
@@ -460,10 +478,10 @@ export class CCMapController {
             const label = node.name + suffix;
 
             const fontSizes = {
-                domain: 14 / globalScale,
+                domain: 18 / globalScale,
                 tag: 12 / globalScale,
                 tool: 12 / globalScale,
-                technique: 9 / globalScale,
+                technique: 12 / globalScale,
             };
 
             const fontSize = fontSizes[node.type] as number;
@@ -472,10 +490,10 @@ export class CCMapController {
             const hmargin = 10.0 / globalScale;
 
             const vmargins = {
-                domain: 16 / globalScale,
+                domain: 8 / globalScale,
                 tag: 8 / globalScale,
                 tool: 6 / globalScale,
-                technique: 2 / globalScale,
+                technique: 6 / globalScale,
             };
             const vmargin = vmargins[node.type] as number;
 
@@ -518,8 +536,8 @@ export class CCMapController {
 
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            const labelColor: string = labelStyle === 'text' ? 'black' : (isSelected ? 'white' : nodeColor)
-            ctx.fillStyle = labelColor
+            const labelColor: string = labelStyle === 'text' ? 'black' : isSelected ? 'white' : nodeColor;
+            ctx.fillStyle = labelColor;
             const textY = labelStyle === 'pill' ? node.y : node.y - 16.0 / globalScale;
             ctx.fillText(label, node.x, textY);
             node.__bckgDimensions = bckgDimensions;
