@@ -2,6 +2,7 @@ import { StrictMode, Suspense, lazy, useEffect, useLayoutEffect, useState } from
 import ReactDOM from 'react-dom/client';
 import { Route, Switch, useSearchParams } from 'wouter';
 import { useSetAtom } from 'jotai';
+import throttle from 'just-throttle';
 import reportWebVitals from './reportWebVitals.ts';
 
 import { Providers } from './modules/providers.tsx';
@@ -12,6 +13,7 @@ import { Navbar } from './modules/navigation.tsx';
 import { selectedNodeIdAtom, showSearchAtom } from './state/model.ts';
 import { store } from './state/store.ts';
 import { useEmitter } from './hooks/useEmitter.tsx';
+import { ESCAPE_KEY, SPACE_KEY } from './state/constants.ts';
 
 const IndexView = lazy(() => import('./views/index-view.tsx'));
 const Home = lazy(() => import('./home.tsx'));
@@ -61,7 +63,7 @@ function App() {
 
     useLayoutEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === ' ') {
+            if (event.key === SPACE_KEY) {
                 if (event.target instanceof HTMLInputElement) return;
 
                 event.preventDefault();
@@ -71,7 +73,7 @@ function App() {
                 store.set(showSearchAtom, !showSearch);
             }
 
-            if (event.key === 'Escape') {
+            if (event.key === ESCAPE_KEY) {
                 const showSearch = store.get(showSearchAtom);
 
                 if (showSearch) {
@@ -84,8 +86,33 @@ function App() {
 
         window.addEventListener('keydown', handleKeyDown);
 
+        const resizeObserver = new ResizeObserver(() => {
+            throttle(
+                () => {
+                    emitter.emit('map:resize');
+                },
+                300,
+                { leading: true, trailing: false }
+            );
+        });
+
+        const onCanvasClick = (event: MouseEvent) => {
+            const showSearch = store.get(showSearchAtom);
+            if (showSearch && event.target instanceof HTMLCanvasElement) {
+                event.preventDefault();
+                event.stopPropagation();
+                store.set(showSearchAtom, false);
+            }
+        };
+
+        window.addEventListener('click', onCanvasClick);
+
+        resizeObserver.observe(document.body);
+
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('click', onCanvasClick);
+            resizeObserver.disconnect();
         };
     }, []);
 

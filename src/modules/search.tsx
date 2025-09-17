@@ -2,17 +2,18 @@ import * as m from 'motion/react-m';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { Suggestions } from './suggestions';
 import type { CCMNode } from '@/types/ccmap';
 import { useSuggestions } from '@/hooks/useSuggestions';
 import { useEmitter } from '@/hooks/useEmitter';
 import Search from '@/components/icons/Search';
 import { selectedNodeIdAtom, showSearchAtom } from '@/state/model';
+import { store } from '@/state/store';
 
 export function SearchOverlay() {
-    const setShowSearch = useSetAtom(showSearchAtom);
-    const setSelectedNodeId = useSetAtom(selectedNodeIdAtom);
+    const setShowSearch = useSetAtom(showSearchAtom, { store });
+    const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
     const inputRef = useRef<HTMLInputElement>(null);
     const [search, setSearch] = useState('');
 
@@ -50,16 +51,19 @@ export function SearchOverlay() {
         [handleInputChange, setSearch]
     );
 
-    useLayoutEffect(() => {
-        inputRef.current?.focus();
-    }, []);
-
     return (
         <m.aside
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="w-[400px] z-20 absolute p-1 right-4 bottom-4 flex flex-col ccm-colors ccm-border rounded-md ccm-transition"
+            onAnimationComplete={(def: any) => {
+                if (inputRef.current && def.opacity === 1) {
+                    setTimeout(() => {
+                        inputRef.current?.focus();
+                    }, 100);
+                }
+            }}
+            className="w-[400px] z-20 p-1 ml-auto mr-4 flex flex-col ccm-colors ccm-border ccm-invert rounded-md ccm-transition"
         >
             <div className="w-full flex flex-col">
                 <AnimatePresence>
@@ -84,11 +88,12 @@ export function SearchOverlay() {
                     )}
                 </AnimatePresence>
                 <div className="flex items-center justify-between gap-2 p-1">
-                    <Search className="size-4 ccm-invert stroke-gray" />
+                    <Search className="size-4" />
                     <input
                         ref={inputRef}
+                        id="search-input"
                         type="text"
-                        className={clsx('type-filter w-full px-1 font-mono', 'ccm-colors ccm-invert', 'outline-none')}
+                        className={clsx('type-filter w-full px-1 font-mono ccm-colors ccm-transition outline-none')}
                         value={search}
                         onKeyDown={(e) => {
                             if (e.key === 'Escape') {

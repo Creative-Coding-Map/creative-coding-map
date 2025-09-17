@@ -430,10 +430,10 @@ export class CCMapController {
                 ctx.beginPath();
                 //  ctx.rect(node.x! - 4 / globalScale, node.y! - 4 / globalScale, 8 / globalScale, 8 / globalScale);
                 for (let i = 0; i < 10; ++i) {
-                    const x0 = node.x + Math.cos((i * 2 * Math.PI) / 10.0) * 4.0 / globalScale;
-                    const x1 = node.x + Math.cos(( (i * 2 + 1) * Math.PI) / 10.0) * 2.0 / globalScale;
-                    const y0 = node.y + Math.sin((i * 2  * Math.PI) / 10.0) * 4.0 / globalScale;
-                    const y1 = node.y + Math.sin(((i * 2 + 1) * Math.PI) / 10.0) * 2.0 / globalScale;
+                    const x0 = node.x + (Math.cos((i * 2 * Math.PI) / 10.0) * 4.0) / globalScale;
+                    const x1 = node.x + (Math.cos(((i * 2 + 1) * Math.PI) / 10.0) * 2.0) / globalScale;
+                    const y0 = node.y + (Math.sin((i * 2 * Math.PI) / 10.0) * 4.0) / globalScale;
+                    const y1 = node.y + (Math.sin(((i * 2 + 1) * Math.PI) / 10.0) * 2.0) / globalScale;
                     if (i == 0) {
                         ctx.moveTo(x0, y0);
                         ctx.lineTo(x1, y1);

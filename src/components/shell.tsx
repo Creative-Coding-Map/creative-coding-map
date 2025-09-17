@@ -8,17 +8,17 @@ export const Shell = ({
     className,
 }: {
     children: React.ReactNode;
-    onOutsideClick?: () => void;
+    onOutsideClick?: (evt: React.MouseEvent<HTMLElement>) => void;
     className?: string;
 }) => {
     const shellRef = useRef<HTMLDivElement>(null);
     return (
         <section
             ref={shellRef}
-            className={clsx('relative h-full bg-amber-250', className)}
+            className={clsx('relative h-full', className)}
             onClick={(evt) => {
                 if (evt.target === shellRef.current) {
-                    onOutsideClick();
+                    onOutsideClick(evt);
                 }
             }}
         >
