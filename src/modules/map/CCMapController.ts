@@ -475,7 +475,9 @@ export class CCMapController {
                         return '';
                 }
             })();
-            const name = (node.type == 'domain' || node.type == 'tag') ? node.name.toUpperCase() : node.name
+            const name =
+                (node.type == 'root') ? '' :(
+                (node.type == 'domain' || node.type == 'tag') ? node.name.toUpperCase() : node.name)
             const label = name + suffix;
 
             const fontSizes = {
@@ -500,7 +502,7 @@ export class CCMapController {
 
             const radii = {
                 domain: 10 / globalScale,
-                tag: 5 / globalScale,
+                tag: 20 / globalScale,
                 tool: 2.5 / globalScale,
                 technique: 2.5 / globalScale,
             };
@@ -531,7 +533,7 @@ export class CCMapController {
                 ctx.fillStyle = backgroundColor;
                 ctx.fill();
                 ctx.strokeStyle = isSelected ? 'white' : nodeColor;
-                ctx.lineWidth = 0.5 / globalScale;
+                ctx.lineWidth = 1.0 / globalScale;
                 ctx.stroke();
             }
 
@@ -539,7 +541,7 @@ export class CCMapController {
             ctx.textBaseline = 'middle';
             const labelColor: string = labelStyle === 'text' ? 'black' : isSelected ? 'white' : nodeColor;
             ctx.fillStyle = labelColor;
-            const textY = labelStyle === 'pill' ? node.y : node.y - 16.0 / globalScale;
+            const textY = labelStyle === 'pill' ? node.y + 1.5 / globalScale : node.y - 16.0 / globalScale;
             ctx.fillText(label, node.x, textY);
             node.__bckgDimensions = bckgDimensions;
 
