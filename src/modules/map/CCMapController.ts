@@ -475,7 +475,8 @@ export class CCMapController {
                         return '';
                 }
             })();
-            const label = node.name + suffix;
+            const name = (node.type == 'domain' || node.type == 'tag') ? node.name.toUpperCase() : node.name
+            const label = name + suffix;
 
             const fontSizes = {
                 domain: 18 / globalScale,
