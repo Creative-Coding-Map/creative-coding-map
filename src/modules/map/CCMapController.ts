@@ -524,7 +524,10 @@ export class CCMapController {
             const nodeColor = node.color || '#000000';
             const backgroundColor = isSelected ? nodeColor : node.type === 'domain' ? '#F4EBFC' : '#ffffff';
 
-            const labelStyle: string = node.type === 'tool' || node.type === 'technique' ? 'text' : 'pill';
+            const labelStyle: string =
+
+                isSelected ? 'pill' :
+                    (node.type === 'tool' || node.type === 'technique' ? 'text' : 'pill')
 
             if (labelStyle === 'pill') {
                 ctx.beginPath();
