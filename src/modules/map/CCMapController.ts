@@ -43,6 +43,8 @@ export class CCMapController {
     private emitter = emitter;
     private hoverNodeId: string | null = null;
 
+    private layoutTimeoutHandler: number | null = null
+
     ogGraph: CCMGraphData | null = null;
 
     pathEnds: CCMPathEnds = { start: null, end: null };
@@ -256,7 +258,8 @@ export class CCMapController {
         this.graphData = this.localBuildGraph(mstNamed.mstEdges);
         this.graphData.links = mstNamed.mstEdges;
 
-        setTimeout(() => {
+        this.layoutTimeoutHandler = setTimeout(() => {
+            this.layoutTimeoutHandler = null
             const linkForce = d3
                 .forceLink(this.graphData.links as any)
                 .id((d: any) => d.id)
@@ -265,7 +268,11 @@ export class CCMapController {
 
             console.log('graphref', this.graphRef);
             this.graphRef!.d3Force('link', linkForce);
-        }, 5000);
+            if (this.selectedNodeId != null) {
+                this.focusOnNode(this.selectedNodeId);
+            }
+
+        }, 100);
 
         this.#runtimeProps = {};
 
