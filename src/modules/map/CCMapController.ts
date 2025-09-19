@@ -25,6 +25,7 @@ import type {
 
 import { linkWeights } from '@/modules/map/link-weights.ts';
 import { emitter } from '@/hooks/useEmitter';
+import throttle from 'just-throttle';
 
 export class CCMapController {
     private selectedNodeId: any | null = null;
@@ -43,7 +44,7 @@ export class CCMapController {
     private emitter = emitter;
     private hoverNodeId: string | null = null;
 
-    private layoutTimeoutHandler: number | null = null
+    private layoutTimeoutHandler: number | null = null;
 
     ogGraph: CCMGraphData | null = null;
 
@@ -51,6 +52,63 @@ export class CCMapController {
     #shortestPaths: Array<Array<string>> = [];
 
     constructor() {}
+
+    initialize(ccmData: CCMData): void {
+        if (this.initialized) return;
+        console.log('initializing');
+        this.ccmData = ccmData;
+
+        this.nodes = buildNodesFromCcmData(this.ccmData);
+
+        this.ogGraph = buildGraph(this.ccmData, this.nodes);
+        updateLinkCounts(this.ogGraph);
+
+        this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
+        this.nodes.domainNodes = this.domainGraph.nodes;
+        this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
+        colorGraph(this.ogGraph, this.viewConfiguration.colorSets);
+
+        const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
+
+        const mstNamed = minimumSpanningTreeFromSubtree(
+            this.nodes.allNodes,
+            this.ogGraph.links.concat(this.domainGraph.links),
+            subTree,
+            linkWeights as any
+        );
+
+        this.graphData = this.localBuildGraph(mstNamed.mstEdges);
+        this.graphData.links = mstNamed.mstEdges;
+
+        this.layoutTimeoutHandler = setTimeout(() => {
+            if (!this.graphRef || !this.graphData) {
+                console.log('graphref or graphdata not found, aborting layout timeout handler');
+                return;
+            }
+
+            if (this.selectedNodeId != null) {
+                // !important: do nothing now, an event will be emitted later to focus the node
+            } else {
+                const linkForce = d3
+                    .forceLink(this.graphData.links as any)
+                    .id((d: any) => d.id)
+                    .distance(30)
+                    .strength((link) => 1);
+
+                this.graphRef.d3Force('link', linkForce);
+            }
+        }, 300);
+
+        this.#runtimeProps = {};
+
+        this.emitter.on('map:path-ends:changed', this.onPathEndsChanged);
+        this.emitter.on('app:selected-node:changed', this.onSelectedNodeChanged);
+        this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
+        this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
+
+        this.initialized = true;
+        this.emitter.emit('map:initialized');
+    }
 
     /**
      * Centers the graph view on the specified node.
@@ -127,7 +185,7 @@ export class CCMapController {
                 this.ogGraph!.nodes.concat(this.domainGraph!.nodes),
                 this.ogGraph!.links.concat(this.domainGraph!.links),
                 subtree,
-                linkWeights
+                linkWeights as any
             );
             this.graphData = this.localBuildGraph(mst.mstEdges);
 
@@ -148,7 +206,10 @@ export class CCMapController {
             node = this.#graphData?.nodes.find((n) => n.id === node) as CCMGraphNode;
         }
 
-        if (!this.graphRef) return null;
+        if (!this.graphRef) {
+            console.log('graphRef not found, aborting focusOnNode');
+            return null;
+        }
 
         console.log('focusing on node', node);
 
@@ -231,59 +292,6 @@ export class CCMapController {
         return node;
     }
 
-    initialize(ccmData: CCMData): void {
-        if (this.initialized) return;
-        console.log('initializing');
-        this.ccmData = ccmData;
-
-        this.nodes = buildNodesFromCcmData(this.ccmData);
-
-        this.ogGraph = buildGraph(this.ccmData, this.nodes);
-        updateLinkCounts(this.ogGraph);
-
-        this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
-        this.nodes.domainNodes = this.domainGraph.nodes;
-        this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
-        colorGraph(this.ogGraph, this.viewConfiguration.colorSets);
-
-        const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
-
-        const mstNamed = minimumSpanningTreeFromSubtree(
-            this.nodes.allNodes,
-            this.ogGraph.links.concat(this.domainGraph.links),
-            subTree,
-            linkWeights
-        );
-
-        this.graphData = this.localBuildGraph(mstNamed.mstEdges);
-        this.graphData.links = mstNamed.mstEdges;
-
-        this.layoutTimeoutHandler = setTimeout(() => {
-            this.layoutTimeoutHandler = null
-            const linkForce = d3
-                .forceLink(this.graphData.links as any)
-                .id((d: any) => d.id)
-                .distance(30)
-                .strength((link) => 1);
-
-            console.log('graphref', this.graphRef);
-            this.graphRef!.d3Force('link', linkForce);
-            if (this.selectedNodeId != null) {
-                this.focusOnNode(this.selectedNodeId);
-            }
-
-        }, 100);
-
-        this.#runtimeProps = {};
-
-        this.emitter.on('map:path-ends:changed', this.onPathEndsChanged);
-        this.emitter.on('app:selected-node:changed', this.onSelectedNodeChanged);
-        this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
-        this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
-
-        this.initialized = true;
-    }
-
     onPathEndsChanged = (p: CCMPathEnds) => {
         if (p.start != null && p.end != null) {
             this.skipPathNodes.clear();
@@ -299,7 +307,10 @@ export class CCMapController {
 
     onShortestPathChanged = (removedId: string) => {
         this.skipPathNodes.add(removedId);
-        this.findShortestPath(this.pathEnds[0], this.pathEnds[1]);
+
+        if (this.pathEnds.start && this.pathEnds.end) {
+            this.findShortestPath(this.pathEnds.start, this.pathEnds.end);
+        }
     };
 
     onFocusSelectedNode = (nodeId: string | null) => {
@@ -327,9 +338,20 @@ export class CCMapController {
         this.emitter.emit('map:runtime-props:updated', this.#runtimeProps);
     }
 
+    // React is too eager in providing new refs when rendering.
+    // setGraphRef = throttle(
+    //     (graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) => {
+    //         this.graphRef = graph;
+    //         console.log('setGraphRef', graph);
+    //         this.emitter.emit('map:initialized');
+    //     },
+    //     200,
+    //     { leading: true, trailing: false }
+    // );
     setGraphRef(graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) {
         this.graphRef = graph;
-        this.emitter.emit('map:initialized');
+        console.log('setGraphRef', graph);
+        // this.emitter.emit('map:initialized');
     }
 
     private localBuildGraph(mstEdges?: Array<any>): CCMGraphData {
@@ -483,8 +505,7 @@ export class CCMapController {
                 }
             })();
             const name =
-                (node.type == 'root') ? '' :(
-                (node.type == 'domain' || node.type == 'tag') ? node.name.toUpperCase() : node.name)
+                node.type == 'root' ? '' : node.type == 'domain' || node.type == 'tag' ? node.name.toUpperCase() : node.name;
             const label = name + suffix;
 
             const fontSizes = {
@@ -531,10 +552,7 @@ export class CCMapController {
             const nodeColor = node.color || '#000000';
             const backgroundColor = isSelected ? nodeColor : node.type === 'domain' ? '#F4EBFC' : '#ffffff';
 
-            const labelStyle: string =
-
-                isSelected ? 'pill' :
-                    (node.type === 'tool' || node.type === 'technique' ? 'text' : 'pill')
+            const labelStyle: string = isSelected ? 'pill' : node.type === 'tool' || node.type === 'technique' ? 'text' : 'pill';
 
             if (labelStyle === 'pill') {
                 ctx.beginPath();

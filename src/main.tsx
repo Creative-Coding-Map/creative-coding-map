@@ -29,31 +29,28 @@ function App() {
     const focusNodeParam = params.get('focusNode');
     const nodeParam = params.get('node');
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (isMapInitialized) return;
 
         function onMapInitialized() {
-            if (focusNodeParam) {
-                setSelectedNodeId(focusNodeParam);
-                emitter.emit('app:selected-node:focus', focusNodeParam);
-            }
-
             setIsMapInitialized(true);
         }
+
         emitter.on('map:initialized', onMapInitialized);
 
         return () => {
             emitter.off('map:initialized', onMapInitialized);
+            setIsMapInitialized(false);
         };
     }, [emitter, setSelectedNodeId, focusNodeParam, isMapInitialized]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!isMapInitialized) return;
 
         setSelectedNodeId(nodeParam);
-    }, [nodeParam, setSelectedNodeId, isMapInitialized]);
+    }, [nodeParam, isMapInitialized]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!isMapInitialized) return;
 
         if (focusNodeParam) {
@@ -134,11 +131,9 @@ function App() {
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
-        <StrictMode>
-            <Providers>
-                <App />
-            </Providers>
-        </StrictMode>
+        <Providers>
+            <App />
+        </Providers>
     );
 }
 

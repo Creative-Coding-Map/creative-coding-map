@@ -36,6 +36,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         const onSelectedNodeChanged = (nodeId: string | null) => {
             if (nodeId) {
                 const params = new URLSearchParams({ node: nodeId });
+                console.log('navigating to', `//?${params.toString()}`);
                 navigate(`/?${params.toString()}`);
             }
         };
@@ -43,30 +44,21 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         const initializeGraph = async () => {
             try {
                 console.log('CCMap initializing');
-                setIsLoading(true);
                 setError(null);
 
                 // Create controller instance
                 const controller = new CCMapController();
+
                 controllerRef.current = controller;
 
                 // Listen for graph data updates
-
                 emitter.on('map:graph-data:updated', onGraphDataUpdated);
                 emitter.on('map:runtime-props:updated', onRuntimePropsUpdated);
                 emitter.on('map:selected-node:changed', onSelectedNodeChanged);
 
                 const data = await fetchCCMData();
 
-                // Initialize data
                 controller.initialize(data);
-
-                // Set the graph reference in the controller
-                if (fgRef.current) {
-                    controller.setGraphRef(fgRef.current);
-                }
-
-                setIsLoading(false);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to initialize graph');
                 setIsLoading(false);
@@ -74,6 +66,8 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         };
 
         initializeGraph();
+
+        console.log('CCMap useOnLayoutMount');
 
         // Cleanup on unmount
         return () => {
@@ -89,14 +83,14 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 console.log('CCMap unmounted');
             }
         };
-    }, [navigate]);
+    }, [fgRef, emitter, navigate]);
 
     // Handle graph ready
-    const handleEngineStop = () => {
-        if (fgRef.current) {
-            // fgRef.current.zoomToFit(400);
-        }
-    };
+    // const handleEngineStop = () => {
+    //     if (fgRef.current) {
+    //         // fgRef.current.zoomToFit(400);
+    //     }
+    // };
 
     if (error) {
         return (
@@ -109,7 +103,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         );
     }
 
-    if (isLoading || !graphData || !controllerRef.current?.isInitialized()) {
+    if (!controllerRef.current?.isInitialized()) {
         return (
             <div className={clsx('ccmap-container', className)}>
                 <div className="ccmap-loading">
@@ -119,6 +113,8 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
             </div>
         );
     }
+
+    console.log('RENDERING CCMap');
 
     return (
         <div className={clsx('ccmap', className)}>
@@ -130,10 +126,10 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                     }
                     fgRef.current = node;
                 }}
-                graphData={graphData}
+                graphData={graphData!}
                 width={typeof window !== 'undefined' ? window.innerWidth : 800}
                 height={typeof window !== 'undefined' ? window.innerHeight : 600}
-                onEngineStop={handleEngineStop}
+                // onEngineStop={handleEngineStop}
                 nodeAutoColorBy={controllerRef.current.getNodeAutoColorBy}
                 linkVisibility={controllerRef.current.getLinkVisibility}
                 linkLineDash={controllerRef.current.getLinkLineDash}
