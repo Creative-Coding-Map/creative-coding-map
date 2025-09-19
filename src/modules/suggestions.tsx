@@ -92,7 +92,7 @@ export function Suggestions({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={clsx(
-                'z-10 ccm-colors p-2 rounded-md ccm-transition',
+                'z-10 ccm-colors p-2 rounded-md ccm-transition-colors',
                 fixed ? 'fixed w-[320px] -mt-2 ccm-border' : 'w-full'
             )}
             style={style}
@@ -100,10 +100,11 @@ export function Suggestions({
             <p className="type-hint text-gray mb-1">SUGGESTED NODES</p>
             <ul
                 ref={ref}
+                id="suggestions"
                 tabIndex={-1}
                 onKeyDown={handleKeyDown}
                 onBlur={onBlur}
-                className="flex flex-col max-h-[6lh] overflow-y-auto ccm-scrollbar focus:outline-none group"
+                className="flex flex-col max-h-[6lh] overflow-y-auto ccm-scrollbar focus:outline-none group ccm-transition-colors"
             >
                 {suggestions.map((suggestion, index) => (
                     <li

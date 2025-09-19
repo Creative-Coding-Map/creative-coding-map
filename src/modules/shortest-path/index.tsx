@@ -18,7 +18,7 @@ export function ShortestPath() {
     const shortestPathNodes = useAtomValue(shortestPathNodesAtom, { store });
 
     return (
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
             {createPath && <CreatePath />}
             {shortestPathNodes.length > 0 && <Path />}
         </AnimatePresence>
@@ -50,6 +50,7 @@ function Path() {
         return (event: React.MouseEvent<HTMLButtonElement>) => {
             event.preventDefault();
             setSelectedNodeId(nodeId);
+            emitter.emit('app:selected-node:changed', nodeId);
         };
     };
 

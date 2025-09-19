@@ -45,15 +45,17 @@ function App() {
     }, [emitter, setSelectedNodeId, focusNodeParam, isMapInitialized]);
 
     useLayoutEffect(() => {
-        if (!isMapInitialized) return;
+        if (!isMapInitialized && !nodeParam) return;
 
         setSelectedNodeId(nodeParam);
+        emitter.emit('app:selected-node:changed', nodeParam);
     }, [nodeParam, isMapInitialized]);
 
     useLayoutEffect(() => {
-        if (!isMapInitialized) return;
+        if (!isMapInitialized && !focusNodeParam) return;
 
         if (focusNodeParam) {
+            setSelectedNodeId(focusNodeParam);
             emitter.emit('app:selected-node:focus', focusNodeParam);
         }
     }, [focusNodeParam, emitter, isMapInitialized]);
@@ -71,12 +73,18 @@ function App() {
             }
 
             if (event.key === ESCAPE_KEY) {
-                const showSearch = store.get(showSearchAtom);
+                const isTargetSuggestions = (event.target as HTMLElement).id === 'suggestions';
 
-                if (showSearch) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    store.set(showSearchAtom, false);
+                if (!isTargetSuggestions) {
+                    const showSearch = store.get(showSearchAtom);
+
+                    if (showSearch) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        emitter.emit('app:suggestions:reset');
+
+                        store.set(showSearchAtom, false);
+                    }
                 }
             }
         };

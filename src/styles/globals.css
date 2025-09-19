@@ -75,6 +75,10 @@
     @apply transition-all duration-300 ease-in;
 }
 
+@utility ccm-transition-colors {
+    @apply transition-colors duration-300 ease-in;
+}
+
 @utility ccm-transition-fast {
     @apply transition-all duration-150 ease-in;
     transition-delay: 0s;

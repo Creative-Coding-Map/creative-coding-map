@@ -25,7 +25,6 @@ import type {
 
 import { linkWeights } from '@/modules/map/link-weights.ts';
 import { emitter } from '@/hooks/useEmitter';
-import throttle from 'just-throttle';
 
 export class CCMapController {
     private selectedNodeId: any | null = null;
@@ -45,6 +44,7 @@ export class CCMapController {
     private hoverNodeId: string | null = null;
 
     private layoutTimeoutHandler: number | null = null;
+    private layoutInterval: number | null = null;
 
     ogGraph: CCMGraphData | null = null;
 
@@ -79,6 +79,11 @@ export class CCMapController {
 
         this.graphData = this.localBuildGraph(mstNamed.mstEdges);
         this.graphData.links = mstNamed.mstEdges;
+
+        if (this.layoutTimeoutHandler) {
+            clearTimeout(this.layoutTimeoutHandler);
+            this.layoutTimeoutHandler = null;
+        }
 
         this.layoutTimeoutHandler = setTimeout(() => {
             if (!this.graphRef || !this.graphData) {
@@ -245,7 +250,7 @@ export class CCMapController {
             relevantNodes,
             this.ogGraph!.links.concat(this.domainGraph!.links),
             subtree,
-            linkWeights
+            linkWeights as any
         );
         console.log('number of links in mst: ', mst.mstEdges.length);
         const nextGraph = this.localBuildGraph(mst.mstEdges);
@@ -264,7 +269,13 @@ export class CCMapController {
         this.graphRef.d3ReheatSimulation();
 
         this.centerOnNode(node.id);
-        const interval = setInterval(() => {
+
+        if (this.layoutInterval) {
+            clearInterval(this.layoutInterval);
+            this.layoutInterval = null;
+        }
+
+        this.layoutInterval = setInterval(() => {
             if (!this.graphRef) return;
 
             const linkForce = d3
@@ -285,10 +296,11 @@ export class CCMapController {
             s += 0.1;
             if (s > 1.0) {
                 s = 1.0;
-                clearInterval(interval);
+                clearInterval(this.layoutInterval!);
             }
             this.graphRef.d3Force('link', linkForce);
         }, 100);
+
         return node;
     }
 
@@ -300,9 +312,7 @@ export class CCMapController {
     };
 
     onSelectedNodeChanged = (nodeId: string | null) => {
-        if (nodeId) {
-            this.selectedNodeId = nodeId;
-        }
+        this.selectedNodeId = nodeId;
     };
 
     onShortestPathChanged = (removedId: string) => {
@@ -338,20 +348,8 @@ export class CCMapController {
         this.emitter.emit('map:runtime-props:updated', this.#runtimeProps);
     }
 
-    // React is too eager in providing new refs when rendering.
-    // setGraphRef = throttle(
-    //     (graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) => {
-    //         this.graphRef = graph;
-    //         console.log('setGraphRef', graph);
-    //         this.emitter.emit('map:initialized');
-    //     },
-    //     200,
-    //     { leading: true, trailing: false }
-    // );
     setGraphRef(graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) {
         this.graphRef = graph;
-        console.log('setGraphRef', graph);
-        // this.emitter.emit('map:initialized');
     }
 
     private localBuildGraph(mstEdges?: Array<any>): CCMGraphData {

@@ -9,9 +9,10 @@ import { MIN_CHAR_SUGGESTIONS } from '@/state/constants';
 
 interface UseSuggestionsProps {
     selectSuggestion: (suggestion: CCMNode) => void;
+    triggerKey?: 'ArrowDown' | 'ArrowUp';
 }
 
-export function useSuggestions({ selectSuggestion }: UseSuggestionsProps) {
+export function useSuggestions({ selectSuggestion, triggerKey = 'ArrowDown' }: UseSuggestionsProps) {
     const database = useAtomValue(databaseAtom, { store });
     const [suggestions, setSuggestions] = useState<CCMNode[]>([]);
     const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
@@ -64,7 +65,7 @@ export function useSuggestions({ selectSuggestion }: UseSuggestionsProps) {
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             switch (e.key) {
-                case 'ArrowDown':
+                case triggerKey:
                     if (suggestions.length > 0) {
                         e.preventDefault();
                         e.stopPropagation();

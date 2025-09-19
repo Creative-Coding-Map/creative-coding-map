@@ -10,12 +10,14 @@ import { useEmitter } from '@/hooks/useEmitter';
 import Search from '@/components/icons/Search';
 import { selectedNodeIdAtom, showSearchAtom } from '@/state/model';
 import { store } from '@/state/store';
+import { useLocation } from 'wouter';
 
 export function SearchOverlay() {
     const setShowSearch = useSetAtom(showSearchAtom, { store });
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
     const inputRef = useRef<HTMLInputElement>(null);
     const [search, setSearch] = useState('');
+    const [_, navigate] = useLocation();
 
     const { emitter } = useEmitter();
 
@@ -23,7 +25,9 @@ export function SearchOverlay() {
         (suggestion: CCMNode) => {
             setShowSearch(false);
             setSelectedNodeId(suggestion.id);
-
+            const params = new URLSearchParams({ focusNode: suggestion.id });
+            navigate(`/?${params.toString()}`);
+            emitter.emit('app:selected-node:focus', suggestion.id);
             emitter.emit('app:suggestions:reset');
         },
         [emitter, setSelectedNodeId]
@@ -40,6 +44,7 @@ export function SearchOverlay() {
         reset,
     } = useSuggestions({
         selectSuggestion,
+        triggerKey: 'ArrowUp',
     });
 
     const onInputChange = useCallback(
@@ -63,10 +68,10 @@ export function SearchOverlay() {
                     }, 100);
                 }
             }}
-            className="w-[400px] z-20 p-1 ml-auto mr-4 flex flex-col ccm-colors ccm-border ccm-invert rounded-md ccm-transition"
+            className="w-[400px] z-20 p-1 ml-auto mr-4 flex flex-col ccm-colors ccm-border ccm-invert rounded-md ccm-transition-colors"
         >
-            <div className="w-full flex flex-col">
-                <AnimatePresence>
+            <div className="w-full flex flex-col ">
+                <AnimatePresence mode="wait">
                     {suggestions.length > 0 && (
                         <Suggestions
                             suggestions={suggestions}

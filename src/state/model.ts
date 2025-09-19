@@ -1,13 +1,11 @@
 import { atom } from 'jotai';
 import { Database } from './database';
 import type { CCMNode } from '@/types/ccmap';
-import { emitter } from '@/hooks/useEmitter';
 
 export const databaseAtom = atom<Database>(new Database());
 
 export const selectedNodeIdAtom = atom(null as string | null, (_, set, newNodeId: string | null) => {
     set(selectedNodeIdAtom, newNodeId);
-    emitter.emit('app:selected-node:changed', newNodeId);
 });
 
 export const selectedNodeAtom = atom<CCMNode | null>((get) => {
