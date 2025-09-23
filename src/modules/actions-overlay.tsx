@@ -9,10 +9,13 @@ import ZoomIn from '@/components/icons/ZoomIn';
 import ZoomOut from '@/components/icons/ZoomOut';
 import { showCreatePathAtom, showInfoAtom } from '@/state/model';
 import { store } from '@/state/store';
+import { useEmitter } from '@/hooks/useEmitter';
 
 export function ActionsOverlay() {
     const [createPath, setCreatePath] = useAtom(showCreatePathAtom, { store });
     const [showInfo, setShowInfo] = useAtom(showInfoAtom, { store });
+    const { emitter } = useEmitter();
+
     return (
         <aside className="z-20 absolute ccm-px bottom-4 flex flex-col type-hint gap-0.5">
             <ul className="flex flex-col gap-2">
@@ -28,17 +31,33 @@ export function ActionsOverlay() {
                     </ActionButton>
                 </li>
                 <li>
-                    <ActionButton onClick={() => {}} label="Zoom in">
+                    <ActionButton
+                        onClick={() => {
+                            console.log('zoom in');
+                            emitter.emit('map:zoom-in');
+                        }}
+                        label="Zoom in"
+                    >
                         <ZoomIn className="size-6 ccm-invert" />
                     </ActionButton>
                 </li>
                 <li>
-                    <ActionButton onClick={() => {}} label="Zoom out">
+                    <ActionButton
+                        onClick={() => {
+                            emitter.emit('map:zoom-out');
+                        }}
+                        label="Zoom out"
+                    >
                         <ZoomOut className="size-6 ccm-invert" />
                     </ActionButton>
                 </li>
                 <li>
-                    <ActionButton onClick={() => {}} label="Recenter">
+                    <ActionButton
+                        onClick={() => {
+                            emitter.emit('map:recenter');
+                        }}
+                        label="Recenter"
+                    >
                         <Recenter className="size-6 ccm-invert" />
                     </ActionButton>
                 </li>

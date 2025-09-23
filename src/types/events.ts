@@ -17,4 +17,7 @@ export type CCMEvents = {
     'map:path-ends:changed': CCMPathEnds;
     'map:shortest-path:changed': Array<Array<string>>;
     'map:resize': undefined;
+    'map:zoom-in': undefined;
+    'map:zoom-out': undefined;
+    'map:recenter': undefined;
 };

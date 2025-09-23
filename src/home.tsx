@@ -9,10 +9,11 @@ import { LegendOverlay } from '@/modules/legend-overlay.tsx';
 import CCMap from '@/modules/map/CCMap';
 import { ActionsOverlay } from '@/modules/actions-overlay';
 import { MapOverlay } from '@/modules/map-overlay';
+import BreakdownsView from './views/breakdowns-view.tsx';
 
 export default function Home() {
     const [isAboutPage] = useRoute('/about');
-
+    const [isBreakdownsPage] = useRoute('/breakdowns');
     return (
         <section className="flex flex-col w-screen overflow-hidden">
             <LegendOverlay />
@@ -21,7 +22,7 @@ export default function Home() {
             <Suspense fallback={<Loading />}>
                 <CCMap />
             </Suspense>
-            <AnimatePresence>
+            <AnimatePresence mode="wait" propagate>
                 {isAboutPage && (
                     <m.div
                         initial={{ opacity: 0, x: '100%' }}
@@ -30,6 +31,16 @@ export default function Home() {
                         transition={{ duration: 0.5 }}
                     >
                         <AboutView />
+                    </m.div>
+                )}
+                {isBreakdownsPage && (
+                    <m.div
+                        initial={{ opacity: 0, x: '100%' }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: '100%' }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <BreakdownsView />
                     </m.div>
                 )}
             </AnimatePresence>

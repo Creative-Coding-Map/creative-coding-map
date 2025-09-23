@@ -51,19 +51,47 @@ export default function AboutView() {
                             </p>
                         </div>
                         <div className="flex flex-col">
-                            <p>Concept, design and back end: RNDR</p>
-                            <p>Implementation: Ricardo Matias</p>
-                            <p>Thanks to COSA, Processing Foundation, Abe Pazos, Raphaël de Courville, and many more.</p>
+                            <p>
+                                Concept, design and back end:{' '}
+                                <a className="ccm-link" href="https://rndr.studio/" target="_blank">
+                                    RNDR
+                                </a>
+                            </p>
+                            <p>
+                                Implementation:{' '}
+                                <a className="ccm-link" href="https://ricardomatias.net/" target="_blank">
+                                    Ricardo Matias
+                                </a>
+                            </p>
+                            <p>
+                                Thanks to COSA,{' '}
+                                <a className="ccm-link" href="https://processingfoundation.org/" target="_blank">
+                                    Processing Foundation
+                                </a>
+                                ,{' '}
+                                <a className="ccm-link" href="https://hamoid.com/" target="_blank">
+                                    Abe Pazos
+                                </a>
+                                ,{' '}
+                                <a className="ccm-link" href="https://processingfoundation.org/people/" target="_blank">
+                                    Raphaël de Courville, and many more
+                                </a>
+                                .
+                            </p>
                         </div>
                         <div>
                             <h4>Made possible by:</h4>
                             <div className="grid grid-cols-2 gap-x-10 mt-4 ">
-                                <img
-                                    src="/images/creative-industries-fund-nl.jpg"
-                                    alt="Creative Industries Fund NL"
-                                    className="h-32"
-                                />
-                                <img src="/images/4PictorightFonds.jpg" alt="Pictoright Fonds" className="h-32 " />
+                                <a className="ccm-link" href="https://www.stimuleringsfonds.nl/en/" target="_blank">
+                                    <img
+                                        src="/images/creative-industries-fund-nl.jpg"
+                                        alt="Creative Industries Fund NL"
+                                        className="h-32"
+                                    />
+                                </a>
+                                <a className="ccm-link" href="https://www.pictoright.nl/" target="_blank">
+                                    <img src="/images/4PictorightFonds.jpg" alt="Pictoright Fonds" className="h-32 " />
+                                </a>
                             </div>
                         </div>
                     </div>

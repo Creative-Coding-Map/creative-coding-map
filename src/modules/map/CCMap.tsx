@@ -138,6 +138,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 enableNodeDrag={true}
                 nodeCanvasObject={controllerRef.current.getNodeCanvasObject}
                 nodePointerAreaPaint={controllerRef.current.getNodePointerAreaPaint}
+                onZoom={controllerRef.current.onZoom}
                 backgroundColor="#f9f6fd"
                 autoPauseRedraw={false}
                 d3AlphaDecay={0.01}

@@ -51,6 +51,8 @@ export class CCMapController {
     pathEnds: CCMPathEnds = { start: null, end: null };
     #shortestPaths: Array<Array<string>> = [];
 
+    private zoom: number = 1.0;
+
     constructor() {}
 
     initialize(ccmData: CCMData): void {
@@ -110,10 +112,27 @@ export class CCMapController {
         this.emitter.on('app:selected-node:changed', this.onSelectedNodeChanged);
         this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
         this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
+        this.emitter.on('map:zoom-in', this.zoomIn);
+        this.emitter.on('map:zoom-out', this.zoomOut);
+        this.emitter.on('map:recenter', this.recenter);
 
         this.initialized = true;
         this.emitter.emit('map:initialized');
     }
+
+    zoomIn = () => {
+        this.zoom *= 1.5;
+        this.graphRef?.zoom(this.zoom, 300);
+    };
+
+    zoomOut = () => {
+        this.zoom *= 1 / 1.5;
+        this.graphRef?.zoom(this.zoom, 300);
+    };
+
+    recenter = () => {
+        this.graphRef?.centerAt(0, 0, 500);
+    };
 
     /**
      * Centers the graph view on the specified node.
@@ -623,6 +642,10 @@ export class CCMapController {
 
     getNodeAutoColorBy = () => {
         return 'type';
+    };
+
+    onZoom = ({ k }: { k: number }) => {
+        this.zoom = k;
     };
 
     isInitialized(): boolean {

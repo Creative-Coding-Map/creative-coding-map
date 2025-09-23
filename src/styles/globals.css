@@ -110,6 +110,10 @@
         @apply border border-white group-hover:border-black dark:border-black dark:group-hover:border-white;
     }
 
+    .ccm-link {
+        @apply underline;
+    }
+
     .ccm-padding {
         @apply p-4 lg:p-5;
     }

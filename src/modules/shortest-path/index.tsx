@@ -60,7 +60,7 @@ function Path() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             key="create-path"
-            className={clsx('relative max-w-xl z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md basis-1/3')}
+            className={clsx('relative mr-4 max-w-xl z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md basis-1/3')}
         >
             <ActionButton
                 className="absolute top-4 right-4"
@@ -103,7 +103,10 @@ function Path() {
                                 if (isLast || isFirst) {
                                     return (
                                         <div key={node.id} className="border border-transparent type-body h-6 px-1.5 w-full ">
-                                            <button onClick={selectNode(node.id)} className="w-full h-full text-left">
+                                            <button
+                                                onClick={selectNode(node.id)}
+                                                className="w-full h-full text-left cursor-pointer "
+                                            >
                                                 {node.id}
                                             </button>
                                         </div>
@@ -116,10 +119,7 @@ function Path() {
                                         className="type-body h-6 rounded-md w-full flex group gap-1 hover:dark ccm-colors ccm-transition-fast"
                                     >
                                         <button
-                                            onClick={(evt) => {
-                                                evt.preventDefault();
-                                                selectNode(node.id);
-                                            }}
+                                            onClick={selectNode(node.id)}
                                             className={clsx(
                                                 'flex-1 rounded-md px-1.5 text-left cursor-pointer ccm-transition-fast',
                                                 'ccm-border-hover hover:bg-black hover:text-white'

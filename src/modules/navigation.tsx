@@ -20,8 +20,8 @@ export const Navbar = () => {
                 <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/about">
                     About
                 </Link>
-                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/breakdown/test-breakdown">
-                    Breakdown
+                <Link className={(active) => clsx('link type-header z-20', active && 'active')} href="/breakdowns">
+                    Breakdowns
                 </Link>
                 <button
                     className="link type-header z-20"
