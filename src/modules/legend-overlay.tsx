@@ -7,8 +7,9 @@ import Breakdowns from '@/components/symbols/Breakdowns';
 import Tags from '@/components/symbols/Tags';
 import Techniques from '@/components/symbols/Techniques';
 import Tools from '@/components/symbols/Tools';
-import { useEmitter } from '@/hooks/useEmitter';
-import { useLocation } from 'wouter';
+import { toggleFilterAtom } from '@/state/model';
+import { useSetAtom } from 'jotai';
+import { store } from '@/state/store';
 
 const viewConfigVariants = {
     open: {
@@ -33,23 +34,38 @@ const itemVariants = {
 export function LegendOverlay() {
     const [selectedDomain, setSelectedDomain] = useState<string>('Domain mode');
     const [showOtherDomains, setShowOtherDomains] = useState<boolean>(false);
-    const [_, navigate] = useLocation();
-    const { emitter } = useEmitter();
+    const toggleFilter = useSetAtom(toggleFilterAtom, { store });
     const domains = ['Domain mode', 'Frameworks', 'Use cases'];
     return (
         <aside className="z-10 absolute ccm-px top-1/5 flex flex-col type-hint gap-0.5">
             <h4 className="text-gray">SHAPE</h4>
             <ul className="flex flex-col gap-0.5">
-                <li className="flex items-center gap-2">
+                <li
+                    className="flex items-center gap-2 cursor-pointer"
+                    role="button"
+                    onClick={() => toggleFilter({ id: 'tags', type: 'shape' })}
+                >
                     <Tags /> <span>TAGS</span>
                 </li>
-                <li className="flex items-center gap-2">
+                <li
+                    className="flex items-center gap-2 cursor-pointer"
+                    role="button"
+                    onClick={() => toggleFilter({ id: 'tools', type: 'shape' })}
+                >
                     <Tools /> <span>TOOLS</span>
                 </li>
-                <li className="flex items-center gap-2">
+                <li
+                    className="flex items-center gap-2 cursor-pointer"
+                    role="button"
+                    onClick={() => toggleFilter({ id: 'techniques', type: 'shape' })}
+                >
                     <Techniques /> <span>TECHNIQUES</span>
                 </li>
-                <li className="flex items-center gap-2">
+                <li
+                    className="flex items-center gap-2 cursor-pointer"
+                    role="button"
+                    onClick={() => toggleFilter({ id: 'breakdowns', type: 'shape' })}
+                >
                     <Breakdowns /> <span>BREAKDOWNS</span>
                 </li>
             </ul>
@@ -117,18 +133,16 @@ export function LegendOverlay() {
                                         role="button"
                                         onClick={(evt) => {
                                             evt.preventDefault();
-                                            console.log('domain', domain);
-                                            let focusNode = '';
+                                            let nodeId = '';
                                             if (selectedDomain === 'Domain mode') {
-                                                focusNode = `domain:${domain.name}`;
+                                                nodeId = `domain:${domain.name}`;
                                             } else if (selectedDomain === 'Frameworks') {
                                                 const node = domain.nodes[0];
-                                                focusNode = node.id;
+                                                nodeId = node.id;
                                             }
 
-                                            if (focusNode) {
-                                                const params = new URLSearchParams({ focusNode });
-                                                navigate(`/?${params.toString()}`);
+                                            if (nodeId) {
+                                                toggleFilter({ id: nodeId, type: 'node' });
                                             }
                                         }}
                                         variants={itemVariants}

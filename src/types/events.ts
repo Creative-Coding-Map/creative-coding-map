@@ -1,5 +1,5 @@
 import type { ForceGraphProps } from 'react-force-graph-2d';
-import type { CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds, CCMViewConfiguration } from './ccmap';
+import type { CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds, CCMViewConfiguration, CCMFilter } from './ccmap';
 
 export type CCMEvents = {
     'app:shortest-path:create': undefined;
@@ -7,6 +7,7 @@ export type CCMEvents = {
     'app:suggestions:reset': undefined;
     'app:selected-node:changed': string | null;
     'app:selected-node:focus': string | null;
+    'app:filters:changed': CCMFilter[];
     'app:index:close-tooltip': string;
     'map:initialized': undefined;
     'map:graph-data:updated': CCMGraphData | null;

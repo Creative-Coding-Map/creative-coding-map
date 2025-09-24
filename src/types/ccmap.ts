@@ -105,3 +105,8 @@ export interface CCMBreakdown {
     }[];
     description: string;
 }
+
+export type CCMFilter = {
+    id: string;
+    type: 'node' | 'shape';
+};

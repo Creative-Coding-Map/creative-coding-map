@@ -15,6 +15,7 @@ import { VIEW_CONFIGURATIONS } from './data';
 import type { ForceGraphMethods, ForceGraphProps } from 'react-force-graph-2d';
 import type {
     CCMData,
+    CCMFilter,
     CCMGraphData,
     CCMGraphLink,
     CCMGraphNode,
@@ -112,6 +113,7 @@ export class CCMapController {
         this.emitter.on('app:selected-node:changed', this.onSelectedNodeChanged);
         this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
         this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
+        this.emitter.on('app:filters:changed', this.onFiltersChanged);
         this.emitter.on('map:zoom-in', this.zoomIn);
         this.emitter.on('map:zoom-out', this.zoomOut);
         this.emitter.on('map:recenter', this.recenter);
@@ -348,6 +350,10 @@ export class CCMapController {
             this.selectedNodeId = nodeId;
             this.focusOnNode(nodeId);
         }
+    };
+
+    onFiltersChanged = (filters: CCMFilter[]) => {
+        console.log('onFiltersChanged', filters);
     };
 
     get graphData(): CCMGraphData | null {

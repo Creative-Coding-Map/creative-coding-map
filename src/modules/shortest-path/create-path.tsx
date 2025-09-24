@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import * as m from 'motion/react-m';
 import { AnimatePresence } from 'motion/react';
 import { Suggestions } from '../suggestions';
-import type { CCMNode, CCMPathEnds } from '@/types/ccmap';
+import type { CCMNode } from '@/types/ccmap';
 import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom, showCreatePathAtom } from '@/state/model';
 import { store } from '@/state/store';
 import CreatePathIcon from '@/components/icons/CreatePath';
