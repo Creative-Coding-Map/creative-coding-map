@@ -60,7 +60,7 @@ function Path() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             key="create-path"
-            className={clsx('relative mr-4 max-w-xl z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md basis-1/3')}
+            className={clsx('relative max-w-xl z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md basis-1/3')}
         >
             <ActionButton
                 className="absolute top-4 right-4"

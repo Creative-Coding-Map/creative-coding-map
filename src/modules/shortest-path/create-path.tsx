@@ -1,11 +1,11 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import * as m from 'motion/react-m';
 import { AnimatePresence } from 'motion/react';
 import { Suggestions } from '../suggestions';
-import type { CCMNode } from '@/types/ccmap';
-import { pathEndNodeAtom, pathStartNodeAtom, showCreatePathAtom } from '@/state/model';
+import type { CCMNode, CCMPathEnds } from '@/types/ccmap';
+import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom, showCreatePathAtom } from '@/state/model';
 import { store } from '@/state/store';
 import CreatePathIcon from '@/components/icons/CreatePath';
 import CloseIcon from '@/components/icons/Close';
@@ -19,6 +19,7 @@ export function CreatePath() {
     const setShowCreatePath = useSetAtom(showCreatePathAtom, { store });
     const [startNode, setStartNode] = useAtom(pathStartNodeAtom, { store });
     const [endNode, setEndNode] = useAtom(pathEndNodeAtom, { store });
+    const database = useAtomValue(databaseAtom, { store });
 
     const [startNodeInput, setStartNodeInput] = useState('');
     const [endNodeInput, setEndNodeInput] = useState('');
@@ -99,11 +100,37 @@ export function CreatePath() {
         [handleInputChange, setStartNodeInput, setEndNodeInput]
     );
 
+    const onSelectedNodeChanged = useCallback(
+        (nodeId: string | null) => {
+            if (nodeId) {
+                if (startNodeInput === '') {
+                    setStartNodeInput(nodeId);
+                    setStartNode(database.getNode(nodeId)!);
+                } else if (endNodeInput === '') {
+                    setEndNodeInput(nodeId);
+                    setEndNode(database.getNode(nodeId)!);
+
+                    if (startNodeInput) {
+                        setShowCreatePath(false);
+                        emitter.emit('app:shortest-path:create');
+                    }
+                }
+            }
+        },
+        [startNodeInput, endNodeInput]
+    );
+
     useLayoutEffect(() => {
         if (startInputRef.current) {
             startInputRef.current.focus();
         }
-    }, [startInputRef.current]);
+
+        emitter.on('map:selected-node:changed', onSelectedNodeChanged);
+
+        return () => {
+            emitter.off('map:selected-node:changed', onSelectedNodeChanged);
+        };
+    }, [onSelectedNodeChanged]);
 
     return (
         <m.aside

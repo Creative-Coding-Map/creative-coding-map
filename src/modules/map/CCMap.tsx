@@ -114,8 +114,6 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         );
     }
 
-    console.log('RENDERING CCMap');
-
     return (
         <div className={clsx('ccmap', className)}>
             <ForceGraph2D

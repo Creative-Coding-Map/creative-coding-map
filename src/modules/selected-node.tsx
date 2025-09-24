@@ -28,7 +28,7 @@ export function SelectedNode() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             key="selected-node"
-            className="max-w-2xl z-10 relative flex flex-col ccm-card ccm-card-px mr-4"
+            className="max-w-2xl z-10 relative flex flex-col ccm-card ccm-card-px"
         >
             <ActionButton
                 className="absolute top-4 right-4"

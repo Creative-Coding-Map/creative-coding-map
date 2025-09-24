@@ -425,7 +425,7 @@ export class CCMapController {
                 }
 
                 // TODO: Fix shortest path start selection logic
-                if (this.pathEnds.start != node.id && this.#shortestPaths.length == 0) {
+                if (this.pathEnds.start != node.id && this.#shortestPaths.length === 0) {
                     this.pathEnds.start = node.id;
                     this.emitter.emit('map:path-ends:changed', this.pathEnds);
                 }

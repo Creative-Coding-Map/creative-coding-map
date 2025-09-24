@@ -68,7 +68,7 @@ export function SearchOverlay() {
                     }, 100);
                 }
             }}
-            className="w-[400px] z-20 p-1 ml-auto mr-4 flex flex-col ccm-colors ccm-border ccm-invert rounded-md ccm-transition-colors"
+            className="max-w-xl w-full z-20 p-1 ml-auto flex flex-col ccm-colors ccm-border ccm-invert rounded-md ccm-transition-colors"
         >
             <div className="w-full flex flex-col ">
                 <AnimatePresence mode="wait">
