@@ -46,9 +46,7 @@ export function SelectedNode() {
                     <h3 className="type-window-title">{selectedNode.id}</h3>
                     <p className="type-hint flex items-center gap-1">NODE SELECTED ({selectedNode.type.toUpperCase()})</p>
                 </div>
-                <p className="type-body mb-4">
-                    A flexible software sketchbook and language for learning how to code within the visual arts.
-                </p>
+                <p className="type-body mb-4">{selectedNode.description}</p>
                 <NodeData node={selectedNode} prop="tags" />
                 <NodeData node={selectedNode} prop="dependsOn" />
                 <NodeData node={selectedNode} prop="supports" />

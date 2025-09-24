@@ -97,6 +97,7 @@ export function SearchOverlay() {
                     <input
                         ref={inputRef}
                         id="search-input"
+                        autoComplete="off"
                         type="text"
                         className={clsx('type-filter w-full px-1 font-mono ccm-colors ccm-transition outline-none')}
                         value={search}

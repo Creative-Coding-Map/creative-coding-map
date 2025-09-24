@@ -1,10 +1,10 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { AnimatePresence } from 'motion/react';
 import { ShortestPath } from './shortest-path';
 import { InfoOverlay } from './info-overlay';
 import { SearchOverlay } from './search';
 import { SelectedNode } from './selected-node';
-import { selectedNodeAtom, selectedNodeIdAtom, showInfoAtom, showSearchAtom } from '@/state/model';
+import { selectedNodeIdAtom, showInfoAtom, showSearchAtom } from '@/state/model';
 import { store } from '@/state/store';
 
 export function MapOverlay() {

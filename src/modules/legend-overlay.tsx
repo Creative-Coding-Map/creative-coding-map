@@ -7,6 +7,7 @@ import Breakdowns from '@/components/symbols/Breakdowns';
 import Tags from '@/components/symbols/Tags';
 import Techniques from '@/components/symbols/Techniques';
 import Tools from '@/components/symbols/Tools';
+import { useEmitter } from '@/hooks/useEmitter';
 
 const viewConfigVariants = {
     open: {
@@ -31,6 +32,7 @@ const itemVariants = {
 export function LegendOverlay() {
     const [selectedDomain, setSelectedDomain] = useState<string>('Domain mode');
     const [showOtherDomains, setShowOtherDomains] = useState<boolean>(false);
+    const { emitter } = useEmitter();
     const domains = ['Domain mode', 'Frameworks', 'Use cases'];
     return (
         <aside className="z-10 absolute ccm-px top-1/5 flex flex-col type-hint gap-0.5">
@@ -108,7 +110,21 @@ export function LegendOverlay() {
                             {VIEW_CONFIGURATIONS.filter((view) => view.name.includes(selectedDomain))
                                 .flatMap((view) => view.domainSets)
                                 .map((domain) => (
-                                    <m.li key={domain.name} variants={itemVariants} className="flex items-center gap-2">
+                                    <m.li
+                                        key={domain.name}
+                                        role="button"
+                                        onClick={(evt) => {
+                                            evt.preventDefault();
+                                            console.log('domain', domain);
+                                            if (selectedDomain === 'Domain mode') {
+                                                emitter.emit('app:selected-node:focus', `domain:${domain.name}`);
+                                            } else if (selectedDomain === 'Frameworks') {
+                                                emitter.emit('app:selected-node:focus', domain.name);
+                                            }
+                                        }}
+                                        variants={itemVariants}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                    >
                                         <Tools className="fill-black" /> <span className="capitalize">{domain.name}</span>
                                     </m.li>
                                 ))}

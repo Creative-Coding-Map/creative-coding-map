@@ -11,6 +11,7 @@ export enum CCMNodeType {
 export interface CCMNode {
     id: string;
     type: CCMNodeType;
+    description?: string;
     name?: string;
     tags?: string[];
     partOf?: string[];
@@ -33,7 +34,7 @@ export type CCMGraphNode = NodeObject<{
     color?: string;
     ccmData?: [string, CCMNode];
     __bckgDimensions?: [number, number];
-    count?: number
+    count?: number;
 }>;
 
 export type CCMGraphLink = LinkObject<CCMGraphNode> & {
