@@ -127,30 +127,37 @@ export function LegendOverlay() {
                         >
                             {VIEW_CONFIGURATIONS.filter((view) => view.name.includes(selectedDomain))
                                 .flatMap((view) => view.domainSets)
-                                .map((domain) => (
-                                    <m.li
-                                        key={domain.name}
-                                        role="button"
-                                        onClick={(evt) => {
-                                            evt.preventDefault();
-                                            let nodeId = '';
-                                            if (selectedDomain === 'Domain mode') {
-                                                nodeId = `domain:${domain.name}`;
-                                            } else if (selectedDomain === 'Frameworks') {
-                                                const node = domain.nodes[0];
-                                                nodeId = node.id;
-                                            }
+                                .map((domain) => {
+                                    const color = VIEW_CONFIGURATIONS.find((view) =>
+                                        view.name.includes(selectedDomain)
+                                    )?.colorSets.find((colorSet) => colorSet.name === domain.name)?.color;
+                                    const colorClass = color ? `fill-[${color}]` : 'fill-black';
+                                    return (
+                                        <m.li
+                                            key={domain.name}
+                                            role="button"
+                                            onClick={(evt) => {
+                                                evt.preventDefault();
+                                                let nodeId = '';
+                                                if (selectedDomain === 'Domain mode') {
+                                                    nodeId = `domain:${domain.name}`;
+                                                } else if (selectedDomain === 'Frameworks') {
+                                                    const node = domain.nodes[0];
+                                                    nodeId = node.id;
+                                                }
 
-                                            if (nodeId) {
-                                                toggleFilter({ id: nodeId, type: 'node' });
-                                            }
-                                        }}
-                                        variants={itemVariants}
-                                        className="flex items-center gap-2 cursor-pointer"
-                                    >
-                                        <Tools className="fill-black" /> <span className="capitalize">{domain.name}</span>
-                                    </m.li>
-                                ))}
+                                                if (nodeId) {
+                                                    toggleFilter({ id: nodeId, type: 'node' });
+                                                }
+                                            }}
+                                            variants={itemVariants}
+                                            className="flex items-center gap-2 cursor-pointer"
+                                        >
+                                            <Tools className={colorClass} style={{ fill: color }} />{' '}
+                                            <span className={clsx(`capitalize`)}>{domain.name}</span>
+                                        </m.li>
+                                    );
+                                })}
                         </m.ul>
                     )}
                 </AnimatePresence>
