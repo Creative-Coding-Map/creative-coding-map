@@ -21,6 +21,11 @@ export interface CCMNode {
     techniques?: string[];
 }
 
+export interface CCMTag {
+    id?: string,
+    description?: string
+}
+
 export interface CCMData {
     tools: Array<[string, CCMNode]>;
     techniques: Array<[string, CCMNode]>;

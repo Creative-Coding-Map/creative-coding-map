@@ -1,6 +1,6 @@
-import type { CCMData, CCMNode } from '@/types/ccmap';
+import type { CCMData, CCMNode, CCMTag } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
-import { TECHNIQUES_URL, TOOLS_URL } from '@/state/constants';
+import { TECHNIQUES_URL, TOOLS_URL, TAGS_URL } from '@/state/constants';
 import { store } from '@/state/store';
 import { databaseAtom } from '@/state/model';
 import { Database } from '@/state/database';
@@ -17,6 +17,7 @@ export async function fetchCCMData(): Promise<CCMData> {
         const tools = ((await fetch(TOOLS_URL).then((res) => res.json())) as { tools: Record<string, CCMNode> }).tools;
         const techniques = ((await fetch(TECHNIQUES_URL).then((res) => res.json())) as { techniques: Record<string, CCMNode> })
             .techniques;
+        const tags = ((await fetch(TAGS_URL).then((res) => res.json())) as { tags: Record<string, CCMTag> });
 
         const data = new Map<string, CCMNode>();
         const toolsArray = [];
@@ -55,8 +56,10 @@ export async function fetchCCMData(): Promise<CCMData> {
             if (data.has(tag)) {
                 console.log('%c[fetchCCMData] duplicate id', 'color: red', tag);
             }
+            const description = tags[tag].description || 'bla'
             data.set(tag, {
                 id: tag,
+                description: description,
                 name: tag,
                 type: CCMNodeType.Tag,
             });

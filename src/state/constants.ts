@@ -2,6 +2,8 @@ export const TOOLS_URL =
     'https://raw.githubusercontent.com/Creative-Coding-Map/ccm-published-data/refs/heads/main/tools/tools.json';
 export const TECHNIQUES_URL =
     'https://raw.githubusercontent.com/Creative-Coding-Map/ccm-published-data/refs/heads/main/techniques/techniques.json';
+export const TAGS_URL =
+    'https://raw.githubusercontent.com/Creative-Coding-Map/ccm-published-data/refs/heads/main/tags/tags.json';
 
 export const NODE_DATA_KEYS = {
     tags: 'TAGS',
