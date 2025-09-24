@@ -8,6 +8,7 @@ import Tags from '@/components/symbols/Tags';
 import Techniques from '@/components/symbols/Techniques';
 import Tools from '@/components/symbols/Tools';
 import { useEmitter } from '@/hooks/useEmitter';
+import { useLocation } from 'wouter';
 
 const viewConfigVariants = {
     open: {
@@ -32,6 +33,7 @@ const itemVariants = {
 export function LegendOverlay() {
     const [selectedDomain, setSelectedDomain] = useState<string>('Domain mode');
     const [showOtherDomains, setShowOtherDomains] = useState<boolean>(false);
+    const [_, navigate] = useLocation();
     const { emitter } = useEmitter();
     const domains = ['Domain mode', 'Frameworks', 'Use cases'];
     return (
@@ -116,10 +118,17 @@ export function LegendOverlay() {
                                         onClick={(evt) => {
                                             evt.preventDefault();
                                             console.log('domain', domain);
+                                            let focusNode = '';
                                             if (selectedDomain === 'Domain mode') {
-                                                emitter.emit('app:selected-node:focus', `domain:${domain.name}`);
+                                                focusNode = `domain:${domain.name}`;
                                             } else if (selectedDomain === 'Frameworks') {
-                                                emitter.emit('app:selected-node:focus', domain.name);
+                                                const node = domain.nodes[0];
+                                                focusNode = node.id;
+                                            }
+
+                                            if (focusNode) {
+                                                const params = new URLSearchParams({ focusNode });
+                                                navigate(`/?${params.toString()}`);
                                             }
                                         }}
                                         variants={itemVariants}
