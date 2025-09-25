@@ -67,6 +67,7 @@ export function CreatePath() {
         reset,
     } = useSuggestions({
         selectSuggestion,
+        triggerKey: 'ArrowUp',
     });
 
     const handleFocus = useCallback(
@@ -124,7 +125,9 @@ export function CreatePath() {
         if (startInputRef.current) {
             startInputRef.current.focus();
         }
+    }, []);
 
+    useLayoutEffect(() => {
         emitter.on('map:selected-node:changed', onSelectedNodeChanged);
 
         return () => {
