@@ -66,7 +66,7 @@ export default function IndexView() {
             map.get(letter)?.push({
                 ...node,
                 category: node.tags ? node.tags[0] : '',
-                description: node.description || "description missing",
+                description: node.description || '',
             });
         }
 
@@ -356,7 +356,9 @@ const NodeListItem = memo(function NodeListItem({ node, isLastColumn }: { node: 
             <span className="hidden group-[.show-content]:block group-[.show-content]:font-bold ellipsis type-filter text-sm">
                 {node.id}
             </span>
-            <span className={clsx('ml-auto type-hint ellipsis category text-xs opacity-60')}>[{node.category}]</span>
+            {node.category && (
+                <span className={clsx('ml-auto type-hint ellipsis category text-xs opacity-60')}>[{node.category}]</span>
+            )}
         </div>
     );
 });

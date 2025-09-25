@@ -60,6 +60,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
 
                 controller.initialize(data);
             } catch (err) {
+                console.error(err);
                 setError(err instanceof Error ? err.message : 'Failed to initialize graph');
                 setIsLoading(false);
             }
