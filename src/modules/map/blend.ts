@@ -15,8 +15,8 @@ export function blendGraphs(viewGraph: CCMGraphData, nextGraph: CCMGraphData): v
     // would be nice to have asymmetric hashing such that hash(a,b) == hash(b,a)
 
     for (const link of nextGraph.links) {
-        const sourceId = nodeId(link.source)
-        const targetId = nodeId(link.target)
+        const sourceId = nodeId(link.source);
+        const targetId = nodeId(link.target);
 
         linkCountMap.set(sourceId, (linkCountMap.get(sourceId) || 0) + 1);
         linkCountMap.set(targetId, (linkCountMap.get(targetId) || 0) + 1);
@@ -28,14 +28,19 @@ export function blendGraphs(viewGraph: CCMGraphData, nextGraph: CCMGraphData): v
             `${nodeId(it.target)}-${nodeId(it.source)}`,
         ])
     );
-    const nextLinks = new Set(nextGraph.links.flatMap((it) => [`${nodeId(it.source)}-${nodeId(it.target)}`, `${nodeId(it.target)}-${nodeId(it.source)}`]));
+    const nextLinks = new Set(
+        nextGraph.links.flatMap((it) => [
+            `${nodeId(it.source)}-${nodeId(it.target)}`,
+            `${nodeId(it.target)}-${nodeId(it.source)}`,
+        ])
+    );
 
     const newLinks = nextLinks.difference(viewLinks);
     const removeLinks = viewLinks.difference(nextLinks);
 
     for (const link of viewGraph.links) {
-        const sourceId = nodeId(link.source)
-        const targetId = nodeId(link.target)
+        const sourceId = nodeId(link.source);
+        const targetId = nodeId(link.target);
 
         if (removeLinks.has(`${nodeId(link.source)}-${nodeId(link.target)}`)) {
             link.strength = 0.0;

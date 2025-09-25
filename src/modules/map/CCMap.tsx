@@ -141,6 +141,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 backgroundColor="#f9f6fd"
                 autoPauseRedraw={false}
                 d3AlphaDecay={0.01}
+                showPointerCursor
                 {...runtimeProps}
             />
             {/* <div className="ccmap-inspectors">

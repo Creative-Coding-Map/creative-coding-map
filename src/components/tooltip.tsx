@@ -1,7 +1,8 @@
 import clsx from 'clsx';
 import { createContext, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import * as m from 'motion/react-m';
+import { AnimatePresence } from 'motion/react';
 import throttle from 'just-throttle';
 import type { Dispatch, ElementType, ReactNode, SetStateAction } from 'react';
 
@@ -100,7 +101,7 @@ export default function Tooltip({
     const tooltipPortal = createPortal(
         <AnimatePresence mode="wait">
             {(isVisible || forceShow) && (
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
@@ -112,7 +113,7 @@ export default function Tooltip({
                     }}
                 >
                     <div className="flex max-w-xs flex-col items-center ccm-border ccm-rounded ccm-colors p-2">{message}</div>
-                </motion.div>
+                </m.div>
             )}
         </AnimatePresence>,
         document.body

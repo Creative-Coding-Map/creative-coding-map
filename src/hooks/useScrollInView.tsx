@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 export const useScrollInView = (id: string) => {
     const containerRef = useRef<HTMLImageElement>(null);
@@ -23,9 +23,9 @@ export const useScrollInView = (id: string) => {
                 scrollY.current = window.scrollY;
             };
 
-            window.addEventListener("scroll", onScroll);
+            window.addEventListener('scroll', onScroll);
 
-            return () => window.removeEventListener("scroll", onScroll);
+            return () => window.removeEventListener('scroll', onScroll);
         }
     }, [id, containerRef.current]);
 

@@ -26,10 +26,6 @@ export default defineConfig({
         //     polyfills: ['set-methods-v2'],
         // }),
     ],
-    test: {
-        globals: true,
-        environment: 'jsdom',
-    },
     resolve: {
         alias: {
             '@': resolve(__dirname, './src'),
@@ -60,9 +56,14 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks(id) {
-                    if (id.includes('faker')) {
-                        return 'faker'; // Split components into their own chunk
+                    const manualChunks = ['react-window', 'd3', 'lucide-react', 'motion', 'force-graph'];
+
+                    for (const chunk of manualChunks) {
+                        if (id.includes(chunk)) {
+                            return chunk; // Split components into their own chunk
+                        }
                     }
+
                     if (id.includes('node_modules')) {
                         return 'vendor'; // Split vendor libraries
                     }

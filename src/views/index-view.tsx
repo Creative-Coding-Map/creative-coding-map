@@ -1,7 +1,6 @@
 /* eslint-disable no-shadow */
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import { faker } from '@faker-js/faker';
 import { atom, useAtom } from 'jotai';
 import { VariableSizeList as List } from 'react-window';
 import useResizeObserver from 'use-resize-observer';
@@ -15,7 +14,7 @@ import Tags from '@/components/symbols/Tags';
 import Tools from '@/components/symbols/Tools';
 import Techniques from '@/components/symbols/Techniques';
 import { databaseAtom } from '@/state/model';
-import { pick, updateArray } from '@/lib/utils';
+import { updateArray } from '@/lib/utils';
 import Tooltip, { TooltipProvider } from '@/components/tooltip';
 import { fetchCCMData } from '@/modules/map/fetch-data';
 import { store } from '@/state/store';

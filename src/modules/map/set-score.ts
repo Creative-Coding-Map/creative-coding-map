@@ -1,4 +1,4 @@
-import type { CCMDomainSet, CCMGraphNode, ColorSet } from "@/types/ccmap";
+import type { CCMDomainSet, CCMGraphNode, ColorSet } from '@/types/ccmap';
 
 /**
  * Calculates a score for a given node based on its tags, degrees of separation, and interaction with a color set.
@@ -41,11 +41,10 @@ export function calculateNodeDegree(node: CCMGraphNode, set: CCMDomainSet, degre
         node.ccmData = [node.id, { tags: [node.id] }];
     }
 
-    const degrees = (set.nodes || [])
-        .map((setNode) => {
-            const degree = degreesOfSeparation[setNode.id][node.id];
-            return degree >= 0 ? degree : 1E32
-        })
+    const degrees = (set.nodes || []).map((setNode) => {
+        const degree = degreesOfSeparation[setNode.id][node.id];
+        return degree >= 0 ? degree : 1e32;
+    });
 
     return Math.min(...degrees);
 }

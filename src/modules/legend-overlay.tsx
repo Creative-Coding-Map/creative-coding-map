@@ -1,14 +1,15 @@
 import clsx from 'clsx';
 import { useState } from 'react';
-import { AnimatePresence, m } from 'motion/react';
+import * as m from 'motion/react-m';
 import { ChevronRight } from 'lucide-react';
+import { useSetAtom } from 'jotai';
+import { AnimatePresence } from 'motion/react';
 import { VIEW_CONFIGURATIONS } from './map/data';
 import Breakdowns from '@/components/symbols/Breakdowns';
 import Tags from '@/components/symbols/Tags';
 import Techniques from '@/components/symbols/Techniques';
 import Tools from '@/components/symbols/Tools';
 import { toggleFilterAtom } from '@/state/model';
-import { useSetAtom } from 'jotai';
 import { store } from '@/state/store';
 
 const viewConfigVariants = {

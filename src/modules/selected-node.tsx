@@ -1,11 +1,11 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { m } from 'motion/react';
+import * as m from 'motion/react-m';
+import { useLocation } from 'wouter';
 import { NodeData } from './node-data';
 import { ActionButton } from '@/components/action-button';
 import { store } from '@/state/store';
 import CloseIcon from '@/components/icons/Close';
 import { selectedNodeAtom, selectedNodeIdAtom } from '@/state/model';
-import { useLocation } from 'wouter';
 import { useEmitter } from '@/hooks/useEmitter';
 
 export function SelectedNode() {

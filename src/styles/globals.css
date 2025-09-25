@@ -33,6 +33,14 @@
     .force-graph-container .float-tooltip-kap {
         @apply !hidden;
     }
+
+    .force-graph-container canvas {
+        @apply cursor-grab;
+    }
+
+    .force-graph-container canvas:active {
+        @apply cursor-grabbing;
+    }
 }
 
 @utility font-roboto {

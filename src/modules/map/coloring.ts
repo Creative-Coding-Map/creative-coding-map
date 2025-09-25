@@ -1,9 +1,9 @@
-import { findAllDegreesOfSeparation } from "./dijkstra"
-import { calculateNodeScore } from "./set-score"
+import { findAllDegreesOfSeparation } from './dijkstra';
+import { calculateNodeScore } from './set-score';
 import type { CCMGraphData, ColorSet } from '@/types/ccmap';
 
 function argmax(array: Array<number>) {
-    return array.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+    return array.reduce((iMax, x, i, arr) => (x > arr[iMax] ? i : iMax), 0);
 }
 
 export function colorGraph(graph: CCMGraphData, colorSets: ColorSet[]) {

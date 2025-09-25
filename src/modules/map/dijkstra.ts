@@ -5,18 +5,18 @@ function nodeId(node: any) {
 }
 
 export function updateLinkCounts(graph: CCMGraphData) {
-    const nodesById = new Map<string, CCMGraphNode>()
+    const nodesById = new Map<string, CCMGraphNode>();
 
     for (const node of graph.nodes) {
-        nodesById.set(node.id, node)
+        nodesById.set(node.id, node);
         node.count = 0;
     }
     for (const link of graph.links) {
-        const sourceNode = nodesById.get(nodeId(link.source))
-        const targetNode = nodesById.get(nodeId(link.target))
+        const sourceNode = nodesById.get(nodeId(link.source));
+        const targetNode = nodesById.get(nodeId(link.target));
         if (sourceNode && targetNode) {
-            sourceNode.count! += 1
-            targetNode.count! += 1
+            sourceNode.count! += 1;
+            targetNode.count! += 1;
         }
     }
 }
@@ -119,7 +119,6 @@ export function findAdjacentSubtree(links: CCMGraphLink[], node: string) {
 //         path: path,
 //     };
 // }
-
 
 export function findAllShortestPaths(nodes: Array<CCMGraphNode>, edges: Array<CCMGraphLink>, start: string, end: string) {
     // Build adjacency list from edges (bidirectional)
@@ -355,9 +354,9 @@ export function minimumSpanningTreeFromSubtree(
 
         // Find the minimum weight edge connecting an included node to a non-included node
         for (const node of included) {
-            const neighbors = graph[node]
+            const neighbors = graph[node];
             if (!neighbors) {
-                throw new Error(`no neighbors for ${node}`)
+                throw new Error(`no neighbors for ${node}`);
             }
 
             for (const neighbor in neighbors) {
@@ -472,8 +471,6 @@ export function buildUndirectedGraph(
         const source = nodeId(edge.source);
         const target = nodeId(edge.target);
 
-
-
         let weight = 0.0;
         if (!weightFunction) {
             switch (type) {
@@ -497,8 +494,8 @@ export function buildUndirectedGraph(
             // Assuming the weight property exists, otherwise default to 1
             weight = edge.weight !== undefined ? edge.weight : defaultWeight;
         } else {
-            const sourceNode = nodes.find(node => node.id === source);
-            const targetNode = nodes.find(node => node.id === target);
+            const sourceNode = nodes.find((node) => node.id === source);
+            const targetNode = nodes.find((node) => node.id === target);
             weight = weightFunction(edge, sourceNode!, targetNode!);
         }
 
@@ -588,7 +585,6 @@ export function pushTerminalTagsUp(nodes: CCMGraphNode[], edges: CCMGraphLink[])
     nodes.forEach((node) => {
         nodesById.set(node.id, node);
     });
-    
 
     // Build adjacency list
     edges.forEach((edge) => {
@@ -606,7 +602,7 @@ export function pushTerminalTagsUp(nodes: CCMGraphNode[], edges: CCMGraphLink[])
     const terminalNodes = Array.from(adjacencyList.entries())
         .filter(([_, neighbors]) => neighbors.size === 1)
         .map(([node]) => node)
-        .filter((node) => nodesById.get(node)!.type == 'tag')
+        .filter((node) => nodesById.get(node)!.type == 'tag');
 
     console.log('Terminal tag nodes:', terminalNodes);
 }

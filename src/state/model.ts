@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { Database } from './database';
-import type { CCMNode, CCMFilter } from '@/types/ccmap';
+import type { CCMFilter, CCMNode } from '@/types/ccmap';
 import { emitter } from '@/hooks/useEmitter';
 
 export const databaseAtom = atom<Database>(new Database());

@@ -1,7 +1,7 @@
 import TechniquesSvg from '@/assets/symbols/techniques.svg?react';
 
 const Techniques = (props: React.ComponentProps<'svg'>) => {
-  return <TechniquesSvg {...props} />;
+    return <TechniquesSvg {...props} />;
 };
 
-export default Techniques; 
+export default Techniques;

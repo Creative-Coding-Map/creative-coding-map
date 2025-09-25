@@ -1,8 +1,9 @@
 import * as m from 'motion/react-m';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
-import { useAtom, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
+import { useLocation } from 'wouter';
 import { Suggestions } from './suggestions';
 import type { CCMNode } from '@/types/ccmap';
 import { useSuggestions } from '@/hooks/useSuggestions';
@@ -10,7 +11,6 @@ import { useEmitter } from '@/hooks/useEmitter';
 import Search from '@/components/icons/Search';
 import { selectedNodeIdAtom, showSearchAtom } from '@/state/model';
 import { store } from '@/state/store';
-import { useLocation } from 'wouter';
 
 export function SearchOverlay() {
     const setShowSearch = useSetAtom(showSearchAtom, { store });

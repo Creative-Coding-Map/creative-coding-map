@@ -1,5 +1,5 @@
 import type { ForceGraphProps } from 'react-force-graph-2d';
-import type { CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds, CCMViewConfiguration, CCMFilter } from './ccmap';
+import type { CCMFilter, CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds, CCMViewConfiguration } from './ccmap';
 
 export type CCMEvents = {
     'app:shortest-path:create': undefined;

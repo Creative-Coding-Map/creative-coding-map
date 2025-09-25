@@ -52,7 +52,7 @@ export class CCMapController {
     pathEnds: CCMPathEnds = { start: null, end: null };
     #shortestPaths: Array<Array<string>> = [];
 
-    private zoom: number = 1.0;
+    private zoom = 1.0;
 
     constructor() {}
 

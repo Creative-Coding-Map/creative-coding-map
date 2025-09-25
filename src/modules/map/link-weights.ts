@@ -9,7 +9,7 @@ export function linkWeights(link: CCMGraphLink, source: CCMGraphNode, target: CC
         throw new Error(`target node ${target.id} has no count`);
     }
 
-    const tagCountPenalty =  Math.log(1+ (source.type === 'tag' ? source.count : 0) + (target.type === 'tag' ? target.count : 0));
+    const tagCountPenalty = Math.log(1 + (source.type === 'tag' ? source.count : 0) + (target.type === 'tag' ? target.count : 0));
 
     // if (link.type === 'domain') {
     //     if (link.domainDegree === 0) {

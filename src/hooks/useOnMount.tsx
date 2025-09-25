@@ -1,5 +1,5 @@
-import type { DependencyList, EffectCallback } from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
+import type { DependencyList, EffectCallback } from 'react';
 
 export function useOnLayoutMount(effect: EffectCallback, deps: DependencyList) {
     const initialized = useRef(false);

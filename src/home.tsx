@@ -1,15 +1,17 @@
 import { Suspense } from 'react';
 import { Route, useRoute } from 'wouter';
 
-import { AnimatePresence, m } from 'motion/react';
+import * as m from 'motion/react-m';
+import { AnimatePresence } from 'motion/react';
+
 import AboutView from './views/about-view.tsx';
 
 import { Loading } from './components/loading';
+import BreakdownsView from './views/breakdowns-view.tsx';
 import { LegendOverlay } from '@/modules/legend-overlay.tsx';
 import CCMap from '@/modules/map/CCMap';
 import { ActionsOverlay } from '@/modules/actions-overlay';
 import { MapOverlay } from '@/modules/map-overlay';
-import BreakdownsView from './views/breakdowns-view.tsx';
 
 export default function Home() {
     const [isAboutPage] = useRoute('/about');

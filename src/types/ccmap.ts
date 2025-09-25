@@ -22,8 +22,8 @@ export interface CCMNode {
 }
 
 export interface CCMTag {
-    id?: string,
-    description?: string
+    id?: string;
+    description?: string;
 }
 
 export interface CCMData {
