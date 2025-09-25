@@ -65,7 +65,7 @@ export default function IndexView() {
             }
             map.get(letter)?.push({
                 ...node,
-                category: node.tags ? pick(node.tags) : pick(['application', 'tools', 'framework', 'libraries', 'language']),
+                category: node.tags ? node.tags[0] : '',
                 description: node.description || "description missing",
             });
         }
