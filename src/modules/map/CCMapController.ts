@@ -215,6 +215,10 @@ export class CCMapController {
             );
             this.graphData = this.localBuildGraph(mst.mstEdges);
 
+            if (this.graphData.links.length > mst.mstEdges.length) {
+                console.error("we have a problem, we have more links than the mst");
+            }
+
             let x = 0.0;
             for (const node of shortestPath) {
                 const node_ = this.nodeForId(node);
@@ -384,7 +388,7 @@ export class CCMapController {
 
         // at this point this.nodes contains the domain nodes
         const graph = buildGraph(this.ccmData, this.nodes, mstEdges);
-        if (this.domainGraph) {
+        if (this.domainGraph && mstEdges == null) {
             graph.links = graph.links.concat(this.domainGraph.links);
         }
         return graph;
