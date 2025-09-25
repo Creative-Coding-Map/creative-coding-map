@@ -10,6 +10,7 @@ import Tools from '@/components/symbols/Tools';
 
 interface SuggestionsProps {
     suggestions: CCMNode[];
+    className?: string;
     activeInputRef: React.RefObject<HTMLInputElement | null>;
     selectedIndex: number;
     setSelectedIndex: (index: number) => void;
@@ -28,6 +29,7 @@ const hasMouseMovedSignificantly = (prev: MousePos, current: MousePos) => {
 
 export function Suggestions({
     suggestions,
+    className,
     selectSuggestion,
     selectedIndex,
     setSelectedIndex,
@@ -104,7 +106,10 @@ export function Suggestions({
                 tabIndex={-1}
                 onKeyDown={handleKeyDown}
                 onBlur={onBlur}
-                className="flex flex-col max-h-[6lh] overflow-y-auto ccm-scrollbar focus:outline-none group ccm-transition-colors"
+                className={clsx(
+                    'flex flex-col max-h-[6lh] overflow-y-auto ccm-scrollbar focus:outline-none group ccm-transition-colors',
+                    className
+                )}
             >
                 {suggestions.map((suggestion, index) => (
                     <li

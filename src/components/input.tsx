@@ -5,5 +5,5 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function Input({ className, ref, ...props }: InputProps) {
-    return <input ref={ref} autoComplete="off" className={clsx('ccm-input', className)} {...props} />;
+    return <input ref={ref} autoComplete="off" className={clsx('ccm-input ccm-transition-colors', className)} {...props} />;
 }

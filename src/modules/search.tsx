@@ -68,7 +68,7 @@ export function SearchOverlay() {
                     }, 100);
                 }
             }}
-            className="max-w-xl w-full z-20 p-1 ml-auto flex flex-col ccm-colors ccm-border ccm-invert rounded-md ccm-transition-colors"
+            className="max-w-xl w-full z-20 p-1 ml-auto flex flex-col ccm-colors ccm-border rounded-md ccm-transition-colors"
         >
             <div className="w-full flex flex-col ">
                 <AnimatePresence mode="wait">
@@ -92,14 +92,14 @@ export function SearchOverlay() {
                         />
                     )}
                 </AnimatePresence>
-                <div className="flex items-center justify-between gap-2 p-1">
+                <div className="flex items-center justify-between gap-2 p-1 ccm-invert">
                     <Search className="size-4" />
                     <input
                         ref={inputRef}
                         id="search-input"
                         autoComplete="off"
                         type="text"
-                        className={clsx('type-filter w-full px-1 font-mono ccm-colors ccm-transition outline-none')}
+                        className={clsx('type-filter w-full px-1 font-mono ccm-colors ccm-invert  ccm-transition outline-none')}
                         value={search}
                         onKeyDown={(e) => {
                             if (e.key === 'Escape') {
