@@ -180,6 +180,7 @@ export class CCMapController {
     }
 
     findShortestPath(source: string, target: string) {
+        console.log('finding shortest path from', source, 'to', target);
         const filteredLinks: Array<CCMGraphLink> = [];
 
         this.ogGraph!.links.forEach((link) => {
@@ -191,8 +192,11 @@ export class CCMapController {
             }
         });
 
-        this.shortestPaths = findAllShortestPaths(this.graphData!.nodes, filteredLinks, source, target).paths;
-
+        console.log('filtered', filteredLinks);
+        const result = findAllShortestPaths(this.graphData!.nodes, filteredLinks, source, target);
+        console.log('result', result);
+        this.shortestPaths = result.paths;
+        console.log('found', this.#shortestPaths);
         if (this.#shortestPaths.length > 0) {
             const shortestPath = this.#shortestPaths[0];
             const subtree: Array<CCMGraphLink> = [];
@@ -216,13 +220,34 @@ export class CCMapController {
             this.graphData = this.localBuildGraph(mst.mstEdges);
 
             if (this.graphData.links.length > mst.mstEdges.length) {
-                console.error("we have a problem, we have more links than the mst");
+                console.error('we have a problem, we have more links than the mst');
             }
 
             let x = 0.0;
             for (const node of shortestPath) {
                 const node_ = this.nodeForId(node);
                 if (node_) {
+                    const tags = this.nodes?.allNodes.find((n) => n.id === node)?.tags || [];
+
+                    node_.pathTag = null;
+                    if (node_.type == 'domain') {
+                        node_.pathTag = 'domain';
+                    } else if (node_.type == 'tool') {
+                        node_.pathTag = 'tool';
+                    } else if (node_.type == 'technique') {
+                        node_.pathTag = 'technique';
+                    } else if (node_.type == 'tag') {
+                        node_.pathTag = 'tag';
+                    }
+
+                    for (const tag of tags) {
+                        if (tag == 'library' || tag == 'application' || tag == 'file format') {
+                            node_.pathTag = tag;
+                            break;
+                        }
+                    }
+
+                    node_.isOnShortestPath = true;
                     node_.fx = x;
                     node_.fy = 0;
                     x += 30.0;
@@ -406,6 +431,56 @@ export class CCMapController {
         }
     }
 
+    getLinkWidth(link: any) {
+        if (link.type === 'shortest-path') {
+            return 10.0;
+        } else {
+            return 1.0;
+        }
+    }
+
+    getLinkCanvasObject(link: any, ctx: CanvasRenderingContext2D, globalScale: number) {
+        const start = link.source;
+        const end = link.target;
+        if (link.type == 'shortest-path') {
+            ctx.save();
+
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+
+            const cx = start.x + dx / 2.0;
+            const cy = start.y + dy / 2.0 - 10.0 / globalScale;
+
+            const fontSize = 10.0 / globalScale;
+            ctx.font = `bold ${fontSize}px Space Mono`;
+            const label = 'DEPENDS ON';
+            const textWidth = ctx.measureText(label).width;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'black';
+            ctx.fillText(label, cx, cy);
+
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3.0 / globalScale;
+            ctx.setLineDash([5.0 / globalScale, 5.0 / globalScale]);
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.stroke();
+
+            ctx.restore();
+        } else {
+            ctx.save();
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 0.25 / globalScale;
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
     getNodeHoverHandler = (node: any, _: any) => {
         if (node !== null) {
             if (this.hoverNodeId !== node.id) {
@@ -436,6 +511,7 @@ export class CCMapController {
 
                 // TODO: Fix shortest path start selection logic
                 if (this.pathEnds.start != node.id && this.#shortestPaths.length === 0) {
+                    console.log('setting path start to', node.id);
                     this.pathEnds.start = node.id;
                     this.emitter.emit('map:path-ends:changed', this.pathEnds);
                 }
@@ -454,6 +530,7 @@ export class CCMapController {
             }
         } else {
             if (this.pathEnds.end != node.id) {
+                console.log('setting path end to', node.id);
                 this.pathEnds.end = node.id;
                 this.emitter.emit('map:path-ends:changed', this.pathEnds);
             }
@@ -461,10 +538,8 @@ export class CCMapController {
     };
 
     getNodeCanvasObject = (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-
-        var globalScaleMapped = globalScale
-        if (globalScaleMapped < 0.4)
-            globalScaleMapped = 0.4;
+        var globalScaleMapped = globalScale;
+        if (globalScaleMapped < 0.4) globalScaleMapped = 0.4;
 
         const transform = ctx.getTransform();
         const scale = (transform.a + transform.d) / 2.0;
@@ -584,7 +659,9 @@ export class CCMapController {
             const nodeColor = node.color || '#000000';
             const backgroundColor = isSelected ? nodeColor : node.type === 'domain' ? '#F4EBFC' : '#ffffff';
 
-            const labelStyle: string = isSelected ? 'pill' : node.type === 'tool' || node.type === 'technique' ? 'text' : 'pill';
+            const inShortestPath = node.isOnShortestPath;
+            const labelStyle: string =
+                isSelected || inShortestPath ? 'pill' : node.type === 'tool' || node.type === 'technique' ? 'text' : 'pill';
 
             if (labelStyle === 'pill') {
                 ctx.beginPath();
@@ -604,6 +681,14 @@ export class CCMapController {
             const textY = labelStyle === 'pill' ? node.y + 1.5 / globalScale : node.y - 16.0 / globalScale;
             ctx.fillText(label, node.x, textY);
             node.__bckgDimensions = bckgDimensions;
+
+            if (node.isOnShortestPath) {
+                const fontSize = 10.0 / globalScale;
+                ctx.font = `bold ${fontSize}px Space Mono`;
+                ctx.fillStyle = 'black';
+                ctx.textAlign = 'left';
+                ctx.fillText(node.pathTag.toUpperCase(), node.x - labelDimensions[0] / 2 + hmargin, textY - 20.0 / globalScale);
+            }
 
             // draw focus widget, when node is selected node
             if (node.id === this.selectedNodeId) {
@@ -643,6 +728,8 @@ export class CCMapController {
                 ctx.lineWidth = 1.0 / globalScale;
                 ctx.strokeStyle = isSelected ? 'white' : nodeColor;
                 ctx.stroke();
+
+
             }
         }
     };

@@ -132,6 +132,8 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 nodeAutoColorBy={controllerRef.current.getNodeAutoColorBy}
                 linkVisibility={controllerRef.current.getLinkVisibility}
                 linkLineDash={controllerRef.current.getLinkLineDash}
+                linkWidth={controllerRef.current.getLinkWidth}
+                linkCanvasObject={controllerRef.current.getLinkCanvasObject}
                 onNodeClick={controllerRef.current.getNodeClickHandler}
                 onNodeHover={controllerRef.current.getNodeHoverHandler}
                 enableNodeDrag={true}
