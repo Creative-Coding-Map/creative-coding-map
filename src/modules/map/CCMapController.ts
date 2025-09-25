@@ -461,6 +461,11 @@ export class CCMapController {
     };
 
     getNodeCanvasObject = (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+
+        var globalScaleMapped = globalScale
+        if (globalScaleMapped < 0.4)
+            globalScaleMapped = 0.4;
+
         const transform = ctx.getTransform();
         const scale = (transform.a + transform.d) / 2.0;
 
@@ -503,18 +508,18 @@ export class CCMapController {
                 break;
             case 'technique':
                 ctx.beginPath();
-                ctx.lineWidth = 1 / globalScale;
+                ctx.lineWidth = 1 / globalScaleMapped;
                 ctx.strokeStyle = node.color || '#000000';
-                ctx.arc(node.x, node.y, 4 / globalScale, 0, 2 * Math.PI, false);
+                ctx.arc(node.x, node.y, 4.0 / globalScale, 0, 2 * Math.PI, false);
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, 2 / globalScale, 0, 2 * Math.PI, false);
+                ctx.arc(node.x, node.y, 2.0 / globalScaleMapped, 0, 2 * Math.PI, false);
                 ctx.stroke();
                 break;
             case 'tool':
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, 4 / globalScale, 0, 2 * Math.PI, false);
+                ctx.arc(node.x, node.y, 4.0 / globalScaleMapped, 0, 2 * Math.PI, false);
                 ctx.fill();
                 break;
         }
