@@ -39,7 +39,7 @@ export function SelectedNode() {
                 }}
                 label="Close"
             >
-                <CloseIcon className="ccm-invert" />
+                <CloseIcon className="ccm-icon" />
             </ActionButton>
             <div className="w-full flex flex-col gap-2">
                 <div>

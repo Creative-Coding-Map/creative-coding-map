@@ -33,7 +33,7 @@ function CollapsedContent({
     return (
         <aside className="relative ccm-card h-64 overflow-hidden flex flex-col" style={{ flex: '0 0 300px' }}>
             <button className="absolute top-4 right-4 btn" onClick={() => setIsExpanded(true)}>
-                <ExpandIcon className="ccm-invert size-5" />
+                <ExpandIcon className="ccm-icon size-5" />
             </button>
             <div className="ccm-card-px mb-4 w-5/6">
                 <h3 className="type-window-title">{breakdown.title}</h3>
@@ -48,7 +48,7 @@ function ExpandedContent({ breakdown, onClose }: { breakdown: CCMBreakdown; onCl
     return (
         <aside className="max-w-3xl ml-auto z-20 absolute top-0 right-0 ccm-card h-full overflow-hidden mr-4">
             <ActionButton className="absolute top-4 right-4 btn" onClick={onClose} label="Close">
-                <CloseIcon className="ccm-invert" />
+                <CloseIcon className="ccm-icon" />
             </ActionButton>
             <div className="w-full flex flex-col gap-2 mt-8 h-full overflow-hidden">
                 <div className="ccm-card-px flex-shrink-0">

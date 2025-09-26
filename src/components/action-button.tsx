@@ -21,7 +21,7 @@ export const ActionButton = ({
                 onClick();
             }}
             className={clsx(
-                'btn ccm-colors flex items-center group overflow-hidden transition-all duration-300',
+                'btn ccm-colors ccm-border flex items-center group overflow-hidden transition-all duration-300',
                 borderless ? '' : 'ccm-action',
                 className
             )}

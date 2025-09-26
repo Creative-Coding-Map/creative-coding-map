@@ -20,7 +20,6 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const fgRef = useRef<any>(null);
     const [_, navigate] = useLocation();
     const controllerRef = useRef<CCMapController | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [graphData, setGraphData] = useState<CCMGraphData | null>(null);
     const [runtimeProps, setRuntimeProps] = useState<ForceGraphProps<CCMGraphNode, CCMGraphLink>>({});
@@ -77,7 +76,6 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
             } catch (err) {
                 console.error(err);
                 setError(err instanceof Error ? err.message : 'Failed to initialize graph');
-                setIsLoading(false);
             }
         };
 

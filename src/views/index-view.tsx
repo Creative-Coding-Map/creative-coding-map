@@ -75,7 +75,7 @@ export default function IndexView() {
     return (
         <main id="index-view" className="w-full h-screen relative ccm-pt ccm-px overflow-hidden">
             <section className={clsx('w-full h-full ccm-filters', addActiveFilters(filters))}>
-                <section className="pt-[80px] ml-auto z-10 relative ccm-colors ccm-transition">
+                <section className="pt-[80px] ml-auto z-10 relative  ccm-transition">
                     <ul className="flex flex-col gap-0.5 type-hint">
                         <li className={clsx('ccm-transition', CCMNodeType.Tag)}>
                             <button

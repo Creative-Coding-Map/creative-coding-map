@@ -8,7 +8,7 @@ export const DarkModeToggle = () => {
     const { toggleColorScheme } = useColorScheme();
     return (
         <ActionButton onClick={toggleColorScheme} label="dark theme">
-            <ThemeToggle className="size-6 z-10 ccm-invert" />
+            <ThemeToggle className="size-6 z-10 ccm-icon" />
         </ActionButton>
     );
 };

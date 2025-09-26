@@ -60,7 +60,7 @@ function Path() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             key="create-path"
-            className={clsx('relative max-w-xl z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md')}
+            className={clsx('relative max-w-xl z-10 p-3.5 flex flex-col ccm-colors  ccm-border rounded-md')}
         >
             <ActionButton
                 className="absolute top-4 right-4"
@@ -69,18 +69,18 @@ function Path() {
                 }}
                 label="Close"
             >
-                <CloseIcon className="ccm-invert" />
+                <CloseIcon className="ccm-icon" />
             </ActionButton>
             <div className="w-full flex flex-col">
                 <div className="flex items-center gap-2">
                     <p className="type-window-title">Shortest Path</p>
-                    <CreatePathIcon className="size-6 ccm-invert inline-block" />
+                    <CreatePathIcon className="size-6 ccm-icon inline-block" />
                 </div>
                 <p className="type-hint block mb-4">PATH SELECTED</p>
                 <div className="flex flex-col items-center justify-baseline w-full gap-2">
                     <p className="type-body mb-4">
-                        The shortest path between <span className="font-bold">{startNode?.id}</span> and{' '}
-                        <span className="font-bold">{endNode?.id}</span> is as follows:
+                        The shortest path between <span className="font-bold">{startNode?.name}</span> and{' '}
+                        <span className="font-bold">{endNode?.name}</span> is as follows:
                     </p>
                     <div className="flex items-center justify-baseline w-full gap-2">
                         <ConnectionPath connections={connections} />
@@ -107,34 +107,31 @@ function Path() {
                                                 onClick={selectNode(node.id)}
                                                 className="w-full h-full text-left cursor-pointer "
                                             >
-                                                {node.id}
+                                                {node.name}
                                             </button>
                                         </div>
                                     );
                                 }
 
                                 return (
-                                    <div
-                                        key={node.id}
-                                        className="type-body h-6 rounded-md w-full flex group gap-1 hover:dark ccm-colors ccm-transition-fast"
-                                    >
+                                    <div key={node.id} className="type-body h-6 rounded-md w-full flex group gap-1 ccm-colors">
                                         <button
                                             onClick={selectNode(node.id)}
                                             className={clsx(
-                                                'flex-1 rounded-md px-1.5 text-left cursor-pointer ccm-transition-fast',
-                                                'ccm-border-hover hover:bg-black hover:text-white'
+                                                'flex-1 rounded-md px-1.5 text-left cursor-pointer',
+                                                'ccm-border-hover ccm-button-hover ccm-transition-colors'
                                             )}
                                         >
-                                            {node.id}
+                                            {node.name}
                                         </button>
                                         <button
-                                            className="h-6 w-6 rounded-md cursor-pointer ccm-transition-fast"
+                                            className="h-6 w-6 rounded-md cursor-pointer"
                                             onClick={(evt) => {
                                                 evt.preventDefault();
                                                 emitter.emit('app:shortest-path:changed', node.id);
                                             }}
                                         >
-                                            <CloseIcon className="opacity-0 group-hover:opacity-100 border border-black h-6 w-6 rounded-md hover:bg-black hover:stroke-white ccm-transition-fast" />
+                                            <CloseIcon className="opacity-0 group-hover:opacity-100 border border-black h-6 w-6 rounded-md hover:bg-black hover:stroke-white ccm-icon ccm-transition" />
                                         </button>
                                     </div>
                                 );

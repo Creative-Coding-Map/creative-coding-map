@@ -32,6 +32,8 @@ const itemVariants = {
     },
 };
 
+const SHAPE_CLASSNAME = 'flex items-center gap-2 cursor-pointer uppercase';
+
 export function LegendOverlay() {
     const [selectedDomain, setSelectedDomain] = useState<string>('Domain mode');
     const [showOtherDomains, setShowOtherDomains] = useState<boolean>(false);
@@ -40,40 +42,24 @@ export function LegendOverlay() {
     return (
         <aside className="z-10 absolute ccm-px top-1/5 flex flex-col type-hint gap-0.5">
             <h4 className="text-gray">SHAPE</h4>
-            <ul className="flex flex-col gap-0.5">
-                <li
-                    className="flex items-center gap-2 cursor-pointer"
-                    role="button"
-                    onClick={() => toggleFilter({ id: 'tags', type: 'shape' })}
-                >
+            <ul className="flex flex-col gap-0.5 ">
+                <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'tags', type: 'shape' })}>
                     <Tags /> <span>TAGS</span>
                 </li>
-                <li
-                    className="flex items-center gap-2 cursor-pointer"
-                    role="button"
-                    onClick={() => toggleFilter({ id: 'tools', type: 'shape' })}
-                >
+                <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'tools', type: 'shape' })}>
                     <Tools /> <span>TOOLS</span>
                 </li>
-                <li
-                    className="flex items-center gap-2 cursor-pointer"
-                    role="button"
-                    onClick={() => toggleFilter({ id: 'techniques', type: 'shape' })}
-                >
+                <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'techniques', type: 'shape' })}>
                     <Techniques /> <span>TECHNIQUES</span>
                 </li>
-                <li
-                    className="flex items-center gap-2 cursor-pointer"
-                    role="button"
-                    onClick={() => toggleFilter({ id: 'breakdowns', type: 'shape' })}
-                >
+                <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'breakdowns', type: 'shape' })}>
                     <Breakdowns /> <span>BREAKDOWNS</span>
                 </li>
             </ul>
             <div className="flex flex-col gap-2 mt-4 w-40">
                 <AnimatePresence>
                     <div
-                        className="flex items-center cursor-pointer uppercase "
+                        className={SHAPE_CLASSNAME}
                         onClick={() => {
                             setShowOtherDomains(!showOtherDomains);
                         }}

@@ -67,7 +67,7 @@ export const ConnectionPath: React.FC<ConnectionPathProps> = ({ connections, cla
                 }
             }}
         >
-            <svg viewBox={`0 -${CIRCLE_RADIUS / 2} ${SVG_WIDTH} ${height}`} className={clsx('ccm-invert')} height={height}>
+            <svg viewBox={`0 -${CIRCLE_RADIUS / 2} ${SVG_WIDTH} ${height}`} className={clsx('ccm-icon')} height={height}>
                 {shapes.map((shape) => {
                     const isFilled = shape.style === 'filled';
                     if (shape.type === 'node') {

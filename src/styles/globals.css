@@ -5,7 +5,7 @@
 @import '@toolwind/anchors';
 
 /* @custom-variant dark (&:where(.dark, .dark *)); */
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@custom-variant dunkel (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
     --font-roboto: 'Roboto', sans-serif;
@@ -68,15 +68,20 @@
 }
 
 @utility ccm-border {
-    @apply border border-black dark:border-white;
+    @apply border border-black dunkel:border-white;
 }
 
 @utility ccm-colors {
-    @apply bg-white dark:bg-black text-black dark:text-white;
+    @apply bg-white dunkel:bg-black text-black dunkel:text-white transition-colors duration-300 ease-in;
+}
+
+@utility ccm-icon {
+    @apply invert-0 dunkel:invert transition-colors duration-300 ease-in;
 }
 
 @utility ccm-invert {
-    @apply invert-0 dark:invert;
+    @apply bg-red
+    /* @apply invert-0 dunkel:invert; */;
 }
 
 @utility ccm-transition {
@@ -111,11 +116,15 @@
     }
 
     .ccm-border {
-        @apply border border-black dark:border-white;
+        @apply border border-black dunkel:border-white;
     }
 
     .ccm-border-hover {
-        @apply border border-white group-hover:border-black dark:border-black dark:group-hover:border-white;
+        @apply border border-white group-hover:border-black dunkel:border-black dunkel:group-hover:border-white;
+    }
+
+    .ccm-button-hover {
+        @apply dunkel:hover:bg-white dunkel:hover:text-black hover:bg-black hover:text-white;
     }
 
     .ccm-link {
@@ -143,15 +152,15 @@
     }
 
     .ccm-action {
-        @apply border border-black dark:border-white rounded-md;
+        @apply border border-black dunkel:border-white rounded-md;
     }
 
     .ccm-action:hover {
-        @apply border-transparent !bg-light-gray dark:!bg-black;
+        @apply border-transparent !bg-light-gray dunkel:!bg-black;
     }
 
     .ccm-input {
-        @apply text-sm px-2 py-1 ccm-border ccm-colors ccm-invert rounded-md;
+        @apply text-sm px-2 py-1 ccm-border ccm-colors rounded-md;
     }
 
     .type-header {
@@ -296,11 +305,11 @@
     }
 
     .ccm-scrollbar::-webkit-scrollbar-track {
-        @apply bg-light-gray dark:bg-gray;
+        @apply bg-light-gray dunkel:bg-gray;
     }
 
     .ccm-scrollbar::-webkit-scrollbar-thumb {
-        @apply bg-gray dark:bg-light-gray;
+        @apply bg-gray dunkel:bg-light-gray;
     }
 
     /* Hide scrollbar for Chrome, Safari and Opera */

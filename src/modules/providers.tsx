@@ -6,10 +6,6 @@ import type { ReactNode } from 'react';
 import { store } from '@/state/store';
 
 export function Providers({ children }: { children: ReactNode }) {
-    // const theme = getLocalStorage<'light' | 'dark'>('theme');
-    // const prefersDark = useMedia('(prefers-color-scheme: dark)');
-    // const isDark = useMemo(() => theme === 'dark' || prefersDark, [theme, prefersDark]);
-
     return (
         <Provider store={store}>
             <LazyMotion features={domAnimation}>{children}</LazyMotion>

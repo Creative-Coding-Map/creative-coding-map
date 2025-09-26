@@ -93,10 +93,7 @@ export function Suggestions({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={clsx(
-                'z-10 ccm-colors p-2 rounded-md ccm-transition-colors',
-                fixed ? 'fixed w-[320px] -mt-2 ccm-border' : 'w-full'
-            )}
+            className={clsx('z-10 ccm-colors p-2 rounded-md ', fixed ? 'fixed w-[320px] -mt-2 ccm-border' : 'w-full')}
             style={style}
         >
             <p className="type-hint text-gray mb-1">SUGGESTED NODES</p>

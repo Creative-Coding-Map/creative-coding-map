@@ -6,7 +6,7 @@ import GithubIcon from './icons/Github';
 import { ExternalLink } from './external-link';
 import ExpandIcon from './icons/Expand';
 
-const ICON_CLASSNAME = 'ccm-invert group-hover:dark:invert-0 ccm-transition-fast';
+const ICON_CLASSNAME = 'ccm-transition-fast';
 
 function RenderUrlIcon({ url }: { url: string }) {
     if (url.includes('wikipedia')) return <WikipediaIcon className={clsx(ICON_CLASSNAME, 'size-4')} />;
@@ -28,7 +28,7 @@ export function Link({
     const props = {
         key: url,
         className: clsx(
-            'cursor-pointer relative ellipsis flex items-center gap-2 ccm-border p-1 pr-6 rounded-md hover:bg-light-gray hover:border-light-gray dark:hover:text-black ccm-transition-fast group',
+            'cursor-pointer relative ellipsis flex items-center gap-2 ccm-border p-1 pr-6 rounded-md hover:bg-light-gray hover:border-light-gray dunkel:hover:text-black ccm-transition-fast group',
             className
         ),
     };

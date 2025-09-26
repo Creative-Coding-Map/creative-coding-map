@@ -141,7 +141,7 @@ export function CreatePath() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             key="create-path"
-            className={clsx('relative z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md ccm-transition-colors')}
+            className={clsx('relative z-10 p-3.5 flex flex-col ccm-colors ccm-border rounded-md ')}
         >
             <ActionButton
                 className="absolute top-4 right-4"
@@ -152,15 +152,15 @@ export function CreatePath() {
                     setEndNode(null);
                 }}
             >
-                <CloseIcon className="ccm-invert ccm-transition-colors" />
+                <CloseIcon className="ccm-icon " />
             </ActionButton>
             <div className="w-full flex flex-col gap-2">
                 <div className="flex items-center gap-2 mb-4">
                     <p className="type-window-title">Shortest Path</p>
-                    <CreatePathIcon className="size-6 ccm-invert ccm-transition-colors" />
+                    <CreatePathIcon className="size-6 ccm-icon " />
                 </div>
                 <div className="flex items-center justify-baseline w-full gap-2">
-                    <div className="flex flex-col gap-2 ccm-invert ccm-transition-colors">
+                    <div className="flex flex-col gap-2 ccm-transition-colors">
                         <ConnectionIcon
                             className="w-2 h-10 "
                             source={{ dashed: startNode === null, filled: startNode !== null }}
@@ -170,7 +170,7 @@ export function CreatePath() {
                     </div>
                     <div className="flex flex-col gap-2 w-full ">
                         <div className="flex flex-col gap-2 max-w-[320px] relative">
-                            <div className="ccm-invert flex flex-col gap-2 ccm-transition-colors">
+                            <div className=" flex flex-col gap-2 ccm-transition-colors">
                                 <Input
                                     ref={startInputRef}
                                     id="start-node-input"

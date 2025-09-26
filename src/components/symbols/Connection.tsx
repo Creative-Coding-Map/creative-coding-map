@@ -18,7 +18,7 @@ const CIRCLE_DIAMETER = 10; // px
 const LINE_LENGTH = 24; // px
 const SVG_WIDTH = 8; // px, for some padding
 const SVG_HEIGHT = CIRCLE_DIAMETER * 2 + LINE_LENGTH; // 4 + 24 + 4 = 32px
-const STROKE_WIDTH = 1;
+const STROKE_WIDTH = 1.5;
 const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS;
 const DASHES = 4;
 const DASH_GAP_PAIR = CIRCLE_CIRCUMFERENCE / DASHES;
@@ -36,19 +36,15 @@ const Connection: React.FC<ConnectionProps> = ({ source, line, destination, clas
     const lineY1 = topY + CIRCLE_RADIUS;
     const lineY2 = bottomY - CIRCLE_RADIUS;
     return (
-        <svg
-            viewBox={`0 -1 ${SVG_WIDTH} ${SVG_HEIGHT + 2}`}
-            className={clsx(className, 'ccm-invert')}
-            style={{ display: 'block' }}
-        >
+        <svg viewBox={`0 -1 ${SVG_WIDTH} ${SVG_HEIGHT + 2}`} className={clsx(className, 'ccm-icon')} style={{ display: 'block' }}>
             {/* Top Circle */}
             {source && (
                 <circle
                     cx={cx}
                     cy={topY}
                     r={CIRCLE_RADIUS}
-                    fill={source.filled ? 'currentColor' : 'none'}
-                    stroke="currentColor"
+                    fill={source.filled ? 'black' : 'none'}
+                    stroke="black"
                     strokeWidth={STROKE_WIDTH}
                     strokeDasharray={source.dashed ? STROKE_DASHARRAY : undefined}
                     strokeDashoffset={source.dashed ? STROKE_DASHOFFSET : undefined}
@@ -61,7 +57,7 @@ const Connection: React.FC<ConnectionProps> = ({ source, line, destination, clas
                     y1={lineY1}
                     x2={cx}
                     y2={lineY2}
-                    stroke="currentColor"
+                    stroke="black"
                     strokeWidth={STROKE_WIDTH}
                     strokeDasharray={line.dashed ? STROKE_DASHARRAY : undefined}
                 />
@@ -72,8 +68,8 @@ const Connection: React.FC<ConnectionProps> = ({ source, line, destination, clas
                     cx={cx}
                     cy={bottomY}
                     r={CIRCLE_RADIUS}
-                    fill={destination.filled ? 'currentColor' : 'none'}
-                    stroke="currentColor"
+                    fill={destination.filled ? 'black' : 'none'}
+                    stroke="black"
                     strokeWidth={STROKE_WIDTH}
                     strokeDasharray={destination.dashed ? STROKE_DASHARRAY : undefined}
                     strokeDashoffset={destination.dashed ? STROKE_DASHOFFSET : undefined}

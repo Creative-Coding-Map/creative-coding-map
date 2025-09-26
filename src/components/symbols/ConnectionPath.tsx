@@ -71,7 +71,7 @@ const ConnectionPath: React.FC<ConnectionPathProps> = ({ connections, className 
             {lines.map((line, i) => (
                 <div key={i} style={{ position: 'absolute', top: i * Y_OFFSET }}>
                     <Connection
-                        className="w-2 h-10 ccm-invert"
+                        className="w-2 h-10 ccm-icon"
                         source={i === 0 ? nodes[i] : undefined}
                         line={line}
                         destination={nodes[i + 1]}

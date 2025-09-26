@@ -27,7 +27,7 @@ export function ActionsOverlay() {
                         className={clsx(createPath && 'invert')}
                         label="Create a path"
                     >
-                        <CreatePathIcon className={clsx('size-6 ccm-invert')} />
+                        <CreatePathIcon className={clsx('size-6 ccm-icon')} />
                     </ActionButton>
                 </li>
                 <li>
@@ -38,7 +38,7 @@ export function ActionsOverlay() {
                         }}
                         label="Zoom in"
                     >
-                        <ZoomIn className="size-6 ccm-invert" />
+                        <ZoomIn className="size-6 ccm-icon" />
                     </ActionButton>
                 </li>
                 <li>
@@ -48,7 +48,7 @@ export function ActionsOverlay() {
                         }}
                         label="Zoom out"
                     >
-                        <ZoomOut className="size-6 ccm-invert" />
+                        <ZoomOut className="size-6 ccm-icon" />
                     </ActionButton>
                 </li>
                 <li>
@@ -58,7 +58,7 @@ export function ActionsOverlay() {
                         }}
                         label="Recenter"
                     >
-                        <Recenter className="size-6 ccm-invert" />
+                        <Recenter className="size-6 ccm-icon" />
                     </ActionButton>
                 </li>
                 <li>
@@ -72,7 +72,7 @@ export function ActionsOverlay() {
                         className={clsx(showInfo && 'invert')}
                         label="Info"
                     >
-                        <Info className="size-6 ccm-invert" />
+                        <Info className="size-6 ccm-icon" />
                     </ActionButton>
                 </li>
             </ul>

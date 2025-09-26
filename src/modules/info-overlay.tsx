@@ -7,12 +7,12 @@ export function InfoOverlay() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="max-w-xl z-10 absolute p-1 left-5 bottom-56 flex flex-col ccm-colors ccm-border rounded-md ccm-transition"
+            className="max-w-xl z-10 absolute p-1 left-5 bottom-56 flex flex-col ccm-colors ccm-border rounded-md "
         >
             <div className="w-full flex flex-col">
                 <div className="flex justify-between gap-2">
                     <h3 className="type-hint text-gray">SHORTCUTS</h3>
-                    <Info className="size-6 ccm-invert" />
+                    <Info className="size-6 ccm-icon" />
                 </div>
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-2 type-filter">
                     <li>SEARCH BAR</li>
