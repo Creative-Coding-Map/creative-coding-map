@@ -258,6 +258,20 @@ export class CCMapController {
                     x += 30.0;
                 }
             }
+            for (let i = 0; i < shortestPath.length; ++i) {
+
+                const node = shortestPath[i];
+                const l = this.#graphData?.nodes.length || 0
+
+                const index = this.#graphData?.nodes.findIndex((n) => n.id === node) || -1
+                if (index >= 0) {
+                    console.log('swapping', index, l - 1 - i);
+                    const tmp = this.#graphData!.nodes[index]
+                    this.#graphData!.nodes[index] = this.#graphData!.nodes[l - 1 - i]
+                    this.#graphData!.nodes[l - 1 - i] = tmp
+                }
+            }
+
         }
     }
 
@@ -503,7 +517,18 @@ export class CCMapController {
     };
     getNodeClickHandler = (node: any, e: MouseEvent) => {
         if (!e.shiftKey) {
+            console.log("shortest paths length", this.#shortestPaths.length)
+            if (this.pathEnds.start != node.id && this.#shortestPaths.length === 0 && this.pathEnds.end != node.id) {
+                console.log("setting path start to", node.id)
+                this.pathEnds.start = node.id;
+                this.emitter.emit('map:path-ends:changed', this.pathEnds);
+            }
+
             if (node.id === this.selectedNodeId) {
+                if (this.pathEnds.start != node.id && this.pathEnds.end != node.id) {
+                    console.log("setting path start to", node.id)
+                    this.pathEnds.start = node.id;
+                }
                 const graphCoord = this.graphRef!.screen2GraphCoords(e.clientX, e.clientY);
                 const bounds = node.focusWidgetBounds
                 if (graphCoord.x >= bounds[0] && graphCoord.x <= (bounds[0] + bounds[2]) && graphCoord.y >= bounds[1] && graphCoord.y <= (bounds[1] + bounds[3])) {
@@ -512,12 +537,7 @@ export class CCMapController {
                     this.centerOnNode(node);
                 }
 
-                // TODO: Fix shortest path start selection logic
-                if (this.pathEnds.start != node.id && this.#shortestPaths.length === 0) {
-                    console.log('setting path start to', node.id);
-                    this.pathEnds.start = node.id;
-                    this.emitter.emit('map:path-ends:changed', this.pathEnds);
-                }
+
             }
             if (node.id != this.selectedNodeId) {
                 this.selectedNodeId = node.id;
@@ -532,7 +552,7 @@ export class CCMapController {
                 this.emitter.emit('map:selected-node:changed', this.selectedNodeId);
             }
         } else {
-            if (this.pathEnds.end != node.id) {
+            if (this.pathEnds.end != node.id && this.pathEnds.start != node.id) {
                 console.log('setting path end to', node.id);
                 this.pathEnds.end = node.id;
                 this.emitter.emit('map:path-ends:changed', this.pathEnds);
