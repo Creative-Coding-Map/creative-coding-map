@@ -1,12 +1,12 @@
 import { findAllDegreesOfSeparation } from './dijkstra';
 import { calculateNodeScore } from './set-score';
-import type { CCMGraphData, ColorSet } from '@/types/ccmap';
+import type { CCMDomainSet, CCMGraphData, ColorSet } from '@/types/ccmap';
 
 function argmax(array: Array<number>) {
     return array.reduce((iMax, x, i, arr) => (x > arr[iMax] ? i : iMax), 0);
 }
 
-export function colorGraph(graph: CCMGraphData, colorSets: ColorSet[]) {
+export function colorGraph(graph: CCMGraphData, colorSets: CCMDomainSet[]) {
     const allSetNodeIds = new Set(colorSets.flatMap((set) => set.nodes || []).map((node) => node.id));
 
     // TODO: add proper typings

@@ -57,6 +57,7 @@ export interface CCMGraphData {
 
 export interface CCMDomainSet {
     name: string;
+    color: string;
     tags?: string[];
     nodes: {
         id: string;

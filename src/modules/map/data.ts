@@ -6,6 +6,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
         domainSets: [
             {
                 name: 'graphics',
+                color: "#E10404",
                 nodes: [
                     { id: '3d graphics', degree: 1 },
                     { id: 'computer graphics', degree: 1 },
@@ -21,6 +22,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
             },
             {
                 name: 'sound',
+                color: '#0000FF',
                 nodes: [
                     { id: 'audio', degree: 1 },
                     { id: 'sound', degree: 1 },
@@ -28,6 +30,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
             },
             {
                 name: 'text',
+                color: '#03FF00',
                 nodes: [
                     { id: 'text', degree: 1 },
                     { id: 'typography', degree: 1 },
@@ -35,6 +38,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
             },
             {
                 name: 'games',
+                color: '#722CFF',
                 nodes: [
                     { id: 'fantasy console', degree: 1 },
                     { id: 'game development', degree: 1 },
@@ -42,6 +46,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
             },
             {
                 name: 'data',
+                color: '#FD98FF',
                 nodes: [
                     { id: 'structured data', degree: 1 },
                     { id: 'data visualization', degree: 1 },
@@ -51,7 +56,8 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                 ],
             },
             {
-                name: 'physical',
+                name: 'Physical computing',
+                color: '#FFA100',
                 nodes: [
                     { id: 'hardware', degree: 1 },
                     { id: 'microcontroller', degree: 1 },
@@ -59,6 +65,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
             },
             {
                 name: 'software technology',
+                color: '#F11691',
                 nodes: [
                     { id: 'language', degree: 1 },
                     { id: 'library', degree: 1 },
@@ -70,6 +77,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
             },
             {
                 name: 'interaction',
+                color: '#FF5900',
                 nodes: [
                     { id: 'ui', degree: 1 },
                     { id: 'media technology', degree: 1 },
@@ -106,26 +114,32 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
         domainSets: [
             {
                 name: 'Processing',
+                color: '#0070cf',
                 nodes: [{ id: 'Processing', degree: 1 }],
             },
             {
                 name: 'OpenFrameworks',
+                color: '#ff00ff',
                 nodes: [{ id: 'OpenFrameworks', degree: 1 }],
             },
             {
                 name: 'p5.js',
+                color: '#ff007f',
                 nodes: [{ id: 'P5Js', degree: 1 }],
             },
             {
                 name: 'Cinder',
+                color: '#c64b24',
                 nodes: [{ id: 'Cinder', degree: 1 }],
             },
             {
                 name: 'Three.js',
+                color: '#00ff7f',
                 nodes: [{ id: 'ThreeJS', degree: 1 }],
             },
             {
                 name: 'OPENRNDR',
+                color: '#ffc0cb',
                 nodes: [{ id: 'OPENRNDR', degree: 1 }],
             },
         ],
