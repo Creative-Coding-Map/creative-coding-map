@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { useMedia } from './useMedia';
 import { useEmitter } from './useEmitter';
 
 export function useColorScheme() {
-    const [colorScheme, setColorScheme] = useLocalStorage('theme');
+    const [colorScheme, setColorScheme] = useLocalStorage<'light' | 'dark'>('theme');
     const systemPrefersDark = useMedia('(prefers-color-scheme: dark)');
     const { emitter } = useEmitter();
 
@@ -15,11 +15,14 @@ export function useColorScheme() {
         [colorScheme, systemPrefersDark]
     );
 
+    useLayoutEffect(() => {
+        document.documentElement.dataset.theme = colorScheme;
+    }, [colorScheme]);
+
     useEffect(() => {
         // document.documentElement.classList.toggle('dunkle', isDarkMode);
         document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
         emitter.emit('app:theme:changed', isDarkMode ? 'dark' : 'light');
-        console.log('isDarkMode', isDarkMode);
     }, [isDarkMode]);
 
     return {

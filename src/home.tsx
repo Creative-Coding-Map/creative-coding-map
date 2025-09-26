@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Route, useRoute } from 'wouter';
+import { useRoute } from 'wouter';
 
 import * as m from 'motion/react-m';
 import { AnimatePresence } from 'motion/react';

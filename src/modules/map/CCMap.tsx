@@ -101,13 +101,6 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
         };
     }, [fgRef, emitter, navigate]);
 
-    // Handle graph ready
-    // const handleEngineStop = () => {
-    //     if (fgRef.current) {
-    //         // fgRef.current.zoomToFit(400);
-    //     }
-    // };
-
     if (error) {
         return (
             <div className={clsx('ccmap-error', className)}>
@@ -121,10 +114,10 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
 
     if (!controllerRef.current?.isInitialized()) {
         return (
-            <div className={clsx('ccmap-container', className)}>
+            <div className={clsx('ccmap', className)}>
                 <div className="ccmap-loading">
-                    <div className="loading-spinner"></div>
-                    <p>Loading Creative Coding Map...</p>
+                    <div className="ccm-spinner-light"></div>
+                    <p className="text-white dunkel:text-black">Loading Creative Coding Map...</p>
                 </div>
             </div>
         );
@@ -161,10 +154,6 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 showPointerCursor
                 {...runtimeProps}
             />
-            {/* <div className="ccmap-inspectors">
-                    <div id="path-inspector" className="inspector"></div>
-                    <div id="item-inspector" className="inspector"></div>
-                </div> */}
         </div>
     );
 };

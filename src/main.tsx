@@ -1,8 +1,7 @@
-import { StrictMode, Suspense, lazy, useEffect, useLayoutEffect, useState } from 'react';
+import { Suspense, lazy, useLayoutEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Route, Switch, useSearchParams } from 'wouter';
 import { useSetAtom } from 'jotai';
-import throttle from 'just-throttle';
 import reportWebVitals from './reportWebVitals.ts';
 
 import { Providers } from './modules/providers.tsx';
@@ -14,6 +13,7 @@ import { selectedNodeIdAtom, showSearchAtom } from './state/model.ts';
 import { store } from './state/store.ts';
 import { useEmitter } from './hooks/useEmitter.tsx';
 import { ESCAPE_KEY, SPACE_KEY } from './state/constants.ts';
+import { useColorScheme } from './hooks/useColorScheme.tsx';
 
 const IndexView = lazy(() => import('./views/index-view.tsx'));
 const Home = lazy(() => import('./home.tsx'));
@@ -25,6 +25,7 @@ function App() {
     const { emitter } = useEmitter();
     const [params] = useSearchParams();
     const [isMapInitialized, setIsMapInitialized] = useState(false);
+    useColorScheme();
 
     const focusNodeParam = params.get('focusNode');
     const nodeParam = params.get('node');
@@ -109,7 +110,7 @@ function App() {
     }, []);
 
     return (
-        <main className="w-full h-screen max-h-screen overflow-hidden relative antialiased">
+        <main className="w-full h-screen max-h-screen overflow-hidden relative antialiased ccm-colors">
             <Navbar />
             <Switch>
                 <Route path="/index-page">

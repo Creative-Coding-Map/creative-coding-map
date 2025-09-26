@@ -140,7 +140,7 @@ export function LegendOverlay() {
                                             variants={itemVariants}
                                             className="flex items-center gap-2 cursor-pointer"
                                         >
-                                            <Tools className={colorClass} style={{ fill: color }} />{' '}
+                                            <Tools className={clsx('ccm-icon', colorClass)} />{' '}
                                             <span className={clsx('capitalize ccm-colors-fg')}>{domain.name}</span>
                                         </m.li>
                                     );

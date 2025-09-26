@@ -17,6 +17,7 @@
     --color-*: initial;
     --color-black: #000000;
     --color-white: #ffffff;
+    --color-dark-gray: #444444;
     --color-gray: #949494;
     --color-light-gray: #ececec;
     --color-red: #ff0000;
@@ -120,6 +121,13 @@
     contain-intrinsic-size: 400px; */
 }
 
+@utility ccm-spinner {
+    @apply border-4 border-t-4 rounded-full;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
 @layer components {
     .layout {
         @apply relative max-h-screen lg:h-screen w-full min-h-screen transition-colors duration-300;
@@ -174,6 +182,14 @@
 
     .ccm-input {
         @apply text-sm px-2 py-1 ccm-border ccm-colors rounded-md;
+    }
+
+    .ccm-spinner-light {
+        @apply ccm-spinner border-dark-gray dunkel:border-light-gray  border-t-white dunkel:border-t-black;
+    }
+
+    .ccm-spinner-dark {
+        @apply ccm-spinner border-light-gray dunkel:border-dark-gray border-t-black dunkel:border-t-white;
     }
 
     .type-header {

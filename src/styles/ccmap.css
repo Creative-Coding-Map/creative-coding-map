@@ -1,7 +1,7 @@
-@import 'tailwindcss';
+@import '@/styles/globals.css';
 
 .ccmap {
-    @apply absolute top-0 left-0 w-full h-full overflow-hidden;
+    @apply absolute top-0 left-0 w-full h-full overflow-hidden bg-background dunkel:bg-black ccm-transition-colors;
 }
 
 .ccmap-graph {
@@ -30,26 +30,11 @@
 }
 
 .ccmap-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    @apply absolute top-1/2 left-1/2 dunkel:bg-white bg-black z-30 flex flex-col items-center justify-center ccm-transition-colors;
     transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 100;
-    background: rgba(255, 255, 255, 0.9);
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
+    gap: 1rem;
 }
 
 @keyframes spin {
@@ -59,11 +44,6 @@
     100% {
         transform: rotate(360deg);
     }
-}
-
-.ccmap-loading p {
-    margin: 0;
-    color: #666;
 }
 
 .ccmap-error {
@@ -91,21 +71,4 @@
 .error-message p {
     color: #666;
     margin-bottom: 0;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .ccmap-inspectors {
-        position: static;
-        display: flex;
-        flex-direction: column;
-        background: rgba(255, 255, 255, 0.95);
-        padding: 8px;
-    }
-
-    .inspector {
-        margin: 4px 0;
-        min-width: auto;
-        max-width: none;
-    }
 }

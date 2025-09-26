@@ -6,6 +6,8 @@ import { VariableSizeList as List } from 'react-window';
 import useResizeObserver from 'use-resize-observer';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'wouter';
+import { AnimatePresence } from 'motion/react';
+import * as m from 'motion/react-m';
 import { NodeData } from '../modules/node-data';
 import type { CCMNode } from '@/types/ccmap';
 import { CCMNodeType } from '@/types/ccmap';
@@ -73,9 +75,9 @@ export default function IndexView() {
     }, [database]);
 
     return (
-        <main id="index-view" className="w-full h-screen relative ccm-pt ccm-px overflow-hidden">
+        <main id="index-view" className="w-full h-screen relative ccm-pt ccm-px overflow-hidden ccm-colors">
             <section className={clsx('w-full h-full ccm-filters', addActiveFilters(filters))}>
-                <section className="pt-[80px] ml-auto z-10 relative  ccm-transition">
+                <section className="pt-[80px] ml-auto z-10 relative ccm-transition">
                     <ul className="flex flex-col gap-0.5 type-hint">
                         <li className={clsx('ccm-transition', CCMNodeType.Tag)}>
                             <button
@@ -85,7 +87,7 @@ export default function IndexView() {
                                 }}
                                 className="btn flex items-center gap-2"
                             >
-                                <Tags /> <span>TAGS</span>
+                                <Tags className="ccm-icon" /> <span>TAGS</span>
                             </button>
                         </li>
                         <li className={clsx('ccm-transition', CCMNodeType.Tool)}>
@@ -96,7 +98,7 @@ export default function IndexView() {
                                 }}
                                 className="btn flex items-center gap-2"
                             >
-                                <Tools /> <span>TOOLS</span>
+                                <Tools className="ccm-icon" /> <span>TOOLS</span>
                             </button>
                         </li>
                         <li className={clsx('ccm-transition', CCMNodeType.Technique)}>
@@ -104,7 +106,7 @@ export default function IndexView() {
                                 onClick={() => setFilters(updateArray(CCMNodeType.Technique))}
                                 className="btn flex items-center gap-2"
                             >
-                                <Techniques /> <span>TECHNIQUES</span>
+                                <Techniques className="ccm-icon" /> <span>TECHNIQUES</span>
                             </button>
                         </li>
                         <li className={clsx('ccm-transition', CCMNodeType.Breakdown)}>
@@ -115,14 +117,24 @@ export default function IndexView() {
                                 }}
                                 className="btn flex items-center gap-2"
                             >
-                                <Breakdowns /> <span>BREAKDOWNS</span>
+                                <Breakdowns className="ccm-icon" /> <span>BREAKDOWNS</span>
                             </button>
                         </li>
                     </ul>
                 </section>
-                <article className="flex w-full h-full pb-20">
-                    <IndexColumns dataByLetter={dataByLetter} />
-                </article>
+                <AnimatePresence propagate>
+                    {dataByLetter.length > 0 && (
+                        <m.article
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="flex w-full h-full pb-20"
+                        >
+                            <IndexColumns dataByLetter={dataByLetter} />
+                        </m.article>
+                    )}
+                </AnimatePresence>
             </section>
         </main>
     );
