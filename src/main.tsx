@@ -91,16 +91,6 @@ function App() {
 
         window.addEventListener('keydown', handleKeyDown);
 
-        const resizeObserver = new ResizeObserver(() => {
-            throttle(
-                () => {
-                    emitter.emit('map:resize');
-                },
-                300,
-                { leading: true, trailing: false }
-            );
-        });
-
         const onCanvasClick = (event: MouseEvent) => {
             const showSearch = store.get(showSearchAtom);
             if (showSearch && event.target instanceof HTMLCanvasElement) {
@@ -112,12 +102,9 @@ function App() {
 
         window.addEventListener('click', onCanvasClick);
 
-        resizeObserver.observe(document.body);
-
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('click', onCanvasClick);
-            resizeObserver.disconnect();
         };
     }, []);
 

@@ -4,6 +4,7 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import ForceGraph2D from 'react-force-graph-2d';
 import { useLocation } from 'wouter';
+import throttle from 'just-throttle';
 import { fetchCCMData } from './fetch-data';
 import { CCMapController } from './CCMapController';
 import type { ForceGraphProps } from 'react-force-graph-2d';
@@ -24,6 +25,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const [graphData, setGraphData] = useState<CCMGraphData | null>(null);
     const [runtimeProps, setRuntimeProps] = useState<ForceGraphProps<CCMGraphNode, CCMGraphLink>>({});
     const { emitter } = useEmitter();
+    const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
 
     useLayoutEffect(() => {
         const onGraphDataUpdated = (newGraphData: CCMGraphData | null) => {
@@ -40,6 +42,19 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 navigate(`/?${params.toString()}`);
             }
         };
+
+        const resizeCanvas = throttle(
+            () => {
+                console.log('onResize');
+                setDimensions({ width: window.innerWidth, height: window.innerHeight });
+            },
+            300,
+            { leading: true, trailing: false }
+        );
+
+        const resizeObserver = new ResizeObserver(resizeCanvas);
+
+        resizeObserver.observe(document.body);
 
         const initializeGraph = async () => {
             try {
@@ -72,6 +87,8 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
 
         // Cleanup on unmount
         return () => {
+            resizeObserver.disconnect();
+
             if (controllerRef.current) {
                 // unbind event listeners
                 emitter.off('map:graph-data:updated', onGraphDataUpdated);
@@ -126,8 +143,8 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                     fgRef.current = node;
                 }}
                 graphData={graphData!}
-                width={typeof window !== 'undefined' ? window.innerWidth : 800}
-                height={typeof window !== 'undefined' ? window.innerHeight : 600}
+                width={dimensions.width}
+                height={dimensions.height}
                 // onEngineStop={handleEngineStop}
                 nodeAutoColorBy={controllerRef.current.getNodeAutoColorBy}
                 linkVisibility={controllerRef.current.getLinkVisibility}
