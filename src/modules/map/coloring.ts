@@ -22,8 +22,12 @@ export function colorGraph(graph: CCMGraphData, colorSets: CCMDomainSet[]) {
         if (scores[bestIdx] > 0) {
             const bestSet = colorSets[bestIdx];
             node.color = bestSet.color;
+            node.unfilteredColor = node.color;
+            node.domain = bestSet.name;
         } else {
             node.color = '#000000';
+            node.unfilteredColor = node.color;
+            node.domain = 'none';
         }
     }
 }

@@ -50,6 +50,12 @@ export class CCMapController {
     private layoutInterval: number | null = null;
     private theme: 'light' | 'dark' = 'light';
 
+    private filters: Array<string> = [];
+
+    private filterTags: boolean = false;
+    private filterTechniques: boolean = false;
+    private filterTools: boolean = false;
+
     ogGraph: CCMGraphData | null = null;
 
     pathEnds: CCMPathEnds = { start: null, end: null };
@@ -460,6 +466,16 @@ export class CCMapController {
 
     onFiltersChanged = (filters: CCMFilter[]) => {
         console.log('onFiltersChanged', filters);
+        this.filters = filters.map((i) => i.id);
+
+        this.filterTags = this.filters.includes('tags');
+        this.filterTechniques = this.filters.includes('techniques');
+        this.filterTools = this.filters.includes('tools');
+
+        console.log('filter tags', this.filterTags);
+        console.log('filter techniques', this.filterTechniques);
+        console.log('filter tools', this.filterTools);
+        console.log('filters set to', this.filters);
     };
 
     onThemeChanged = (theme: string) => {
@@ -641,6 +657,13 @@ export class CCMapController {
         const transform = ctx.getTransform();
         const scale = (transform.a + transform.d) / 2.0;
 
+        const domainName = `domain:${node.domain}`;
+        const isFiltered =
+            (node.type === 'tag' && this.filterTags) ||
+            (node.type === 'tool' && this.filterTools) ||
+            (node.type === 'technique' && this.filterTechniques) ||
+            this.filters.includes(domainName);
+
         let minScale = 2.0;
         switch (node.type) {
             case 'domain':
@@ -655,7 +678,9 @@ export class CCMapController {
                 break;
         }
 
-        ctx.fillStyle = node.color || '#000000';
+        const nodeColor = isFiltered ? '#e0e0e0' : node.color || '#000000';
+
+        ctx.fillStyle = nodeColor;
 
         // TODO: Implement glyphs per design
         switch (node.type) {
@@ -681,7 +706,7 @@ export class CCMapController {
             case 'technique':
                 ctx.beginPath();
                 ctx.lineWidth = 1 / globalScaleMapped;
-                ctx.strokeStyle = node.color || '#000000';
+                ctx.strokeStyle = nodeColor;
                 ctx.arc(node.x, node.y, 4.0 / globalScale, 0, 2 * Math.PI, false);
                 ctx.stroke();
 
@@ -758,7 +783,11 @@ export class CCMapController {
 
             const inShortestPath = node.isOnShortestPath;
             const labelStyle: string =
-                isSelected || inShortestPath ? 'pill' : node.type === 'tool' || node.type === 'technique' ? 'text' : 'pill';
+                (!isFiltered && isSelected) || inShortestPath
+                    ? 'pill'
+                    : node.type === 'tool' || node.type === 'technique'
+                      ? 'text'
+                      : 'pill';
 
             if (labelStyle === 'pill') {
                 ctx.beginPath();
@@ -771,13 +800,15 @@ export class CCMapController {
                 ctx.stroke();
             }
 
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            const labelColor: string = labelStyle === 'text' ? 'black' : isSelected ? 'white' : nodeColor;
-            ctx.fillStyle = labelColor;
             const textY = labelStyle === 'pill' ? node.y + 1.5 / globalScale : node.y - 16.0 / globalScale;
-            ctx.fillText(label, node.x, textY);
-            node.__bckgDimensions = bckgDimensions;
+            if (!isFiltered || node.isOnShortestPath) {
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const labelColor: string = labelStyle === 'text' ? 'black' : isSelected ? 'white' : nodeColor;
+                ctx.fillStyle = labelColor;
+                ctx.fillText(label, node.x, textY);
+                node.__bckgDimensions = bckgDimensions;
+            }
 
             if (node.isOnShortestPath) {
                 const fontSize = 10.0 / globalScale;
@@ -788,7 +819,7 @@ export class CCMapController {
             }
 
             // draw focus widget, when node is selected node
-            if (node.id === this.selectedNodeId) {
+            if (!isFiltered && node.id === this.selectedNodeId) {
                 ctx.beginPath();
                 node.focusX = labelDimensions[0] / 2 + 2.0 / globalScale;
                 ctx.roundRect(
