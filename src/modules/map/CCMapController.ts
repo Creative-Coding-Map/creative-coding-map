@@ -46,6 +46,7 @@ export class CCMapController {
 
     private layoutTimeoutHandler: number | null = null;
     private layoutInterval: number | null = null;
+    private theme: 'light' | 'dark' = 'light';
 
     ogGraph: CCMGraphData | null = null;
 
@@ -54,11 +55,15 @@ export class CCMapController {
 
     private zoom = 1.0;
 
-    constructor() {}
+    constructor() {
+        this.theme = document.documentElement.dataset.theme as 'light' | 'dark';
+        console.log('theme', this.theme);
+    }
 
     initialize(ccmData: CCMData): void {
         if (this.initialized) return;
         console.log('initializing');
+
         this.ccmData = ccmData;
 
         this.nodes = buildNodesFromCcmData(this.ccmData);
@@ -114,6 +119,7 @@ export class CCMapController {
         this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
         this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
         this.emitter.on('app:filters:changed', this.onFiltersChanged);
+        this.emitter.on('app:theme:changed', this.onThemeChanged);
         this.emitter.on('map:zoom-in', this.zoomIn);
         this.emitter.on('map:zoom-out', this.zoomOut);
         this.emitter.on('map:recenter', this.recenter);
@@ -246,7 +252,13 @@ export class CCMapController {
                     }
 
                     for (const tag of tags) {
-                        if (tag == 'library' || tag == 'application' || tag == 'file format' || tag == 'sensor' || tag == 'protocol') {
+                        if (
+                            tag == 'library' ||
+                            tag == 'application' ||
+                            tag == 'file format' ||
+                            tag == 'sensor' ||
+                            tag == 'protocol'
+                        ) {
                             node_.pathTag = tag;
                             break;
                         }
@@ -259,19 +271,17 @@ export class CCMapController {
                 }
             }
             for (let i = 0; i < shortestPath.length; ++i) {
-
                 const node = shortestPath[i];
-                const l = this.#graphData?.nodes.length || 0
+                const l = this.#graphData?.nodes.length || 0;
 
-                const index = this.#graphData?.nodes.findIndex((n) => n.id === node) || -1
+                const index = this.#graphData?.nodes.findIndex((n) => n.id === node) || -1;
                 if (index >= 0) {
                     console.log('swapping', index, l - 1 - i);
-                    const tmp = this.#graphData!.nodes[index]
-                    this.#graphData!.nodes[index] = this.#graphData!.nodes[l - 1 - i]
-                    this.#graphData!.nodes[l - 1 - i] = tmp
+                    const tmp = this.#graphData!.nodes[index];
+                    this.#graphData!.nodes[index] = this.#graphData!.nodes[l - 1 - i];
+                    this.#graphData!.nodes[l - 1 - i] = tmp;
                 }
             }
-
         }
     }
 
@@ -404,6 +414,18 @@ export class CCMapController {
         console.log('onFiltersChanged', filters);
     };
 
+    onThemeChanged = (theme: string) => {
+        this.theme = theme as 'light' | 'dark';
+    };
+
+    get background(): string {
+        return this.theme === 'dark' ? '#000000' : '#ffffff';
+    }
+
+    get foreground(): string {
+        return this.theme === 'dark' ? '#ffffff' : '#000000';
+    }
+
     get graphData(): CCMGraphData | null {
         return this.#graphData;
     }
@@ -458,9 +480,10 @@ export class CCMapController {
         }
     }
 
-    getLinkCanvasObject(link: any, ctx: CanvasRenderingContext2D, globalScale: number) {
+    getLinkCanvasObject = (link: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
         const start = link.source;
         const end = link.target;
+
         if (link.type == 'shortest-path') {
             ctx.save();
 
@@ -497,7 +520,7 @@ export class CCMapController {
             ctx.stroke();
             ctx.restore();
         }
-    }
+    };
 
     getNodeHoverHandler = (node: any, _: any) => {
         if (node !== null) {
@@ -517,27 +540,30 @@ export class CCMapController {
     };
     getNodeClickHandler = (node: any, e: MouseEvent) => {
         if (!e.shiftKey) {
-            console.log("shortest paths length", this.#shortestPaths.length)
+            console.log('shortest paths length', this.#shortestPaths.length);
             if (this.pathEnds.start != node.id && this.#shortestPaths.length === 0 && this.pathEnds.end != node.id) {
-                console.log("setting path start to", node.id)
+                console.log('setting path start to', node.id);
                 this.pathEnds.start = node.id;
                 this.emitter.emit('map:path-ends:changed', this.pathEnds);
             }
 
             if (node.id === this.selectedNodeId) {
                 if (this.pathEnds.start != node.id && this.pathEnds.end != node.id) {
-                    console.log("setting path start to", node.id)
+                    console.log('setting path start to', node.id);
                     this.pathEnds.start = node.id;
                 }
                 const graphCoord = this.graphRef!.screen2GraphCoords(e.clientX, e.clientY);
-                const bounds = node.focusWidgetBounds
-                if (graphCoord.x >= bounds[0] && graphCoord.x <= (bounds[0] + bounds[2]) && graphCoord.y >= bounds[1] && graphCoord.y <= (bounds[1] + bounds[3])) {
+                const bounds = node.focusWidgetBounds;
+                if (
+                    graphCoord.x >= bounds[0] &&
+                    graphCoord.x <= bounds[0] + bounds[2] &&
+                    graphCoord.y >= bounds[1] &&
+                    graphCoord.y <= bounds[1] + bounds[3]
+                ) {
                     this.focusOnNode(node);
                 } else {
                     this.centerOnNode(node);
                 }
-
-
             }
             if (node.id != this.selectedNodeId) {
                 this.selectedNodeId = node.id;
@@ -561,7 +587,7 @@ export class CCMapController {
     };
 
     getNodeCanvasObject = (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-        var globalScaleMapped = globalScale;
+        let globalScaleMapped = globalScale;
         if (globalScaleMapped < 0.4) globalScaleMapped = 0.4;
 
         const transform = ctx.getTransform();
@@ -724,7 +750,12 @@ export class CCMapController {
                     labelDimensions[1],
                     radius
                 );
-                node.focusWidgetBounds = [node.x! + labelDimensions[0] / 2 + 2.0 / globalScale, node.y! - labelDimensions[1] / 2, labelDimensions[1], labelDimensions[1]]
+                node.focusWidgetBounds = [
+                    node.x! + labelDimensions[0] / 2 + 2.0 / globalScale,
+                    node.y! - labelDimensions[1] / 2,
+                    labelDimensions[1],
+                    labelDimensions[1],
+                ];
 
                 ctx.fillStyle = isSelected ? nodeColor : 'white';
                 ctx.fill();
@@ -752,8 +783,6 @@ export class CCMapController {
                 ctx.lineWidth = 1.0 / globalScale;
                 ctx.strokeStyle = isSelected ? 'white' : nodeColor;
                 ctx.stroke();
-
-
             }
         }
     };
@@ -797,5 +826,10 @@ export class CCMapController {
         this.emitter.off('app:selected-node:changed', this.onSelectedNodeChanged);
         this.emitter.off('app:shortest-path:changed', this.onShortestPathChanged);
         this.emitter.off('app:selected-node:focus', this.onFocusSelectedNode);
+        this.emitter.off('app:filters:changed', this.onFiltersChanged);
+        this.emitter.off('app:theme:changed', this.onThemeChanged);
+        this.emitter.off('map:zoom-in', this.zoomIn);
+        this.emitter.off('map:zoom-out', this.zoomOut);
+        this.emitter.off('map:recenter', this.recenter);
     }
 }

@@ -9,6 +9,7 @@ export type CCMEvents = {
     'app:selected-node:focus': string | null;
     'app:filters:changed': CCMFilter[];
     'app:index:close-tooltip': string;
+    'app:theme:changed': string;
     'map:initialized': undefined;
     'map:graph-data:updated': CCMGraphData | null;
     'map:runtime-props:updated': ForceGraphProps<CCMGraphNode, CCMGraphLink>;

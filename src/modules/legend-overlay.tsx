@@ -42,30 +42,30 @@ export function LegendOverlay() {
     return (
         <aside className="z-10 absolute ccm-px top-1/5 flex flex-col type-hint gap-0.5">
             <h4 className="text-gray">SHAPE</h4>
-            <ul className="flex flex-col gap-0.5 ">
+            <ul className="flex flex-col gap-0.5">
                 <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'tags', type: 'shape' })}>
-                    <Tags /> <span>TAGS</span>
+                    <Tags className="ccm-icon" /> <span className="ccm-colors-fg">TAGS</span>
                 </li>
                 <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'tools', type: 'shape' })}>
-                    <Tools /> <span>TOOLS</span>
+                    <Tools className="ccm-icon" /> <span className="ccm-colors-fg">TOOLS</span>
                 </li>
                 <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'techniques', type: 'shape' })}>
-                    <Techniques /> <span>TECHNIQUES</span>
+                    <Techniques className="ccm-icon" /> <span className="ccm-colors-fg">TECHNIQUES</span>
                 </li>
                 <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'breakdowns', type: 'shape' })}>
-                    <Breakdowns /> <span>BREAKDOWNS</span>
+                    <Breakdowns className="ccm-icon" /> <span className="ccm-colors-fg">BREAKDOWNS</span>
                 </li>
             </ul>
             <div className="flex flex-col gap-2 mt-4 w-40">
                 <AnimatePresence>
                     <div
-                        className={SHAPE_CLASSNAME}
+                        className={clsx(SHAPE_CLASSNAME, 'ccm-colors-fg')}
                         onClick={() => {
                             setShowOtherDomains(!showOtherDomains);
                         }}
                     >
                         {selectedDomain}
-                        <ChevronRight className={clsx('size-4 ccm-transition', showOtherDomains && 'rotate-90')} />
+                        <ChevronRight className={clsx('size-4 ccm-transition ccm-colors-fg', showOtherDomains && 'rotate-90')} />
                         {/* {showOtherDomains ? <ChevronDown className="size-4" /> : } */}
                     </div>
                 </AnimatePresence>
@@ -85,7 +85,7 @@ export function LegendOverlay() {
                                     <m.li
                                         key={domain}
                                         className={clsx(
-                                            'flex items-center cursor-pointer uppercase text-gray hover:text-black transition-colors duration-200',
+                                            'flex items-center cursor-pointer uppercase text-gray hover:text-black ccm-invert',
                                             // selectedDomain !== domain && 'bg-white',
                                             index === domains.length - 1 && ''
                                         )}
@@ -141,7 +141,7 @@ export function LegendOverlay() {
                                             className="flex items-center gap-2 cursor-pointer"
                                         >
                                             <Tools className={colorClass} style={{ fill: color }} />{' '}
-                                            <span className={clsx(`capitalize`)}>{domain.name}</span>
+                                            <span className={clsx('capitalize ccm-colors-fg')}>{domain.name}</span>
                                         </m.li>
                                     );
                                 })}
