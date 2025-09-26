@@ -70,11 +70,11 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
 
                 nodes: [
                     { id: 'language', degree: 1 },
-                    { id: 'library', degree: 1 },
+                    // { id: 'library', degree: 1 },
                     { id: 'parsing', degree: 1 },
                     { id: 'binding', degree: 1 },
                     { id: 'data structure', degree: 1 },
-                    { id: 'opensource', degree: 1 },
+                    // { id: 'opensource', degree: 1 },
                 ],
             },
             {
