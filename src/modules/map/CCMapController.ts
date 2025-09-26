@@ -142,7 +142,6 @@ export class CCMapController {
         this.graphRef?.centerAt(0, 0, 500);
     };
 
-    smooth
     /**
      * Centers the graph view on the specified node.
      *
