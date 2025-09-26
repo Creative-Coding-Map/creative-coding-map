@@ -16,6 +16,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'video', degree: 1 },
                     { id: 'image processing', degree: 1 },
                     { id: 'print', degree: 1 },
+                    { id: 'color', degree: 1 },
                 ],
             },
             {
@@ -54,7 +55,6 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                 nodes: [
                     { id: 'hardware', degree: 1 },
                     { id: 'microcontroller', degree: 1 },
-                    { id: 'media technology', degree: 1 },
                 ],
             },
             {
@@ -64,6 +64,17 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'library', degree: 1 },
                     { id: 'parsing', degree: 1 },
                     { id: 'binding', degree: 1 },
+                    { id: 'data structure', degree: 1 },
+                    { id: 'opensource', degree: 1 },
+                ],
+            },
+            {
+                name: 'interaction',
+                nodes: [
+                    { id: 'ui', degree: 1 },
+                    { id: 'media technology', degree: 1 },
+                    { id: 'sensor', degree: 1 },
+                    { id: 'augmented reality', degree: 1 },
                 ],
             },
         ],
