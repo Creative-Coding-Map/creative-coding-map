@@ -110,7 +110,7 @@ export class CCMapController {
 
                 this.graphRef.d3Force('link', linkForce);
             }
-        }, 300);
+        }, 30);
 
         this.#runtimeProps = {};
 
@@ -142,6 +142,7 @@ export class CCMapController {
         this.graphRef?.centerAt(0, 0, 500);
     };
 
+    smooth
     /**
      * Centers the graph view on the specified node.
      *
@@ -198,11 +199,8 @@ export class CCMapController {
             }
         });
 
-        console.log('filtered', filteredLinks);
         const result = findAllShortestPaths(this.graphData!.nodes, filteredLinks, source, target);
-        console.log('result', result);
         this.shortestPaths = result.paths;
-        console.log('found', this.#shortestPaths);
         if (this.#shortestPaths.length > 0) {
             const shortestPath = this.#shortestPaths[0];
             const subtree: Array<CCMGraphLink> = [];
@@ -223,6 +221,8 @@ export class CCMapController {
                 subtree,
                 linkWeights as any
             );
+
+            // set the new graphdata
             this.graphData = this.localBuildGraph(mst.mstEdges);
 
             if (this.graphData.links.length > mst.mstEdges.length) {
@@ -234,7 +234,6 @@ export class CCMapController {
                 delete node.pathTag;
             }
 
-            let x = 0.0;
             for (const node of shortestPath) {
                 const node_ = this.nodeForId(node);
                 if (node_) {
@@ -263,11 +262,7 @@ export class CCMapController {
                             break;
                         }
                     }
-
                     node_.isOnShortestPath = true;
-                    node_.fx = x;
-                    node_.fy = 0;
-                    x += 30.0;
                 }
             }
             for (let i = 0; i < shortestPath.length; ++i) {
@@ -276,12 +271,53 @@ export class CCMapController {
 
                 const index = this.#graphData?.nodes.findIndex((n) => n.id === node) || -1;
                 if (index >= 0) {
-                    console.log('swapping', index, l - 1 - i);
                     const tmp = this.#graphData!.nodes[index];
                     this.#graphData!.nodes[index] = this.#graphData!.nodes[l - 1 - i];
                     this.#graphData!.nodes[l - 1 - i] = tmp;
                 }
             }
+
+            this.graphRef?.zoomToFit(0, 20, (node) => shortestPath.includes(node.id));
+
+            setTimeout(() => {
+                const startNode = this.nodeForId(shortestPath[0])!;
+
+                console.log(startNode);
+                var x = startNode.x!;
+                const y = startNode.y!;
+                console.log(x);
+                const sourcePositions = shortestPath.map((node) => {
+                    const n = this.nodeForId(node)!;
+                    return [n.x!, n.y!];
+                });
+                const targetPositions = shortestPath.map((_) => {
+                    x += 200.0;
+                    return [x, y];
+                });
+
+                var iterations = 0;
+                const interval = setInterval(() => {
+                    const f = Math.min(1.0, iterations / 100.0);
+                    for (let i = 0; i < shortestPath.length; ++i) {
+                        const node = shortestPath[i];
+                        const node_ = this.nodeForId(node)!;
+                        node_.fx = sourcePositions[i][0] * (1.0 - f) + targetPositions[i][0] * f;
+                        node_.fy = sourcePositions[i][1] * (1.0 - f) + targetPositions[i][1] * f;
+                    }
+                    iterations++;
+                    this.graphRef?.zoomToFit(0, 200, (node) => shortestPath.includes(node.id));
+
+                    console.log(this.graphRef?.getGraphBbox());
+                    const height = window.outerHeight;
+
+                    const cx = (targetPositions[0][0] + targetPositions[targetPositions.length - 1][0]) / 2.0;
+                    const cy = targetPositions[0][1] + (height / 2 - 200) / this.graphRef!.zoom();
+                    this.graphRef?.centerAt(cx, cy, 1000);
+                    if (iterations >= 110) {
+                        clearInterval(interval);
+                    }
+                }, 10);
+            }, 1000);
         }
     }
 
@@ -651,7 +687,7 @@ export class CCMapController {
         node.__bckgDimensions = [8, 8];
 
         // Draw labels if zoomed in enough
-        if (scale >= minScale || node.id === this.hoverNodeId || node.id === this.selectedNodeId) {
+        if (scale >= minScale || node.id === this.hoverNodeId || node.id === this.selectedNodeId || node.isOnShortestPath) {
             const suffix = (() => {
                 switch (node.type) {
                     case 'tag':
