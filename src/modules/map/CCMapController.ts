@@ -223,6 +223,11 @@ export class CCMapController {
                 console.error('we have a problem, we have more links than the mst');
             }
 
+            for (const node of this.#graphData?.nodes || []) {
+                delete node.isOnShortestPath;
+                delete node.pathTag;
+            }
+
             let x = 0.0;
             for (const node of shortestPath) {
                 const node_ = this.nodeForId(node);
