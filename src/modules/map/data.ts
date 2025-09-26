@@ -16,6 +16,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'raster graphics', degree: 1 },
                     { id: 'video', degree: 1 },
                     { id: 'image processing', degree: 1 },
+                    { id: 'space partitioning', degree: 1 },
                     { id: 'print', degree: 1 },
                     { id: 'color', degree: 1 },
                 ],
@@ -30,7 +31,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
             },
             {
                 name: 'text',
-                color: '#03FF00',
+                color: '#F11691',
                 nodes: [
                     { id: 'text', degree: 1 },
                     { id: 'typography', degree: 1 },
@@ -65,7 +66,8 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
             },
             {
                 name: 'software technology',
-                color: '#F11691',
+                color: '#03FF00',
+
                 nodes: [
                     { id: 'language', degree: 1 },
                     { id: 'library', degree: 1 },
