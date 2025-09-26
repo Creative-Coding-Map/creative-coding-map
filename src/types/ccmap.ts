@@ -12,6 +12,7 @@ export interface CCMNode {
     id: string;
     type: CCMNodeType;
     description?: string;
+    color?: string;
     name?: string;
     tags?: string[];
     partOf?: string[];

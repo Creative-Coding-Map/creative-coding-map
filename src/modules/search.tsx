@@ -23,6 +23,7 @@ export function SearchOverlay() {
     const selectSuggestion = useCallback(
         (suggestion: CCMNode) => {
             setSelectedNodeId(suggestion.id);
+            setSearch('');
             const params = new URLSearchParams({ focusNode: suggestion.id });
             navigate(`/?${params.toString()}`);
             emitter.emit('app:selected-node:focus', suggestion.id);
@@ -71,10 +72,10 @@ export function SearchOverlay() {
                     }, 100);
                 }
             }}
-            className="max-w-xl w-full z-20 p-1 ml-auto flex flex-col ccm-colors ccm-border rounded-md"
+            className="max-w-xl w-full z-20 px-1 ml-auto flex flex-col ccm-colors ccm-border rounded-md overflow-hidden"
         >
-            <div className="w-full flex flex-col ">
-                <AnimatePresence mode="wait">
+            <div className="w-full flex flex-col">
+                <AnimatePresence mode="wait" propagate>
                     {suggestions.length > 0 && (
                         <Suggestions
                             suggestions={suggestions}
@@ -92,10 +93,11 @@ export function SearchOverlay() {
                                 }
                             }}
                             ref={suggestionsRef}
+                            animateHeight
                         />
                     )}
                 </AnimatePresence>
-                <div className="flex items-center justify-between gap-2 p-1 ">
+                <div className="flex items-center justify-between gap-2 p-1 py-2 z-10 ccm-colors">
                     <Search className="size-4" />
                     <input
                         ref={inputRef}

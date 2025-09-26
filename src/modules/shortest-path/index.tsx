@@ -100,13 +100,14 @@ function Path() {
                             {shortestPathNodes.map((node, index) => {
                                 const isLast = index === shortestPathNodes.length - 1;
                                 const isFirst = index === 0;
-
+                                console.log(node);
                                 if (isLast || isFirst) {
                                     return (
-                                        <div key={node.id} className="border border-transparent type-body h-6 px-1.5 w-full ">
+                                        <div key={node.id} className="border border-transparent type-body h-6 w-full ">
                                             <button
                                                 onClick={selectNode(node.id)}
-                                                className="w-full h-full text-left cursor-pointer "
+                                                className="w-full h-full text-left cursor-pointer rounded-md px-1.5 text-white"
+                                                style={{ backgroundColor: node.color }}
                                             >
                                                 {node.name}
                                             </button>
@@ -119,9 +120,10 @@ function Path() {
                                         <button
                                             onClick={selectNode(node.id)}
                                             className={clsx(
-                                                'flex-1 rounded-md px-1.5 text-left cursor-pointer',
+                                                'flex-1 rounded-md px-1.5 text-left text-white cursor-pointer flex',
                                                 'ccm-border-hover ccm-button-hover ccm-transition-colors'
                                             )}
+                                            style={{ backgroundColor: node.color }}
                                         >
                                             {node.name}
                                         </button>

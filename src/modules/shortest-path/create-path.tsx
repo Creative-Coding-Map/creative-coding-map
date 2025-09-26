@@ -34,17 +34,16 @@ export function CreatePath() {
             if (activeInput === 'start') {
                 setStartNodeInput(suggestion.id);
                 setStartNode(suggestion);
-                startInputRef.current?.focus();
-            } else if (activeInput === 'end') {
+                endInputRef.current?.focus();
+            } else {
                 setEndNodeInput(suggestion.id);
                 setEndNode(suggestion);
-                endInputRef.current?.focus();
             }
 
             emitter.emit('app:suggestions:reset');
             setActiveInput(null);
 
-            if (activeInput === 'end') {
+            if (activeInput !== 'start') {
                 setTimeout(() => {
                     if (startNode) {
                         setShowCreatePath(false);
@@ -73,7 +72,6 @@ export function CreatePath() {
     const handleFocus = useCallback(
         (inputType: 'start' | 'end') => {
             setActiveInput(inputType);
-            // setSuggestions([]);
 
             const inputRef = inputType === 'start' ? startInputRef : endInputRef;
 
@@ -85,7 +83,7 @@ export function CreatePath() {
                 });
             }
         },
-        [setSuggestionsPosition, startInputRef, endInputRef]
+        [setSuggestionsPosition, startInputRef, endInputRef, setActiveInput]
     );
 
     const onInputChange = useCallback(
@@ -120,7 +118,6 @@ export function CreatePath() {
         },
         [startNodeInput, endNodeInput]
     );
-
     useLayoutEffect(() => {
         if (startInputRef.current) {
             startInputRef.current.focus();
@@ -190,6 +187,7 @@ export function CreatePath() {
                                     value={endNodeInput}
                                     onFocus={() => handleFocus('end')}
                                     onChange={(e) => onInputChange(e.target.value, 'end')}
+                                    onBlur={handleBlur}
                                     onKeyDown={handleKeyDown}
                                 />
                             </div>
@@ -205,6 +203,7 @@ export function CreatePath() {
                                         setSelectedIndex={setSelectedSuggestionIndex}
                                         activeInputRef={activeInput === 'start' ? startInputRef : endInputRef}
                                         onBlur={(evt) => {
+                                            console.log('blurring', evt);
                                             if (evt.relatedTarget?.nodeName === 'INPUT') {
                                                 return;
                                             }

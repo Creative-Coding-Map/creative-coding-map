@@ -55,6 +55,10 @@ export class Database {
         return this.#data.get(id);
     }
 
+    hasNode(id: string): boolean {
+        return this.#data.has(id);
+    }
+
     getBreakdowns(id: string): CCMBreakdown[] {
         return this.#breakdowns.get(id) || [];
     }

@@ -10,6 +10,7 @@ import Tools from '@/components/symbols/Tools';
 
 interface SuggestionsProps {
     suggestions: CCMNode[];
+    outerClassName?: string;
     className?: string;
     activeInputRef: React.RefObject<HTMLInputElement | null>;
     selectedIndex: number;
@@ -19,6 +20,7 @@ interface SuggestionsProps {
     ref: React.RefObject<HTMLUListElement | null>;
     fixed?: boolean;
     position?: { top: number; left: number };
+    animateHeight?: boolean;
 }
 
 type MousePos = { x: number; y: number };
@@ -29,7 +31,7 @@ const hasMouseMovedSignificantly = (prev: MousePos, current: MousePos) => {
 
 export function Suggestions({
     suggestions,
-    className,
+    className = '',
     selectSuggestion,
     selectedIndex,
     setSelectedIndex,
@@ -38,6 +40,7 @@ export function Suggestions({
     position,
     ref,
     fixed = false,
+    animateHeight = false,
 }: SuggestionsProps) {
     const mousePosRef = useRef<{ x: number; y: number }>({ x: Infinity, y: Infinity });
 
@@ -70,6 +73,7 @@ export function Suggestions({
                 break;
             case 'Enter':
                 e.preventDefault();
+                console.log('enter', selectedIndex, suggestions[selectedIndex]);
                 if (selectedIndex > -1) {
                     selectSuggestion(suggestions[selectedIndex]);
                 }
@@ -88,12 +92,20 @@ export function Suggestions({
 
     const style = position ? { top: `${position.top}px`, left: `${position.left}px`, transform: 'translateY(-100%)' } : {};
 
+    const exitAnimation = animateHeight ? { height: 0, paddingTop: 0 } : { opacity: 0 };
+    const enterAnimation = animateHeight ? { height: 'auto', paddingTop: '4px' } : { opacity: 1 };
+
     return (
         <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className={clsx('z-10 ccm-colors p-2 rounded-md ', fixed ? 'fixed w-[320px] -mt-2 ccm-border' : 'w-full')}
+            initial={exitAnimation}
+            animate={enterAnimation}
+            exit={exitAnimation}
+            transition={{ opacity: { duration: 0.25 }, height: { duration: 0.5 } }}
+            className={clsx(
+                'z-10 ccm-colors px-2 rounded-md',
+                fixed ? 'fixed w-[320px] -mt-2 ccm-border' : 'w-full',
+                animateHeight ? '' : 'py-2'
+            )}
             style={style}
         >
             <p className="type-hint text-gray mb-1">SUGGESTED NODES</p>

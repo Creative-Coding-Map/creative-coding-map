@@ -115,10 +115,7 @@ export function LegendOverlay() {
                             {VIEW_CONFIGURATIONS.filter((view) => view.name.includes(selectedDomain))
                                 .flatMap((view) => view.domainSets)
                                 .map((domain) => {
-                                    const color = VIEW_CONFIGURATIONS.find((view) =>
-                                        view.name.includes(selectedDomain)
-                                    )?.colorSets.find((colorSet) => colorSet.name === domain.name)?.color;
-                                    const colorClass = color ? `fill-[${color}]` : 'fill-black';
+                                    const color = domain.color;
                                     return (
                                         <m.li
                                             key={domain.name}
@@ -140,7 +137,7 @@ export function LegendOverlay() {
                                             variants={itemVariants}
                                             className="flex items-center gap-2 cursor-pointer"
                                         >
-                                            <Tools className={clsx('ccm-icon', colorClass)} />{' '}
+                                            <Tools className={clsx('ccm-icon')} style={{ fill: color }} />{' '}
                                             <span className={clsx('capitalize ccm-colors-fg')}>{domain.name}</span>
                                         </m.li>
                                     );

@@ -26,6 +26,8 @@ import type {
 
 import { linkWeights } from '@/modules/map/link-weights.ts';
 import { emitter } from '@/hooks/useEmitter';
+import { databaseAtom } from '@/state/model';
+import { store } from '@/state/store';
 
 export class CCMapController {
     private selectedNodeId: any | null = null;
@@ -67,6 +69,17 @@ export class CCMapController {
         this.ccmData = ccmData;
 
         this.nodes = buildNodesFromCcmData(this.ccmData);
+
+        // defer this
+        setTimeout(() => {
+            const database = store.get(databaseAtom);
+
+            this.nodes?.allNodes.forEach((node) => {
+                if (database.hasNode(node.id)) {
+                    database.getNode(node.id)!.color = node.color;
+                }
+            });
+        }, 0);
 
         this.ogGraph = buildGraph(this.ccmData, this.nodes);
         updateLinkCounts(this.ogGraph);
@@ -282,7 +295,7 @@ export class CCMapController {
                 const startNode = this.nodeForId(shortestPath[0])!;
 
                 console.log(startNode);
-                var x = startNode.x!;
+                let x = startNode.x!;
                 const y = startNode.y!;
                 console.log(x);
                 const sourcePositions = shortestPath.map((node) => {
@@ -294,7 +307,7 @@ export class CCMapController {
                     return [x, y];
                 });
 
-                var iterations = 0;
+                let iterations = 0;
                 const interval = setInterval(() => {
                     const f = Math.min(1.0, iterations / 100.0);
                     for (let i = 0; i < shortestPath.length; ++i) {

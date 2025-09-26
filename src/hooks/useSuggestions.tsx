@@ -74,6 +74,7 @@ export function useSuggestions({ selectSuggestion, triggerKey = 'ArrowDown' }: U
                     }
                     break;
                 case 'Enter':
+                    console.log('selecting suggestion', suggestions[selectedSuggestionIndex]);
                     if (selectedSuggestionIndex !== -1) {
                         e.preventDefault();
                         selectSuggestion(suggestions[selectedSuggestionIndex]);
@@ -84,7 +85,6 @@ export function useSuggestions({ selectSuggestion, triggerKey = 'ArrowDown' }: U
                     reset();
                     break;
                 case 'Tab':
-                    console.log('on Tab', selectedSuggestionIndex);
                     if (suggestions.length > 0) {
                         if (selectedSuggestionIndex === -1) {
                             setSelectedSuggestionIndex(0);
