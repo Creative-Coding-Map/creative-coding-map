@@ -246,7 +246,7 @@ export class CCMapController {
                     }
 
                     for (const tag of tags) {
-                        if (tag == 'library' || tag == 'application' || tag == 'file format') {
+                        if (tag == 'library' || tag == 'application' || tag == 'file format' || tag == 'sensor' || tag == 'protocol') {
                             node_.pathTag = tag;
                             break;
                         }
@@ -459,7 +459,6 @@ export class CCMapController {
             const fontSize = 10.0 / globalScale;
             ctx.font = `bold ${fontSize}px Space Mono`;
             const label = 'DEPENDS ON';
-            const textWidth = ctx.measureText(label).width;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = 'black';
@@ -505,10 +504,9 @@ export class CCMapController {
     getNodeClickHandler = (node: any, e: MouseEvent) => {
         if (!e.shiftKey) {
             if (node.id === this.selectedNodeId) {
-                // TODO: Fix bounds check
                 const graphCoord = this.graphRef!.screen2GraphCoords(e.clientX, e.clientY);
-                const dx = graphCoord.x - node.x - node.__bckgDimensions[0] / 2.0;
-                if (dx > -40.0) {
+                const bounds = node.focusWidgetBounds
+                if (graphCoord.x >= bounds[0] && graphCoord.x <= (bounds[0] + bounds[2]) && graphCoord.y >= bounds[1] && graphCoord.y <= (bounds[1] + bounds[3])) {
                     this.focusOnNode(node);
                 } else {
                     this.centerOnNode(node);
@@ -706,6 +704,7 @@ export class CCMapController {
                     labelDimensions[1],
                     radius
                 );
+                node.focusWidgetBounds = [node.x! + labelDimensions[0] / 2 + 2.0 / globalScale, node.y! - labelDimensions[1] / 2, labelDimensions[1], labelDimensions[1]]
 
                 ctx.fillStyle = isSelected ? nodeColor : 'white';
                 ctx.fill();
