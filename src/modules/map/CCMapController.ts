@@ -232,7 +232,7 @@ export class CCMapController {
             for (const node of shortestPath) {
                 const node_ = this.nodeForId(node);
                 if (node_) {
-                    const tags = this.nodes?.allNodes.find((n) => n.id === node)?.tags || [];
+                    const tags = this.nodes?.allNodes.find((n) => n.id === node)?.ccmData?.[1]?.tags || [];
 
                     node_.pathTag = null;
                     if (node_.type == 'domain') {
