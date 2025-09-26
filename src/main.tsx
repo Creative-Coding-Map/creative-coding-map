@@ -9,10 +9,8 @@ import { Loading } from './components/loading.tsx';
 
 import '@/styles/globals.css';
 import { Navbar } from './modules/navigation.tsx';
-import { selectedNodeIdAtom, showSearchAtom } from './state/model.ts';
-import { store } from './state/store.ts';
+import { selectedNodeIdAtom } from './state/model.ts';
 import { useEmitter } from './hooks/useEmitter.tsx';
-import { ESCAPE_KEY, SPACE_KEY } from './state/constants.ts';
 import { useColorScheme } from './hooks/useColorScheme.tsx';
 
 const IndexView = lazy(() => import('./views/index-view.tsx'));
@@ -60,54 +58,6 @@ function App() {
             emitter.emit('app:selected-node:focus', focusNodeParam);
         }
     }, [focusNodeParam, emitter, isMapInitialized]);
-
-    useLayoutEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === SPACE_KEY) {
-                if (event.target instanceof HTMLInputElement) return;
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                const showSearch = store.get(showSearchAtom);
-                store.set(showSearchAtom, !showSearch);
-            }
-
-            if (event.key === ESCAPE_KEY) {
-                const isTargetSuggestions = (event.target as HTMLElement).id === 'suggestions';
-
-                if (!isTargetSuggestions) {
-                    const showSearch = store.get(showSearchAtom);
-
-                    if (showSearch) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        emitter.emit('app:suggestions:reset');
-
-                        store.set(showSearchAtom, false);
-                    }
-                }
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-
-        const onCanvasClick = (event: MouseEvent) => {
-            const showSearch = store.get(showSearchAtom);
-            if (showSearch && event.target instanceof HTMLCanvasElement) {
-                event.preventDefault();
-                event.stopPropagation();
-                store.set(showSearchAtom, false);
-            }
-        };
-
-        window.addEventListener('click', onCanvasClick);
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('click', onCanvasClick);
-        };
-    }, []);
 
     return (
         <main className="w-full h-screen max-h-screen overflow-hidden relative antialiased ccm-colors">

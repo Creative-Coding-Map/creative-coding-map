@@ -157,7 +157,7 @@
     }
 
     .ccm-page {
-        @apply ccm-px ccm-colors ccm-border ccm-rounded ccm-mx transition-all duration-300;
+        @apply ccm-px ccm-colors ccm-border ccm-rounded ccm-mx;
     }
 
     .ccm-card {

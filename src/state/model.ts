@@ -16,7 +16,6 @@ export const selectedNodeAtom = atom<CCMNode | null>((get) => {
 });
 
 export const showInfoAtom = atom<boolean>(false);
-export const showSearchAtom = atom<boolean>(false);
 export const showCreatePathAtom = atom<boolean>(false);
 export const showPathAtom = atom<boolean>(false);
 

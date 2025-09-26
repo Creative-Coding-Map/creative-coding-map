@@ -26,5 +26,4 @@ export const BREAKDOWN_KEYS = {
 
 export const MIN_CHAR_SUGGESTIONS = 2;
 
-export const SPACE_KEY = ' ';
 export const ESCAPE_KEY = 'Escape';

@@ -49,6 +49,7 @@ function Path() {
     const selectNode = (nodeId: string) => {
         return (event: React.MouseEvent<HTMLButtonElement>) => {
             event.preventDefault();
+            event.stopPropagation();
             setSelectedNodeId(nodeId);
             emitter.emit('app:selected-node:changed', nodeId);
         };

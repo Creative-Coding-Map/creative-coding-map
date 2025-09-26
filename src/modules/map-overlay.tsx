@@ -4,12 +4,11 @@ import { ShortestPath } from './shortest-path';
 import { InfoOverlay } from './info-overlay';
 import { SearchOverlay } from './search';
 import { SelectedNode } from './selected-node';
-import { selectedNodeIdAtom, showInfoAtom, showSearchAtom } from '@/state/model';
+import { selectedNodeIdAtom, showInfoAtom } from '@/state/model';
 import { store } from '@/state/store';
 
 export function MapOverlay() {
     const showInfo = useAtomValue(showInfoAtom);
-    const showSearch = useAtomValue(showSearchAtom, { store });
     const selectedNodeId = useAtomValue(selectedNodeIdAtom, { store });
 
     return (
@@ -19,8 +18,8 @@ export function MapOverlay() {
                 <ShortestPath />
                 <AnimatePresence mode="wait" propagate>
                     {selectedNodeId && <SelectedNode />}
-                    {showSearch && <SearchOverlay />}
                 </AnimatePresence>
+                <SearchOverlay />
             </div>
         </>
     );

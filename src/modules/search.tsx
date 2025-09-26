@@ -9,21 +9,19 @@ import type { CCMNode } from '@/types/ccmap';
 import { useSuggestions } from '@/hooks/useSuggestions';
 import { useEmitter } from '@/hooks/useEmitter';
 import Search from '@/components/icons/Search';
-import { selectedNodeIdAtom, showSearchAtom } from '@/state/model';
+import { selectedNodeIdAtom } from '@/state/model';
 import { store } from '@/state/store';
 
 export function SearchOverlay() {
-    const setShowSearch = useSetAtom(showSearchAtom, { store });
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
     const inputRef = useRef<HTMLInputElement>(null);
     const [search, setSearch] = useState('');
-    const [_, navigate] = useLocation();
+    const [url, navigate] = useLocation();
 
     const { emitter } = useEmitter();
 
     const selectSuggestion = useCallback(
         (suggestion: CCMNode) => {
-            setShowSearch(false);
             setSelectedNodeId(suggestion.id);
             const params = new URLSearchParams({ focusNode: suggestion.id });
             navigate(`/?${params.toString()}`);
@@ -56,11 +54,16 @@ export function SearchOverlay() {
         [handleInputChange, setSearch]
     );
 
+    if (new URL(url, window.location.href).pathname !== '/') {
+        return null;
+    }
+
     return (
         <m.aside
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            key="search-overlay"
             onAnimationComplete={(def: any) => {
                 if (inputRef.current && def.opacity === 1) {
                     setTimeout(() => {
@@ -105,7 +108,6 @@ export function SearchOverlay() {
                             if (e.key === 'Escape') {
                                 setSearch('');
                                 reset();
-                                setShowSearch(false);
                             } else {
                                 handleKeyDown(e);
                             }
