@@ -2,14 +2,14 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import * as m from 'motion/react-m';
 import { ChevronRight } from 'lucide-react';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { AnimatePresence } from 'motion/react';
 import { VIEW_CONFIGURATIONS } from './map/data';
 import Breakdowns from '@/components/symbols/Breakdowns';
 import Tags from '@/components/symbols/Tags';
 import Techniques from '@/components/symbols/Techniques';
 import Tools from '@/components/symbols/Tools';
-import { toggleFilterAtom } from '@/state/model';
+import { filtersAtom, toggleFilterAtom } from '@/state/model';
 import { store } from '@/state/store';
 
 const viewConfigVariants = {
@@ -33,27 +33,47 @@ const itemVariants = {
 };
 
 const SHAPE_CLASSNAME = 'flex items-center gap-2 cursor-pointer uppercase';
+const FILTER_CLASSNAME = 'text-gray ccm-transition-colors';
 
 export function LegendOverlay() {
     const [selectedDomain, setSelectedDomain] = useState<string>('Domain mode');
     const [showOtherDomains, setShowOtherDomains] = useState<boolean>(false);
+    const filters = useAtomValue(filtersAtom, { store });
     const toggleFilter = useSetAtom(toggleFilterAtom, { store });
     const domains = ['Domain mode', 'Frameworks', 'Use cases'];
+
+    const isTagFilter = filters.some((f) => f.id === 'tags' && f.type === 'shape');
+    const isToolFilter = filters.some((f) => f.id === 'tools' && f.type === 'shape');
+    const isTechniqueFilter = filters.some((f) => f.id === 'techniques' && f.type === 'shape');
+    const isBreakdownFilter = filters.some((f) => f.id === 'breakdowns' && f.type === 'shape');
+
     return (
         <aside className="z-10 absolute ccm-px top-1/5 flex flex-col type-hint gap-0.5">
             <h4 className="text-gray">SHAPE</h4>
             <ul className="flex flex-col gap-0.5">
-                <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'tags', type: 'shape' })}>
-                    <Tags className="ccm-icon" /> <span className="ccm-colors-fg">TAGS</span>
+                <li className={clsx(SHAPE_CLASSNAME)} role="button" onClick={() => toggleFilter({ id: 'tags', type: 'shape' })}>
+                    <Tags className="ccm-icon" />{' '}
+                    <span className={clsx(isTagFilter ? FILTER_CLASSNAME : 'ccm-colors-fg')}>TAGS</span>
                 </li>
-                <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'tools', type: 'shape' })}>
-                    <Tools className="ccm-icon" /> <span className="ccm-colors-fg">TOOLS</span>
+                <li className={clsx(SHAPE_CLASSNAME)} role="button" onClick={() => toggleFilter({ id: 'tools', type: 'shape' })}>
+                    <Tools className="ccm-icon" />{' '}
+                    <span className={clsx(isToolFilter ? FILTER_CLASSNAME : 'ccm-colors-fg')}>TOOLS</span>
                 </li>
-                <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'techniques', type: 'shape' })}>
-                    <Techniques className="ccm-icon" /> <span className="ccm-colors-fg">TECHNIQUES</span>
+                <li
+                    className={clsx(SHAPE_CLASSNAME)}
+                    role="button"
+                    onClick={() => toggleFilter({ id: 'techniques', type: 'shape' })}
+                >
+                    <Techniques className="ccm-icon" />{' '}
+                    <span className={clsx(isTechniqueFilter ? FILTER_CLASSNAME : 'ccm-colors-fg')}>TECHNIQUES</span>
                 </li>
-                <li className={SHAPE_CLASSNAME} role="button" onClick={() => toggleFilter({ id: 'breakdowns', type: 'shape' })}>
-                    <Breakdowns className="ccm-icon" /> <span className="ccm-colors-fg">BREAKDOWNS</span>
+                <li
+                    className={clsx(SHAPE_CLASSNAME)}
+                    role="button"
+                    onClick={() => toggleFilter({ id: 'breakdowns', type: 'shape' })}
+                >
+                    <Breakdowns className="ccm-icon" />{' '}
+                    <span className={clsx(isBreakdownFilter ? FILTER_CLASSNAME : 'ccm-colors-fg')}>BREAKDOWNS</span>
                 </li>
             </ul>
             <div className="flex flex-col gap-2 mt-4 w-40">
@@ -116,19 +136,20 @@ export function LegendOverlay() {
                                 .flatMap((view) => view.domainSets)
                                 .map((domain) => {
                                     const color = domain.color;
+                                    let nodeId = '';
+                                    if (selectedDomain === 'Domain mode') {
+                                        nodeId = `domain:${domain.name}`;
+                                    } else if (selectedDomain === 'Frameworks') {
+                                        const node = domain.nodes[0];
+                                        nodeId = node.id;
+                                    }
+                                    const isDomainFilter = filters.some((f) => f.id === nodeId && f.type === 'node');
                                     return (
                                         <m.li
                                             key={domain.name}
                                             role="button"
                                             onClick={(evt) => {
                                                 evt.preventDefault();
-                                                let nodeId = '';
-                                                if (selectedDomain === 'Domain mode') {
-                                                    nodeId = `domain:${domain.name}`;
-                                                } else if (selectedDomain === 'Frameworks') {
-                                                    const node = domain.nodes[0];
-                                                    nodeId = node.id;
-                                                }
 
                                                 if (nodeId) {
                                                     toggleFilter({ id: nodeId, type: 'node' });
@@ -138,7 +159,14 @@ export function LegendOverlay() {
                                             className="flex items-center gap-2 cursor-pointer"
                                         >
                                             <Tools className={clsx('ccm-icon')} style={{ fill: color }} />{' '}
-                                            <span className={clsx('capitalize ccm-colors-fg')}>{domain.name}</span>
+                                            <span
+                                                className={clsx(
+                                                    'capitalize',
+                                                    isDomainFilter ? FILTER_CLASSNAME : 'ccm-colors-fg'
+                                                )}
+                                            >
+                                                {domain.name}
+                                            </span>
                                         </m.li>
                                     );
                                 })}
