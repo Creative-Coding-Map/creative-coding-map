@@ -60,7 +60,7 @@ function App() {
     }, [focusNodeParam, emitter, isMapInitialized]);
 
     return (
-        <main className="w-full h-screen max-h-screen overflow-hidden relative antialiased ccm-colors">
+        <main className="w-full h-dvh max-h-dvh overflow-hidden relative antialiased ccm-colors">
             <Navbar />
             <Switch>
                 <Route path="/index-page">

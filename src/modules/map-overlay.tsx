@@ -11,7 +11,7 @@ export function MapOverlay() {
 
     return (
         <>
-            <div className="flex flex-col justify-end gap-2 absolute bottom-4 right-4 h-[calc(100vh-5lh)] w-xl overflow-hidden">
+            <div className="flex flex-col justify-end gap-2 absolute left-2 md:left-auto right-2 bottom-4 md:right-4 h-[calc(100dvh-5lh)] md:h-[calc(100vh-5lh)] md:w-xl overflow-hidden">
                 <ShortestPath />
                 <AnimatePresence mode="wait" propagate>
                     {selectedNodeId && <SelectedNode />}
