@@ -548,6 +548,12 @@ export class CCMapController {
         const start = link.source;
         const end = link.target;
 
+        var linkColor = this.foreground
+
+        if (this.#shortestPaths.length > 0 && link.type !== 'shortest-path') {
+            linkColor = this.theme === 'light' ? 'rgba(127, 127, 127, 0.5)' : 'rgba(127, 127, 127, 0.5)';
+        }
+
         if (link.type == 'shortest-path') {
             ctx.save();
 
@@ -565,7 +571,7 @@ export class CCMapController {
             ctx.fillStyle = this.foreground
             ctx.fillText(label, cx, cy);
 
-            ctx.strokeStyle = this.theme === 'light' ? '#000000' : '#ffffff';
+            ctx.strokeStyle = linkColor
             ctx.lineWidth = 3.0 / globalScale;
             ctx.setLineDash([5.0 / globalScale, 5.0 / globalScale]);
             ctx.beginPath();
@@ -576,7 +582,7 @@ export class CCMapController {
             ctx.restore();
         } else {
             ctx.save();
-            ctx.strokeStyle = this.theme === 'light' ? '#000000' : '#ffffff';
+            ctx.strokeStyle = linkColor
             ctx.lineWidth = 0.25 / globalScale;
             ctx.beginPath();
             ctx.moveTo(start.x, start.y);
@@ -654,6 +660,7 @@ export class CCMapController {
         let globalScaleMapped = globalScale;
         if (globalScaleMapped < 0.4) globalScaleMapped = 0.4;
 
+        const showingShortestPaths = this.#shortestPaths.length > 0;
         const transform = ctx.getTransform();
         const scale = (transform.a + transform.d) / 2.0;
 
@@ -783,12 +790,16 @@ export class CCMapController {
             const backgroundColor = isSelected ? nodeColor :  this.background;
 
             const inShortestPath = node.isOnShortestPath;
-            const labelStyle: string =
+            var labelStyle: string =
                 (!isFiltered && isSelected) || inShortestPath
                     ? 'pill'
                     : node.type === 'tool' || node.type === 'technique'
                       ? 'text'
                       : 'pill';
+
+            if (!inShortestPath && showingShortestPaths) {
+                labelStyle = 'text';
+            }
 
             if (labelStyle === 'pill') {
                 ctx.beginPath();
@@ -802,11 +813,18 @@ export class CCMapController {
                 ctx.stroke();
             }
 
+            // draw label
             const textY = labelStyle === 'pill' ? node.y + 1.5 / globalScale : node.y - 16.0 / globalScale;
             if (!isFiltered || node.isOnShortestPath) {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                const labelColor: string = labelStyle === 'text' ? this.foreground : isSelected ? this.background : nodeColor;
+                var labelColor: string = labelStyle === 'text' ? this.foreground : isSelected ? this.background : nodeColor;
+
+                if (showingShortestPaths && !inShortestPath) {
+                    labelColor = this.theme === 'light' ? 'rgba(127, 127, 127, 0.25)' : 'rgba(127, 127, 127, 0.25)';
+                }
+
+
                 ctx.fillStyle = labelColor;
                 ctx.fillText(label, node.x, textY);
                 node.__bckgDimensions = bckgDimensions;
@@ -821,7 +839,7 @@ export class CCMapController {
             }
 
             // draw focus widget, when node is selected node
-            if (!isFiltered && node.id === this.selectedNodeId) {
+            if (!showingShortestPaths && (!isFiltered && node.id === this.selectedNodeId)) {
                 ctx.beginPath();
                 node.focusX = labelDimensions[0] / 2 + 2.0 / globalScale;
                 ctx.roundRect(
