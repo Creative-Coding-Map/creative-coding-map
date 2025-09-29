@@ -158,7 +158,7 @@ export function LegendOverlay() {
                                             variants={itemVariants}
                                             className="flex items-center gap-2 cursor-pointer"
                                         >
-                                            <Tools className={clsx('ccm-icon')} style={{ fill: color }} />{' '}
+                                            <Tools className={clsx('')} style={{ fill: color }} />{' '}
                                             <span
                                                 className={clsx(
                                                     'capitalize',
