@@ -15,6 +15,7 @@ import { VIEW_CONFIGURATIONS } from './data';
 import type { ForceGraphMethods, ForceGraphProps } from 'react-force-graph-2d';
 import type {
     CCMData,
+    CCMDomainModes,
     CCMFilter,
     CCMGraphData,
     CCMGraphLink,
@@ -133,6 +134,7 @@ export class CCMapController {
 
         this.#runtimeProps = {};
 
+        this.emitter.on('app:domain:changed', this.onDomainChanged);
         this.emitter.on('map:path-ends:changed', this.onPathEndsChanged);
         this.emitter.on('app:selected-node:changed', this.onSelectedNodeChanged);
         this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
@@ -473,9 +475,14 @@ export class CCMapController {
             this.pathEnds.start = null;
             this.pathEnds.end = null;
         }
-        this.resetGraph()
-        setTimeout(() => { this.recenter()}, 500)
+        this.resetGraph();
+        setTimeout(() => {
+            this.recenter();
+        }, 500);
+    };
 
+    onDomainChanged = (domain: CCMDomainModes) => {
+        // TODO: Implement domain changed
     };
 
     onShortestPathChanged = (removedId: string) => {

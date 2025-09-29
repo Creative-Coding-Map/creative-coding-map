@@ -8,6 +8,8 @@ export enum CCMNodeType {
     Breakdown = 'breakdown',
 }
 
+export type CCMDomainModes = 'domain' | 'frameworks' | 'use-cases';
+
 export interface CCMNode {
     id: string;
     type: CCMNodeType;

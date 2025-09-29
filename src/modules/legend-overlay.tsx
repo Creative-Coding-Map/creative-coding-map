@@ -5,11 +5,12 @@ import { ChevronRight } from 'lucide-react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { AnimatePresence } from 'motion/react';
 import { VIEW_CONFIGURATIONS } from './map/data';
+import type { CCMDomainModes } from '@/types/ccmap';
 import Breakdowns from '@/components/symbols/Breakdowns';
 import Tags from '@/components/symbols/Tags';
 import Techniques from '@/components/symbols/Techniques';
 import Tools from '@/components/symbols/Tools';
-import { filtersAtom, toggleFilterAtom } from '@/state/model';
+import { domainAtom, filtersAtom, setDomainAtom, toggleFilterAtom } from '@/state/model';
 import { store } from '@/state/store';
 
 const viewConfigVariants = {
@@ -35,12 +36,19 @@ const itemVariants = {
 const SHAPE_CLASSNAME = 'flex items-center gap-2 cursor-pointer uppercase';
 const FILTER_CLASSNAME = 'text-gray ccm-transition-colors';
 
+const DOMAIN_LEGEND: Record<CCMDomainModes, string> = {
+    ['domain']: 'Domain mode',
+    ['frameworks']: 'Frameworks',
+    ['use-cases']: 'Use cases',
+};
+const DOMAIN_MODES: CCMDomainModes[] = ['domain', 'frameworks', 'use-cases'];
+
 export function LegendOverlay() {
-    const [selectedDomain, setSelectedDomain] = useState<string>('Domain mode');
+    const selectedDomain = useAtomValue(domainAtom, { store });
+    const setSelectedDomain = useSetAtom(setDomainAtom, { store });
     const [showOtherDomains, setShowOtherDomains] = useState<boolean>(false);
     const filters = useAtomValue(filtersAtom, { store });
     const toggleFilter = useSetAtom(toggleFilterAtom, { store });
-    const domains = ['Domain mode', 'Frameworks', 'Use cases'];
 
     const isTagFilter = filters.some((f) => f.id === 'tags' && f.type === 'shape');
     const isToolFilter = filters.some((f) => f.id === 'tools' && f.type === 'shape');
@@ -98,7 +106,7 @@ export function LegendOverlay() {
                             exit="closed"
                             variants={viewConfigVariants}
                         >
-                            {domains.map((domain, index) => {
+                            {DOMAIN_MODES.map((domain, index) => {
                                 if (domain === selectedDomain) return null;
 
                                 return (
@@ -107,7 +115,7 @@ export function LegendOverlay() {
                                         className={clsx(
                                             'flex items-center cursor-pointer uppercase text-gray hover:text-black ccm-invert',
                                             // selectedDomain !== domain && 'bg-white',
-                                            index === domains.length - 1 && ''
+                                            index === DOMAIN_MODES.length - 1 && ''
                                         )}
                                         onClick={() => {
                                             setShowOtherDomains(false);
@@ -117,13 +125,13 @@ export function LegendOverlay() {
                                         }}
                                         variants={itemVariants}
                                     >
-                                        {domain}
+                                        {DOMAIN_LEGEND[domain]}
                                     </m.li>
                                 );
                             })}
                         </m.ul>
                     )}
-                    {selectedDomain && !showOtherDomains && (
+                    {!showOtherDomains && (
                         <m.ul
                             key={selectedDomain}
                             className="flex flex-col gap-1"
@@ -132,14 +140,14 @@ export function LegendOverlay() {
                             exit="closed"
                             variants={viewConfigVariants}
                         >
-                            {VIEW_CONFIGURATIONS.filter((view) => view.name.includes(selectedDomain))
+                            {VIEW_CONFIGURATIONS.filter((view) => view.name.includes(DOMAIN_LEGEND[selectedDomain]))
                                 .flatMap((view) => view.domainSets)
                                 .map((domain) => {
                                     const color = domain.color;
                                     let nodeId = '';
-                                    if (selectedDomain === 'Domain mode') {
+                                    if (selectedDomain === 'domain') {
                                         nodeId = `domain:${domain.name}`;
-                                    } else if (selectedDomain === 'Frameworks') {
+                                    } else if (selectedDomain === 'frameworks') {
                                         const node = domain.nodes[0];
                                         nodeId = node.id;
                                     }

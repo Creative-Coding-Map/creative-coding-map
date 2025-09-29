@@ -1,10 +1,19 @@
 import type { ForceGraphProps } from 'react-force-graph-2d';
-import type { CCMFilter, CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds, CCMViewConfiguration } from './ccmap';
+import type {
+    CCMDomainModes,
+    CCMFilter,
+    CCMGraphData,
+    CCMGraphLink,
+    CCMGraphNode,
+    CCMPathEnds,
+    CCMViewConfiguration,
+} from './ccmap';
 
 export type CCMEvents = {
     'app:shortest-path:create': undefined;
     'app:shortest-path:changed': string;
     'app:shortest-path:cleared': undefined;
+    'app:domain:changed': CCMDomainModes;
     'app:suggestions:reset': undefined;
     'app:selected-node:changed': string | null;
     'app:selected-node:focus': string | null;

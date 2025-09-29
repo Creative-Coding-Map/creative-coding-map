@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { Database } from './database';
-import type { CCMFilter, CCMNode } from '@/types/ccmap';
+import type { CCMDomainModes, CCMFilter, CCMNode } from '@/types/ccmap';
 import { emitter } from '@/hooks/useEmitter';
 
 export const databaseAtom = atom<Database>(new Database());
@@ -22,6 +22,12 @@ export const showPathAtom = atom<boolean>(false);
 export const pathStartNodeAtom = atom<CCMNode | null>(null);
 export const pathEndNodeAtom = atom<CCMNode | null>(null);
 export const shortestPathNodesAtom = atom<CCMNode[]>([]);
+
+export const domainAtom = atom<CCMDomainModes>('domain');
+export const setDomainAtom = atom(null, (_, set, domain: CCMDomainModes) => {
+    set(domainAtom, domain);
+    emitter.emit('app:domain:changed', domain);
+});
 
 export const filtersAtom = atom<CCMFilter[]>([]);
 
