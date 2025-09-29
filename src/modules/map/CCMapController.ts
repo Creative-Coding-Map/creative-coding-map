@@ -300,10 +300,8 @@ export class CCMapController {
             setTimeout(() => {
                 const startNode = this.nodeForId(shortestPath[0])!;
 
-                console.log(startNode);
                 let x = startNode.x!;
                 const y = startNode.y!;
-                console.log(x);
                 const sourcePositions = shortestPath.map((node) => {
                     const n = this.nodeForId(node)!;
                     return [n.x!, n.y!];
@@ -324,8 +322,6 @@ export class CCMapController {
                     }
                     iterations++;
                     this.graphRef?.zoomToFit(0, 200, (node) => shortestPath.includes(node.id));
-
-                    console.log(this.graphRef?.getGraphBbox());
                     const height = window.outerHeight;
 
                     const cx = (targetPositions[0][0] + targetPositions[targetPositions.length - 1][0]) / 2.0;
@@ -801,7 +797,7 @@ export class CCMapController {
                 labelStyle = 'text';
             }
 
-            if (isFiltered && !isSelected) {
+            if (isFiltered && !isSelected && !inShortestPath) {
                 labelStyle = 'text'
             }
 
