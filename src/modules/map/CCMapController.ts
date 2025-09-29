@@ -565,7 +565,7 @@ export class CCMapController {
             ctx.fillStyle = 'black';
             ctx.fillText(label, cx, cy);
 
-            ctx.strokeStyle = '#000000';
+            ctx.strokeStyle = this.theme === 'light' ? '#000000' : '#ffffff';
             ctx.lineWidth = 3.0 / globalScale;
             ctx.setLineDash([5.0 / globalScale, 5.0 / globalScale]);
             ctx.beginPath();
@@ -576,7 +576,7 @@ export class CCMapController {
             ctx.restore();
         } else {
             ctx.save();
-            ctx.strokeStyle = '#000000';
+            ctx.strokeStyle = this.theme === 'light' ? '#000000' : '#ffffff';
             ctx.lineWidth = 0.25 / globalScale;
             ctx.beginPath();
             ctx.moveTo(start.x, start.y);
