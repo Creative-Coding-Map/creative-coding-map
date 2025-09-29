@@ -336,6 +336,25 @@ export class CCMapController {
         }
     }
 
+    resetGraph() {
+        this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
+        this.nodes.domainNodes = this.domainGraph.nodes;
+        this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
+        colorGraph(this.ogGraph, this.viewConfiguration.domainSets);
+
+        const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
+
+        const mstNamed = minimumSpanningTreeFromSubtree(
+            this.nodes.allNodes,
+            this.ogGraph.links.concat(this.domainGraph.links),
+            subTree,
+            linkWeights as any
+        );
+
+        this.graphData = this.localBuildGraph(mstNamed.mstEdges);
+        this.graphData.links = mstNamed.mstEdges;
+    }
+
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
         if (typeof node === 'string') {
             node = this.#graphData?.nodes.find((n) => n.id === node) as CCMGraphNode;
@@ -446,7 +465,17 @@ export class CCMapController {
     };
 
     onShortestPathCleared = () => {
-        // !DO SOMETHING HERE
+        this.shortestPaths = [];
+        for (const node of this.#graphData?.nodes || []) {
+            delete node.fx;
+            delete node.fy;
+            delete node.isOnShortestPath;
+            this.pathEnds.start = null;
+            this.pathEnds.end = null;
+        }
+        this.resetGraph()
+        setTimeout(() => { this.recenter()}, 500)
+
     };
 
     onShortestPathChanged = (removedId: string) => {
