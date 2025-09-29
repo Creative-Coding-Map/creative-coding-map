@@ -72,7 +72,7 @@ export function SearchOverlay() {
                     }, 100);
                 }
             }}
-            className="max-w-xl w-full z-20 px-1 ml-auto flex flex-col ccm-colors ccm-border rounded-md overflow-hidden"
+            className="hidden md:flex max-w-xl w-full z-20 px-1 ml-auto  flex-col ccm-colors ccm-border rounded-md overflow-hidden"
         >
             <div className="w-full flex flex-col">
                 <AnimatePresence mode="wait" propagate>

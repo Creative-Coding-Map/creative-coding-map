@@ -25,7 +25,7 @@ export default function Tooltip({
     message: React.ReactNode;
     children: React.ReactNode;
     scrollContainerId?: string;
-    align?: 'start' | 'end';
+    align?: 'start' | 'end' | 'center';
     forceShow?: boolean;
     onlyShowOnClick?: boolean;
     onClose?: () => void;
@@ -39,9 +39,19 @@ export default function Tooltip({
         if (!containerRef.current) return;
 
         const rect = containerRef.current.getBoundingClientRect();
+        let left = 0;
+        let top = rect.top + window.scrollY;
+        if (align === 'start') {
+            left = rect.left + window.scrollX - 8;
+        } else if (align === 'end') {
+            left = rect.right + window.scrollX + 8;
+        } else {
+            top = rect.top + window.scrollY + rect.height;
+            left = rect.left + window.scrollX;
+        }
         setPosition({
-            top: rect.top + window.scrollY,
-            left: align === 'start' ? rect.left + window.scrollX - 8 : rect.right + window.scrollX + 8, // 8px offset to the right
+            top,
+            left, // 8px offset to the right
         });
     }, [isVisible, forceShow, align]);
 

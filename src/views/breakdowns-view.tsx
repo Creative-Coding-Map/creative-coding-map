@@ -1,12 +1,19 @@
 import { useLocation } from 'wouter';
 import { Shell } from '@/components/shell';
+import { ActionButton } from '@/components/action-button';
+import CloseIcon from '@/components/icons/Close';
 
 export default function AboutView() {
     const [_, navigate] = useLocation();
 
     return (
         <Shell className="ccm-pt" onOutsideClick={() => navigate('/')}>
-            <aside className="max-w-screen-md ml-auto z-10 relative py-4 ccm-colors ccm-border ccm-rounded ccm-mx ccm-transition">
+            <aside className="max-w-screen-md md:ml-auto z-20 relative py-4 ccm-colors ccm-border ccm-rounded ccm-mx ccm-transition">
+                <div className="absolute top-4 right-4 z-10">
+                    <ActionButton label="Close" onClick={() => navigate('/')}>
+                        <CloseIcon className="ccm-icon" />
+                    </ActionButton>
+                </div>
                 <div className="overflow-y-auto ccm-scrollbar max-h-[calc(100vh-7.9rem)] ccm-px pb-10">
                     <div className="flex flex-col gap-8">
                         <h1 className="type-header mb-10">Breakdowns</h1>

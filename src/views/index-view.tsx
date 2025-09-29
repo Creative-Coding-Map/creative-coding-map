@@ -21,6 +21,7 @@ import Tooltip, { TooltipProvider } from '@/components/tooltip';
 import { fetchCCMData } from '@/modules/map/fetch-data';
 import { store } from '@/state/store';
 import { useEmitter } from '@/hooks/useEmitter';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 type IndexNode = CCMNode & { category: string; description: string };
 
@@ -149,7 +150,7 @@ const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter
         // Calculate number of columns based on width
         const minColumnWidth = 280;
         const gutter = 16;
-        const columnCount = Math.max(2, Math.min(6, Math.floor(width / minColumnWidth)));
+        const columnCount = Math.max(1, Math.min(6, Math.floor(width / minColumnWidth)));
 
         // Keep letters in alphabetical order
         const sortedDataByLetter = [...dataByLetter].sort(([a], [b]) => a.localeCompare(b));
@@ -248,7 +249,7 @@ const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter
             <div
                 id="index-view-container"
                 ref={ref}
-                className="flex flex-auto gap-x-4 w-full h-full pb-10 my-8 overflow-y-auto ccm-scrollbar"
+                className="flex flex-auto gap-x-4 w-full h-full pb-10 pr-1 my-8 overflow-y-auto ccm-scrollbar"
             >
                 {width && width > 0
                     ? columns.map((columnItems, columnIndex) => (
@@ -291,7 +292,7 @@ const ListCell = memo(function ListCell({ index, style, data, isLastColumn }: Li
 
     // item.type === 'node'
     return (
-        <div style={style}>
+        <div style={style} className="overflow-hidden md:overflow-visible">
             <NodeListItem node={item.node} isLastColumn={isLastColumn} />
         </div>
     );
@@ -300,6 +301,7 @@ const ListCell = memo(function ListCell({ index, style, data, isLastColumn }: Li
 const NodeListItem = memo(function NodeListItem({ node, isLastColumn }: { node: IndexNode; isLastColumn: boolean }) {
     const { emitter } = useEmitter();
     const [showContent, setShowContent] = useState(false);
+    const { isMobile } = useIsMobile();
 
     const onShowContent = useCallback(() => {
         const element = document.getElementById('index-view-container');
@@ -338,7 +340,7 @@ const NodeListItem = memo(function NodeListItem({ node, isLastColumn }: { node: 
                 onClose={() => setShowContent(false)}
                 onlyShowOnClick
                 scrollContainerId="index-view-container"
-                align={isLastColumn ? 'start' : 'end'}
+                align={isMobile ? 'center' : isLastColumn ? 'start' : 'end'}
                 message={
                     <div className="flex flex-col gap-1">
                         <p className="flex items-center gap-1 type-filter">

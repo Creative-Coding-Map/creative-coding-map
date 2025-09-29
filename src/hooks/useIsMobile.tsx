@@ -25,6 +25,6 @@ export function IsMobileProvider({ children, value = false }: Props): React.Reac
     return <IsMobileContext.Provider value={mediaQueryValue}>{children}</IsMobileContext.Provider>;
 }
 
-export function useMediaQueryContext(): MediaQueries {
+export function useIsMobile(): MediaQueries {
     return useContext(IsMobileContext);
 }
