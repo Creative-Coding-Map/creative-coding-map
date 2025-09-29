@@ -801,6 +801,10 @@ export class CCMapController {
                 labelStyle = 'text';
             }
 
+            if (isFiltered && !isSelected) {
+                labelStyle = 'text'
+            }
+
             if (labelStyle === 'pill') {
                 ctx.beginPath();
                 ctx.fillStyle = backgroundColor;
