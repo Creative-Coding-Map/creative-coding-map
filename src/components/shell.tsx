@@ -15,7 +15,7 @@ export const Shell = ({
     return (
         <section
             ref={shellRef}
-            className={clsx('relative h-screen', className)}
+            className={clsx('relative h-dvh md:h-screen', className)}
             onMouseDown={(evt) => {
                 if (evt.target === shellRef.current) {
                     onOutsideClick(evt);

@@ -48,7 +48,7 @@
     }
 
     #app {
-        @apply min-h-screen;
+        @apply min-h-dvh md:min-h-screen;
     }
 
     .force-graph-container .float-tooltip-kap {

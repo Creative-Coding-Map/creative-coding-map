@@ -9,14 +9,14 @@ export default function AboutView() {
     return (
         <Shell className="ccm-pt" onOutsideClick={() => navigate('/')}>
             <aside className="max-w-screen-md md:ml-auto z-20 relative py-4 ccm-colors ccm-border ccm-rounded ccm-mx ccm-transition">
-                <div className="absolute top-4 right-4 z-10">
+                <div className="absolute top-2 right-2 z-10">
                     <ActionButton label="Close" onClick={() => navigate('/')}>
                         <CloseIcon className="ccm-icon" />
                     </ActionButton>
                 </div>
                 <div className="overflow-y-auto ccm-scrollbar max-h-[calc(100dvh-10rem)] md:max-h-[calc(100vh-7.9rem)] ccm-px pb-10">
                     <div className="flex flex-col gap-8">
-                        <h1 className="type-header mb-10">About Unfolding the creative coding landscape</h1>
+                        <h1 className="type-header mt-2 mb-4 md:mb-10">About Unfolding the creative coding landscape</h1>
                         <p>
                             “Unfolding the creative coding landscape” is an interactive platform that maps, connects, and
                             celebrates diverse creative coding frameworks. This living document offers a dynamic visualization of

@@ -14,7 +14,7 @@ export default function AboutView() {
                         <CloseIcon className="ccm-icon" />
                     </ActionButton>
                 </div>
-                <div className="overflow-y-auto ccm-scrollbar max-h-[calc(100vh-7.9rem)] ccm-px pb-10">
+                <div className="overflow-y-auto ccm-scrollbar max-h-[calc(100dvh-10rem)] md:max-h-[calc(100vh-7.9rem)] ccm-px pb-10">
                     <div className="flex flex-col gap-8">
                         <h1 className="type-header mb-10">Breakdowns</h1>
                         <p>
