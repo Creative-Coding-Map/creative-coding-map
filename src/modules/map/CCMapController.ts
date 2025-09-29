@@ -91,22 +91,7 @@ export class CCMapController {
         this.ogGraph = buildGraph(this.ccmData, this.nodes);
         updateLinkCounts(this.ogGraph);
 
-        this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
-        this.nodes.domainNodes = this.domainGraph.nodes;
-        this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
-        colorGraph(this.ogGraph, this.viewConfiguration.domainSets);
-
-        const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
-
-        const mstNamed = minimumSpanningTreeFromSubtree(
-            this.nodes.allNodes,
-            this.ogGraph.links.concat(this.domainGraph.links),
-            subTree,
-            linkWeights as any
-        );
-
-        this.graphData = this.localBuildGraph(mstNamed.mstEdges);
-        this.graphData.links = mstNamed.mstEdges;
+        this.createGraph()
 
         if (this.layoutTimeoutHandler) {
             clearTimeout(this.layoutTimeoutHandler);
@@ -149,6 +134,25 @@ export class CCMapController {
         this.initialized = true;
         this.emitter.emit('map:initialized');
     }
+    createGraph() {
+        this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
+        this.nodes.domainNodes = this.domainGraph.nodes;
+        this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
+        colorGraph(this.ogGraph, this.viewConfiguration.domainSets);
+
+        const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
+
+        const mstNamed = minimumSpanningTreeFromSubtree(
+            this.nodes.allNodes,
+            this.ogGraph.links.concat(this.domainGraph.links),
+            subTree,
+            linkWeights as any
+        );
+
+        this.graphData = this.localBuildGraph(mstNamed.mstEdges);
+        this.graphData.links = mstNamed.mstEdges;
+    }
+
 
     zoomIn = () => {
         this.zoom *= 1.5;
@@ -196,6 +200,9 @@ export class CCMapController {
         if (this.viewConfiguration != viewConfiguration) {
             this.viewConfiguration = viewConfiguration;
             this.emitter.emit('map:view-configuration:changed', this.viewConfiguration);
+            this.shortestPaths = []
+            this.pathEnds = { start: null, end: null };
+            this.createGraph();
         }
     }
 
@@ -338,24 +345,6 @@ export class CCMapController {
         }
     }
 
-    resetGraph() {
-        this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
-        this.nodes.domainNodes = this.domainGraph.nodes;
-        this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
-        colorGraph(this.ogGraph, this.viewConfiguration.domainSets);
-
-        const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
-
-        const mstNamed = minimumSpanningTreeFromSubtree(
-            this.nodes.allNodes,
-            this.ogGraph.links.concat(this.domainGraph.links),
-            subTree,
-            linkWeights as any
-        );
-
-        this.graphData = this.localBuildGraph(mstNamed.mstEdges);
-        this.graphData.links = mstNamed.mstEdges;
-    }
 
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
         if (typeof node === 'string') {
@@ -475,14 +464,14 @@ export class CCMapController {
             this.pathEnds.start = null;
             this.pathEnds.end = null;
         }
-        this.resetGraph();
+        this.createGraph();
         setTimeout(() => {
             this.recenter();
         }, 500);
     };
 
     onDomainChanged = (domain: CCMDomainModes) => {
-        // TODO: Implement domain changed
+        this.setViewConfiguration( VIEW_CONFIGURATIONS.find((i) => i.id === domain)!)
     };
 
     onShortestPathChanged = (removedId: string) => {

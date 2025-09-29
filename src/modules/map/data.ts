@@ -3,6 +3,7 @@ import type { CCMViewConfiguration } from '@/types/ccmap';
 export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
     {
         name: 'Domain mode',
+        id: 'domain',
         domainSets: [
             {
                 name: 'graphics',
@@ -87,32 +88,11 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'augmented reality', degree: 1 },
                 ],
             },
-        ],
-        colorSets: [
-            {
-                name: '3d graphics',
-                tags: ['3d graphics'],
-                color: '#ff0000',
-            },
-            {
-                name: 'file formats',
-                tags: ['file format'],
-                color: '#00ff00',
-            },
-            {
-                name: 'OPENRNDR',
-                nodes: [{ id: 'OPENRNDR', degree: 1 }],
-                color: '#ffc0cb',
-            },
-            {
-                name: 'Processing',
-                nodes: [{ id: 'Processing', degree: 1 }],
-                color: '#0000ff',
-            },
-        ],
+        ]
     },
     {
         name: 'Frameworks',
+        id: 'frameworks',
         domainSets: [
             {
                 name: 'Processing',
@@ -143,38 +123,6 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                 name: 'OPENRNDR',
                 color: '#ffc0cb',
                 nodes: [{ id: 'OPENRNDR', degree: 1 }],
-            },
-        ],
-        colorSets: [
-            {
-                name: 'Processing',
-                nodes: [{ id: 'Processing', degree: 1 }],
-                color: '#0000ff',
-            },
-            {
-                name: 'OpenFrameworks',
-                nodes: [{ id: 'OpenFrameworks', degree: 1 }],
-                color: '#00ffff',
-            },
-            {
-                name: 'p5.js',
-                nodes: [{ id: 'P5Js', degree: 1 }],
-                color: '#ff00ff',
-            },
-            {
-                name: 'Cinder',
-                nodes: [{ id: 'Cinder', degree: 1 }],
-                color: '#ff7f00',
-            },
-            {
-                name: 'Three.js',
-                nodes: [{ id: 'ThreeJS', degree: 1 }],
-                color: '#7f7f00',
-            },
-            {
-                name: 'OPENRNDR',
-                nodes: [{ id: 'OPENRNDR', degree: 1 }],
-                color: '#ffc0cb',
             },
         ],
     },
