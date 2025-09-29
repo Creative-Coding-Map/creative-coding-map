@@ -25,7 +25,7 @@ export function colorGraph(graph: CCMGraphData, colorSets: CCMDomainSet[]) {
             node.unfilteredColor = node.color;
             node.domain = bestSet.name;
         } else {
-            node.color = '#000000';
+            node.color = '#7f7f7f';
             node.unfilteredColor = node.color;
             node.domain = 'none';
         }
