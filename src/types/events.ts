@@ -4,6 +4,7 @@ import type { CCMFilter, CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds, 
 export type CCMEvents = {
     'app:shortest-path:create': undefined;
     'app:shortest-path:changed': string;
+    'app:shortest-path:cleared': undefined;
     'app:suggestions:reset': undefined;
     'app:selected-node:changed': string | null;
     'app:selected-node:focus': string | null;

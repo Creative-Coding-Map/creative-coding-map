@@ -52,9 +52,9 @@ export class CCMapController {
 
     private filters: Array<string> = [];
 
-    private filterTags: boolean = false;
-    private filterTechniques: boolean = false;
-    private filterTools: boolean = false;
+    private filterTags = false;
+    private filterTechniques = false;
+    private filterTools = false;
 
     ogGraph: CCMGraphData | null = null;
 
@@ -136,6 +136,7 @@ export class CCMapController {
         this.emitter.on('map:path-ends:changed', this.onPathEndsChanged);
         this.emitter.on('app:selected-node:changed', this.onSelectedNodeChanged);
         this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
+        this.emitter.on('app:shortest-path:cleared', this.onShortestPathCleared);
         this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
         this.emitter.on('app:filters:changed', this.onFiltersChanged);
         this.emitter.on('app:theme:changed', this.onThemeChanged);
@@ -444,6 +445,10 @@ export class CCMapController {
         this.selectedNodeId = nodeId;
     };
 
+    onShortestPathCleared = () => {
+        // !DO SOMETHING HERE
+    };
+
     onShortestPathChanged = (removedId: string) => {
         this.skipPathNodes.add(removedId);
 
@@ -544,7 +549,7 @@ export class CCMapController {
         const start = link.source;
         const end = link.target;
 
-        var linkColor = this.foreground
+        let linkColor = this.foreground;
 
         if (this.#shortestPaths.length > 0 && link.type !== 'shortest-path') {
             linkColor = this.theme === 'light' ? 'rgba(127, 127, 127, 0.5)' : 'rgba(127, 127, 127, 0.5)';
@@ -564,10 +569,10 @@ export class CCMapController {
             const label = 'DEPENDS ON';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = this.foreground
+            ctx.fillStyle = this.foreground;
             ctx.fillText(label, cx, cy);
 
-            ctx.strokeStyle = linkColor
+            ctx.strokeStyle = linkColor;
             ctx.lineWidth = 3.0 / globalScale;
             ctx.setLineDash([5.0 / globalScale, 5.0 / globalScale]);
             ctx.beginPath();
@@ -578,7 +583,7 @@ export class CCMapController {
             ctx.restore();
         } else {
             ctx.save();
-            ctx.strokeStyle = linkColor
+            ctx.strokeStyle = linkColor;
             ctx.lineWidth = 0.25 / globalScale;
             ctx.beginPath();
             ctx.moveTo(start.x, start.y);
@@ -682,7 +687,7 @@ export class CCMapController {
         }
 
         const filteredColor = this.theme === 'light' ? '#e0e0e0' : '#202020';
-        const nodeColor = isFiltered ? filteredColor : node.color || this.foreground
+        const nodeColor = isFiltered ? filteredColor : node.color || this.foreground;
 
         ctx.fillStyle = nodeColor;
 
@@ -782,11 +787,11 @@ export class CCMapController {
 
             const isSelected = node.id === this.selectedNodeId;
 
-            const nodeColor = node.type === 'domain' ? (this.foreground) : (node.color || this.foreground);
-            const backgroundColor = isSelected ? nodeColor :  this.background;
+            const nodeColor = node.type === 'domain' ? this.foreground : node.color || this.foreground;
+            const backgroundColor = isSelected ? nodeColor : this.background;
 
             const inShortestPath = node.isOnShortestPath;
-            var labelStyle: string =
+            let labelStyle: string =
                 (!isFiltered && isSelected) || inShortestPath
                     ? 'pill'
                     : node.type === 'tool' || node.type === 'technique'
@@ -798,7 +803,7 @@ export class CCMapController {
             }
 
             if (isFiltered && !isSelected && !inShortestPath) {
-                labelStyle = 'text'
+                labelStyle = 'text';
             }
 
             if (labelStyle === 'pill') {
@@ -818,12 +823,11 @@ export class CCMapController {
             if (!isFiltered || node.isOnShortestPath) {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                var labelColor: string = labelStyle === 'text' ? this.foreground : isSelected ? this.background : nodeColor;
+                let labelColor: string = labelStyle === 'text' ? this.foreground : isSelected ? this.background : nodeColor;
 
                 if (showingShortestPaths && !inShortestPath) {
                     labelColor = this.theme === 'light' ? 'rgba(127, 127, 127, 0.25)' : 'rgba(127, 127, 127, 0.25)';
                 }
-
 
                 ctx.fillStyle = labelColor;
                 ctx.fillText(label, node.x, textY);
@@ -833,13 +837,13 @@ export class CCMapController {
             if (node.isOnShortestPath) {
                 const fontSize = 10.0 / globalScale;
                 ctx.font = `bold ${fontSize}px Space Mono`;
-                ctx.fillStyle = this.foreground
+                ctx.fillStyle = this.foreground;
                 ctx.textAlign = 'left';
                 ctx.fillText(node.pathTag.toUpperCase(), node.x - labelDimensions[0] / 2 + hmargin, textY - 20.0 / globalScale);
             }
 
             // draw focus widget, when node is selected node
-            if (!showingShortestPaths && (!isFiltered && node.id === this.selectedNodeId)) {
+            if (!showingShortestPaths && !isFiltered && node.id === this.selectedNodeId) {
                 ctx.beginPath();
                 node.focusX = labelDimensions[0] / 2 + 2.0 / globalScale;
                 ctx.roundRect(
@@ -847,7 +851,7 @@ export class CCMapController {
                     node.y! - labelDimensions[1] / 2,
                     labelDimensions[1],
                     labelDimensions[1],
-                    4.0 /globalScale
+                    4.0 / globalScale
                 );
                 node.focusWidgetBounds = [
                     node.x! + labelDimensions[0] / 2 + 2.0 / globalScale,
@@ -858,7 +862,7 @@ export class CCMapController {
 
                 ctx.fillStyle = isSelected ? nodeColor : this.background;
                 ctx.fill();
-                ctx.strokeStyle = this.background
+                ctx.strokeStyle = this.background;
                 ctx.lineWidth = 0.5 / globalScale;
                 ctx.stroke();
 
