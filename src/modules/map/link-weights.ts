@@ -28,6 +28,9 @@ export function linkWeights(link: CCMGraphLink, source: CCMGraphNode, target: CC
 
         case 'domain-tool':
         case 'tool-domain':
+            if (target.id.endsWith(source.name)) {
+                return 1
+            }
         case 'domain-technique':
         case 'technique-domain':
             return 20;
@@ -41,6 +44,13 @@ export function linkWeights(link: CCMGraphLink, source: CCMGraphNode, target: CC
         case 'technique-tag':
             return 5 + Math.min(5, tagCountPenalty);
         case 'tool-tool':
+            if (link.type === 'part-of') {
+                return 1;
+            }
+            if (link.type == 'dependency') {
+                return 100;
+            }
+
         case 'technique-tool':
         case 'tool-technique':
             return 7;
