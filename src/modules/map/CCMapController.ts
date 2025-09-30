@@ -27,7 +27,7 @@ import type {
 
 import { linkWeights } from '@/modules/map/link-weights.ts';
 import { emitter } from '@/hooks/useEmitter';
-import { databaseAtom } from '@/state/model';
+import { databaseAtom, pathEndNodeAtom, pathStartNodeAtom } from '@/state/model';
 import { store } from '@/state/store';
 
 export class CCMapController {
@@ -91,7 +91,7 @@ export class CCMapController {
         this.ogGraph = buildGraph(this.ccmData, this.nodes);
         updateLinkCounts(this.ogGraph);
 
-        this.createGraph()
+        this.createGraph();
 
         if (this.layoutTimeoutHandler) {
             clearTimeout(this.layoutTimeoutHandler);
@@ -125,6 +125,7 @@ export class CCMapController {
         this.emitter.on('app:selected-node:focus', this.onFocusSelectedNode);
         this.emitter.on('app:shortest-path:cleared', this.onShortestPathCleared);
         this.emitter.on('app:shortest-path:changed', this.onShortestPathChanged);
+        this.emitter.on('app:shortest-path:create', this.onShortestPathCreate);
         this.emitter.on('app:filters:changed', this.onFiltersChanged);
         this.emitter.on('app:theme:changed', this.onThemeChanged);
         this.emitter.on('map:zoom-in', this.zoomIn);
@@ -135,7 +136,7 @@ export class CCMapController {
         this.emitter.emit('map:initialized');
     }
     createGraph() {
-        this.domainGraph = buildDomainGraph(this.ogGraph, this.viewConfiguration.domainSets) as CCMGraphData;
+        this.domainGraph = buildDomainGraph(this.ogGraph!, this.viewConfiguration.domainSets) as CCMGraphData;
         this.nodes.domainNodes = this.domainGraph.nodes;
         this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
         colorGraph(this.ogGraph, this.viewConfiguration.domainSets);
@@ -152,7 +153,6 @@ export class CCMapController {
         this.graphData = this.localBuildGraph(mstNamed.mstEdges);
         this.graphData.links = mstNamed.mstEdges;
     }
-
 
     zoomIn = () => {
         this.zoom *= 1.5;
@@ -200,7 +200,7 @@ export class CCMapController {
         if (this.viewConfiguration != viewConfiguration) {
             this.viewConfiguration = viewConfiguration;
             this.emitter.emit('map:view-configuration:changed', this.viewConfiguration);
-            this.shortestPaths = []
+            this.shortestPaths = [];
             this.pathEnds = { start: null, end: null };
             this.createGraph();
         }
@@ -215,7 +215,6 @@ export class CCMapController {
     }
 
     findShortestPath(source: string, target: string) {
-        console.log('finding shortest path from', source, 'to', target);
         const filteredLinks: Array<CCMGraphLink> = [];
 
         this.ogGraph!.links.forEach((link) => {
@@ -235,25 +234,25 @@ export class CCMapController {
             const relations = result.relations[0];
 
             for (let i = 0; i < shortestPath.length - 1; ++i) {
-                var relation = ""
-                console.log('i', relations[i])
+                let relation = '';
+                console.log('i', relations[i]);
                 switch (relations[i]) {
                     case 'tag':
-                        relation = 'tagged'
-                        break
+                        relation = 'tagged';
+                        break;
                     case 'part-of':
-                        relation = 'part of'
-                        break
+                        relation = 'part of';
+                        break;
                     case 'is-a':
-                        relation = 'is a'
-                        break
+                        relation = 'is a';
+                        break;
                     case 'support':
-                        relation = 'supports'
-                        break
+                        relation = 'supports';
+                        break;
 
                     case 'dependency':
-                        relation = 'depends on'
-                        break
+                        relation = 'depends on';
+                        break;
                 }
 
                 const link: CCMGraphLink = {
@@ -261,7 +260,7 @@ export class CCMapController {
                     target: shortestPath[i + 1],
                     weight: 1.0,
                     type: 'shortest-path',
-                    relation: relation
+                    relation: relation,
                 };
                 subtree.push(link);
             }
@@ -345,7 +344,7 @@ export class CCMapController {
                 });
 
                 let iterations = 0;
-                const interval = setInterval(() => {
+                const animate = () => {
                     const f = Math.min(1.0, iterations / 100.0);
                     for (let i = 0; i < shortestPath.length; ++i) {
                         const node = shortestPath[i];
@@ -355,19 +354,19 @@ export class CCMapController {
                     }
                     iterations++;
                     this.graphRef?.zoomToFit(0, 200, (node) => shortestPath.includes(node.id));
-                    const height = window.outerHeight;
+                    const height = window.innerHeight;
 
                     const cx = (targetPositions[0][0] + targetPositions[targetPositions.length - 1][0]) / 2.0;
                     const cy = targetPositions[0][1] + (height / 2 - 200) / this.graphRef!.zoom();
                     this.graphRef?.centerAt(cx, cy, 1000);
-                    if (iterations >= 110) {
-                        clearInterval(interval);
+                    if (iterations < 110) {
+                        requestAnimationFrame(animate);
                     }
-                }, 10);
+                };
+                requestAnimationFrame(animate);
             }, 1000);
         }
     }
-
 
     focusOnNode(node: string | CCMGraphNode): CCMGraphNode | null {
         if (typeof node === 'string') {
@@ -480,6 +479,7 @@ export class CCMapController {
 
     onShortestPathCleared = () => {
         this.shortestPaths = [];
+
         for (const node of this.#graphData?.nodes || []) {
             delete node.fx;
             delete node.fy;
@@ -494,7 +494,7 @@ export class CCMapController {
     };
 
     onDomainChanged = (domain: CCMDomainModes) => {
-        this.setViewConfiguration( VIEW_CONFIGURATIONS.find((i) => i.id === domain)!)
+        this.setViewConfiguration(VIEW_CONFIGURATIONS.find((i) => i.id === domain)!);
     };
 
     onShortestPathChanged = (removedId: string) => {
@@ -505,9 +505,16 @@ export class CCMapController {
         }
     };
 
+    onShortestPathCreate = () => {
+        const startNode = store.get(pathStartNodeAtom);
+        const endNode = store.get(pathEndNodeAtom);
+
+        this.pathEnds.start = startNode?.id || null;
+        this.pathEnds.end = endNode?.id || null;
+    };
+
     onFocusSelectedNode = (nodeId: string | null) => {
         if (nodeId) {
-            console.log('onFocusSelectedNode', nodeId);
             this.selectedNodeId = nodeId;
             this.focusOnNode(nodeId);
         }
@@ -558,6 +565,7 @@ export class CCMapController {
 
     setGraphRef(graph: ForceGraphMethods<CCMGraphNode, CCMGraphLink>) {
         this.graphRef = graph;
+        this.zoom = this.graphRef.zoom();
     }
 
     private localBuildGraph(mstEdges?: Array<any>): CCMGraphData {
@@ -614,7 +622,7 @@ export class CCMapController {
 
             const fontSize = 10.0 / globalScale;
             ctx.font = `bold ${fontSize}px Space Mono`;
-            const label = link.relation.toUpperCase()
+            const label = link.relation.toUpperCase();
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = this.foreground;

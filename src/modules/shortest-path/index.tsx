@@ -55,6 +55,11 @@ function Path() {
         };
     };
 
+    const clearPath = () => {
+        setShortestPathNodes([]);
+        emitter.emit('app:shortest-path:cleared');
+    };
+
     return (
         <m.aside
             initial={{ opacity: 0 }}
@@ -66,8 +71,7 @@ function Path() {
             <ActionButton
                 className="absolute top-4 right-4"
                 onClick={() => {
-                    setShortestPathNodes([]);
-                    emitter.emit('app:shortest-path:cleared');
+                    clearPath();
                 }}
                 label="Close"
             >
@@ -158,8 +162,7 @@ function Path() {
                     <button
                         className="btn type-button ccm-action ccm-transition ease-linear px-2"
                         onClick={() => {
-                            setShortestPathNodes([]);
-                            emitter.emit('app:shortest-path:cleared');
+                            clearPath();
                         }}
                     >
                         CLEAR

@@ -42,18 +42,16 @@ export function CreatePath() {
 
             emitter.emit('app:suggestions:reset');
             setActiveInput(null);
-
-            if (activeInput !== 'start') {
-                setTimeout(() => {
-                    if (startNode) {
-                        setShowCreatePath(false);
-                        emitter.emit('app:shortest-path:create');
-                    }
-                }, 100);
-            }
         },
         [activeInput, setStartNode, setEndNode, startNode]
     );
+
+    useLayoutEffect(() => {
+        if (startNode && endNode) {
+            setShowCreatePath(false);
+            emitter.emit('app:shortest-path:create');
+        }
+    }, [startNode, endNode]);
 
     const {
         handleInputChange,
