@@ -23,6 +23,6 @@ export function useColorScheme() {
 
     return {
         colorScheme,
-        toggleColorScheme: () => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark'),
+        toggleColorScheme: () => setColorScheme(isDarkMode ? 'light' : 'dark'),
     };
 }
