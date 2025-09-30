@@ -17,6 +17,7 @@ export function useColorScheme() {
 
     useLayoutEffect(() => {
         document.documentElement.dataset.theme = colorScheme;
+        emitter.emit('app:theme:changed', colorScheme ?? 'light');
     }, [colorScheme]);
 
     useEffect(() => {
