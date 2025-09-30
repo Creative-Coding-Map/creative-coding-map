@@ -133,6 +133,7 @@ function Path() {
                                             onClick={(evt) => {
                                                 evt.preventDefault();
                                                 emitter.emit('app:shortest-path:changed', node.id);
+                                                console.log('shortest-path:changed', node.id);
                                             }}
                                         >
                                             <CloseIcon className="opacity-0 group-hover:opacity-100 border border-black h-6 w-6 rounded-md hover:bg-black hover:stroke-white ccm-icon ccm-transition" />
