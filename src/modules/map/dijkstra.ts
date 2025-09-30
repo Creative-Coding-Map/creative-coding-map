@@ -122,7 +122,7 @@ export function findAdjacentSubtree(links: CCMGraphLink[], node: string) {
 
 export function findAllShortestPaths(nodes: Array<CCMGraphNode>, edges: Array<CCMGraphLink>, start: string, end: string) {
     // Build adjacency list from edges (bidirectional)
-    const graph = buildUndirectedGraph(nodes, edges);
+    const {graph, edgeTypes} = buildUndirectedGraph(nodes, edges);
 
     // Distance from start to each node
     const distances = new Map<string, number>();
@@ -224,9 +224,24 @@ export function findAllShortestPaths(nodes: Array<CCMGraphNode>, edges: Array<CC
     // Reverse paths to get them in start->end order
     const formattedPaths = allPaths.map((path) => path.reverse());
 
+    //
+    const relations = []
+    for (const path of formattedPaths) {
+
+        const cur = []
+        for (var i = 0; i < path.length - 1; i++) {
+            const source = path[i];
+            const target = path[i + 1];
+            const type = edgeTypes[source][target];
+            cur.push(type)
+        }
+        relations.push(cur)
+    }
+
     return {
         distance: distances[end],
         paths: formattedPaths,
+        relations: relations
     };
 }
 
@@ -238,7 +253,7 @@ export function findAllShortestPaths(nodes: Array<CCMGraphNode>, edges: Array<CC
  */
 export function minimumSpanningTree(edges, startNode) {
     // Build adjacency list from edges (bidirectional)
-    const graph = buildUndirectedGraph(edges);
+    const graph = buildUndirectedGraph(edges).graph;
 
     // If the graph is empty or the start node doesn't exist
     if (!graph[startNode]) {
@@ -311,7 +326,7 @@ export function minimumSpanningTreeFromSubtree(
 ) {
     // Build adjacency list from all edges (bidirectional)
 
-    const graph = buildUndirectedGraph(nodes, edges, weightFunction);
+    const graph = buildUndirectedGraph(nodes, edges, weightFunction).graph;
 
     // Set of nodes included in MST (start with all nodes from the initial subtree)
     const included = new Set<string>();
@@ -457,11 +472,15 @@ export function buildUndirectedGraph(
     weightFunction: ((edge: any, source: CCMGraphNode, target: CCMGraphNode) => number) | undefined = undefined
 ) {
     const graph = {};
+    const edgeTypes = {}
 
     // Initialize graph with empty adjacency lists
     for (const edge of edges) {
         if (!graph[nodeId(edge.source)]) graph[nodeId(edge.source)] = {};
         if (!graph[nodeId(edge.target)]) graph[nodeId(edge.target)] = {};
+
+        if (!edgeTypes[nodeId(edge.source)]) edgeTypes[nodeId(edge.source)] = {};
+        if (!edgeTypes[nodeId(edge.target)]) edgeTypes[nodeId(edge.target)] = {};
     }
 
     // Fill adjacency lists with weights (bidirectional)
@@ -477,17 +496,21 @@ export function buildUndirectedGraph(
                 case 'dependency':
                     defaultWeight = 3;
                     break;
+                case 'part-of':
                 case 'support':
-                    defaultWeight = 3;
+                case 'input':
+                case 'output':
+                case 'is-a':
+                    defaultWeight = 2;
                     break;
                 case 'tag':
-                    defaultWeight = 2;
+                    defaultWeight = 100;
                     break;
                 case 'tool-technique':
                     defaultWeight = 10;
                     break;
                 case 'domain':
-                    defaultWeight = 1;
+                    defaultWeight = 1000;
                     break;
             }
 
@@ -502,9 +525,12 @@ export function buildUndirectedGraph(
         // Add edge in both directions
         graph[source][target] = weight;
         graph[target][source] = weight; // This is the key change for undirected graphs
+        edgeTypes[source][target] = type;
+        edgeTypes[target][source] = type;
     }
 
-    return graph;
+
+    return {  'graph':graph, 'edgeTypes': edgeTypes }
 }
 
 /**

@@ -21,6 +21,9 @@ export interface CCMNode {
     dependsOn?: string[];
     references?: string[];
     supports?: string[];
+    isA?: string[];
+    input?: string[];
+    output?: string[];
     techniques?: string[];
 }
 

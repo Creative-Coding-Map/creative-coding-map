@@ -232,13 +232,36 @@ export class CCMapController {
         if (this.#shortestPaths.length > 0) {
             const shortestPath = this.#shortestPaths[0];
             const subtree: Array<CCMGraphLink> = [];
+            const relations = result.relations[0];
 
             for (let i = 0; i < shortestPath.length - 1; ++i) {
+                var relation = ""
+                console.log('i', relations[i])
+                switch (relations[i]) {
+                    case 'tag':
+                        relation = 'tagged'
+                        break
+                    case 'part-of':
+                        relation = 'part of'
+                        break
+                    case 'is-a':
+                        relation = 'is a'
+                        break
+                    case 'support':
+                        relation = 'supports'
+                        break
+
+                    case 'dependency':
+                        relation = 'depends on'
+                        break
+                }
+
                 const link: CCMGraphLink = {
                     source: shortestPath[i],
                     target: shortestPath[i + 1],
                     weight: 1.0,
                     type: 'shortest-path',
+                    relation: relation
                 };
                 subtree.push(link);
             }
@@ -591,7 +614,7 @@ export class CCMapController {
 
             const fontSize = 10.0 / globalScale;
             ctx.font = `bold ${fontSize}px Space Mono`;
-            const label = 'DEPENDS ON';
+            const label = link.relation.toUpperCase()
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = this.foreground;

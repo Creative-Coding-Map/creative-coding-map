@@ -84,6 +84,20 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
                 });
             }
 
+            if (!mst) {
+                (n[1].partOf || []).forEach((t) => {
+                    const dependn = toolNodes.find((it) => it.id === t);
+                    if (dependn) {
+                        const link: CCMGraphLink = {
+                            source: dependn.id,
+                            target: tooln.id,
+                            type: 'part-of',
+                        };
+                        links.push(link);
+                    }
+                });
+            }
+
             if (enableSupportLinks && !mst) {
                 (n[1].supports || []).forEach((t) => {
                     const supportn = toolNodes.find((it) => it.id === t);
@@ -94,6 +108,8 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
                             type: 'support',
                         };
                         links.push(link);
+                    } else {
+                        console.log("Can't find support tool:",n[1], t )
                     }
                 });
             }
@@ -105,6 +121,39 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
                         source: tooln.id,
                         target: technique,
                         type: 'tool-technique',
+                    };
+                    links.push(link);
+                }
+            }
+            if (!mst) {
+                const inputs = n[1].input || [];
+                for (const input of inputs) {
+                    const link: CCMGraphLink = {
+                        source: tooln.id,
+                        target: input,
+                        type: 'input',
+                    };
+                    links.push(link);
+                }
+            }
+            if (!mst) {
+                const outputs = n[1].output || [];
+                for (const output of outputs) {
+                    const link: CCMGraphLink = {
+                        source: tooln.id,
+                        target: output,
+                        type: 'output',
+                    };
+                    links.push(link);
+                }
+            }
+            if (!mst) {
+                const isA = n[1].isA || [];
+                for (const tool of isA) {
+                    const link: CCMGraphLink = {
+                        source: tooln.id,
+                        target: tool,
+                        type: 'is-a',
                     };
                     links.push(link);
                 }
@@ -135,6 +184,19 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
                         };
                         links.push(link);
                     }
+                });
+            }
+
+            if (!mst) {
+                (n[1].isA || []).forEach((t) => {
+                        const link: CCMGraphLink = {
+                            source: techniquen.id,
+                            target: t,
+                            type: 'is-a',
+                            curvature: 0.0,
+                        };
+                        links.push(link);
+
                 });
             }
         }
