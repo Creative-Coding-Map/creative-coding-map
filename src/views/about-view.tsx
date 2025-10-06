@@ -59,6 +59,14 @@ export default function AboutView() {
                         </div>
                         <div className="flex flex-col">
                             <p>
+                                Source Code:{' '}
+                                <a className="ccm-link" href="https://github.com/Creative-Coding-Map" target="_blank">
+                                    Github
+                                </a>
+                            </p>
+                        </div>
+                        <div className="flex flex-col">
+                            <p>
                                 Concept, design and back end:{' '}
                                 <a className="ccm-link" href="https://rndr.studio/" target="_blank">
                                     RNDR

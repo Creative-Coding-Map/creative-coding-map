@@ -12,13 +12,16 @@ import { Navbar } from './modules/navigation.tsx';
 import { selectedNodeIdAtom } from './state/model.ts';
 import { useEmitter } from './hooks/useEmitter.tsx';
 import { useColorScheme } from './hooks/useColorScheme.tsx';
+import { useShowMobileOverlay } from './hooks/useShowMobileOverlay.tsx';
 
 const IndexView = lazy(() => import('./views/index-view.tsx'));
 const Home = lazy(() => import('./home.tsx'));
+const MobileOverlay = lazy(() => import('./modules/mobile-overlay.tsx').then((module) => ({ default: module.MobileOverlay })));
 
 const rootElement = document.getElementById('app');
 
 function App() {
+    const [showMobileOverlay, setShowMobileOverlay] = useShowMobileOverlay();
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom);
     const { emitter } = useEmitter();
     const [params] = useSearchParams();
@@ -61,6 +64,7 @@ function App() {
 
     return (
         <main className="w-full h-dvh max-h-dvh overflow-hidden relative antialiased ccm-colors">
+            {showMobileOverlay && <MobileOverlay setShowMobileOverlay={setShowMobileOverlay} />}
             <Navbar />
             <Switch>
                 <Route path="/index-page">

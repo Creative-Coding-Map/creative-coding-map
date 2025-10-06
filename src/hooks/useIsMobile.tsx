@@ -14,7 +14,7 @@ interface MediaQueries {
 export const IsMobileContext = createContext<MediaQueries>({ isMobile: false, isTablet: false });
 
 const TABLET_MEDIA_QUERY = '(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)';
-const MOBILE_MEDIA_QUERY = '(max-width: 1024px)';
+const MOBILE_MEDIA_QUERY = '(max-width: 425px)';
 
 export function IsMobileProvider({ children, value = false }: Props): React.ReactNode {
     const isMobile = useMedia(MOBILE_MEDIA_QUERY, value);
