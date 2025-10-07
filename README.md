@@ -15,8 +15,10 @@ Concept, design and back end: [RNDR](https://rndr.studio)
 Implementation: [Ricardo Matias](https://ricardomatias.net/)  
 Thanks to COSA, Processing Foundation, Abe Pazos, Raphaël de Courville, and many more.
 
-### Made possible by Creative Industries Fund NL & Pictoright Fonds
+### Made possible by [Creative Industries Fund NL](https://stimuleringsfonds.nl) & [Pictoright Fonds](https://fonds.pictoright.nl)
+
 --
+
 To run this application:
 
 ```bash
