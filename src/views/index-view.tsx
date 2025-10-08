@@ -160,7 +160,7 @@ const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter
 
         // Calculate items per column for roughly equal distribution
         const totalLetters = sortedDataByLetter.length;
-        const nodesCount = sortedDataByLetter.reduce((acc, [, nodes]) => acc + nodes.length, 0);
+        const nodesCount = sortedDataByLetter.reduce((acc, [_, nodes]) => acc + nodes.length, 0);
         let itemsPerColumn = Math.ceil((totalLetters + nodesCount) / columnCount);
         itemsPerColumn += Math.floor(itemsPerColumn * 0.25);
 
@@ -347,7 +347,7 @@ const NodeListItem = memo(function NodeListItem({ node, isLastColumn }: { node: 
                             {node.name} ({node.type.toUpperCase()})
                         </p>
                         <Link
-                            href={`/#/?focusNode=${node.id}`}
+                            href={`/?focusNode=${node.id}`}
                             className="type-hint flex items-center gap-1 text-xs border-b border-transparent hover:border-black ccm-transition w-fit"
                         >
                             SHOW IT ON THE MAP <ArrowRight className="size-3" />
