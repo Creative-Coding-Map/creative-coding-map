@@ -28,11 +28,11 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-force-graph-2d": "^1.29.0",
+        "react-router-dom": "^7.9.3",
         "react-virtualized-auto-sizer": "^1.0.26",
         "react-window": "^1.8.11",
         "tailwindcss": "^4.1.8",
-        "use-resize-observer": "^9.1.0",
-        "wouter": "^3.7.1"
+        "use-resize-observer": "^9.1.0"
     },
     "devDependencies": {
         "@fullhuman/postcss-purgecss": "^7.0.2",

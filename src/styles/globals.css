@@ -124,6 +124,10 @@
     max-height: fit-content;
 }
 
+@utility type-header {
+    @apply text-lg md:text-xl font-bold;
+}
+
 @utility ccm-optimize {
     contain: content;
     /* content-visibility: auto;
@@ -199,10 +203,6 @@
 
     .ccm-spinner-dark {
         @apply ccm-spinner border-light-gray dunkel:border-dark-gray border-t-black dunkel:border-t-white;
-    }
-
-    .type-header {
-        @apply text-lg md:text-xl font-bold;
     }
 
     .type-body {

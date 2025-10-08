@@ -1,10 +1,10 @@
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { Shell } from '@/components/shell';
 import { ActionButton } from '@/components/action-button';
 import CloseIcon from '@/components/icons/Close';
 
 export default function AboutView() {
-    const [_, navigate] = useLocation();
+    const navigate = useNavigate();
 
     return (
         <Shell className="ccm-pt" onOutsideClick={() => navigate('/')}>

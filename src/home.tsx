@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { useRoute } from 'wouter';
+import { useMatch } from 'react-router-dom';
 
 import * as m from 'motion/react-m';
 import { AnimatePresence } from 'motion/react';
@@ -14,8 +14,8 @@ import { ActionsOverlay } from '@/modules/actions-overlay';
 import { MapOverlay } from '@/modules/map-overlay';
 
 export default function Home() {
-    const [isAboutPage] = useRoute('/about');
-    const [isBreakdownsPage] = useRoute('/breakdowns');
+    const isAboutPage = useMatch('/about');
+    const isBreakdownsPage = useMatch('/breakdowns');
     return (
         <section className="flex flex-col w-screen overflow-hidden">
             <LegendOverlay />

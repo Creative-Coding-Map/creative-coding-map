@@ -1,6 +1,6 @@
 import { Suspense, lazy, useLayoutEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Route, Switch, useSearchParams } from 'wouter';
+import { HashRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import reportWebVitals from './reportWebVitals.ts';
 
@@ -24,12 +24,12 @@ function App() {
     const [showMobileOverlay, setShowMobileOverlay] = useShowMobileOverlay();
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom);
     const { emitter } = useEmitter();
-    const [params] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const [isMapInitialized, setIsMapInitialized] = useState(false);
     useColorScheme();
 
-    const focusNodeParam = params.get('focusNode');
-    const nodeParam = params.get('node');
+    const focusNodeParam = searchParams.get('focusNode');
+    const nodeParam = searchParams.get('node');
 
     useLayoutEffect(() => {
         if (isMapInitialized) return;
@@ -66,14 +66,17 @@ function App() {
         <main className="w-full h-dvh max-h-dvh overflow-hidden relative antialiased ccm-colors">
             {showMobileOverlay && <MobileOverlay setShowMobileOverlay={setShowMobileOverlay} />}
             <Navbar />
-            <Switch>
-                <Route path="/index-page">
-                    <Suspense fallback={<Loading />}>
-                        <IndexView />
-                    </Suspense>
-                </Route>
-                <Route path="/" component={Home} nest />
-            </Switch>
+            <Routes>
+                <Route
+                    path="/index-page"
+                    element={
+                        <Suspense fallback={<Loading />}>
+                            <IndexView />
+                        </Suspense>
+                    }
+                />
+                <Route path="/*" element={<Home />} />
+            </Routes>
         </main>
     );
 }
@@ -81,9 +84,11 @@ function App() {
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
-        <Providers>
-            <App />
-        </Providers>
+        <HashRouter>
+            <Providers>
+                <App />
+            </Providers>
+        </HashRouter>
     );
 }
 

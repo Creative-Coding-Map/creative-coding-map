@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Link } from 'wouter';
+import { Link, NavLink } from 'react-router-dom';
 
 export const Navbar = () => {
     return (
@@ -10,24 +10,30 @@ export const Navbar = () => {
                 </Link>
             </section>
             <section className="flex flex-col items-end gap-1 md:flex-row md:items-center  md:gap-4">
-                <Link
-                    className={(active) => clsx('link type-body font-bold z-20 ccm-colors-fg', active && 'active')}
-                    href="/index-page"
+                <NavLink
+                    className={({ isActive }) =>
+                        clsx('link type-body md:type-header font-bold z-20 ccm-colors-fg', isActive && 'active')
+                    }
+                    to="/index-page"
                 >
                     Index
-                </Link>
-                <Link
-                    className={(active) => clsx('link type-body font-bold z-20 ccm-colors-fg', active && 'active')}
-                    href="/about"
+                </NavLink>
+                <NavLink
+                    className={({ isActive }) =>
+                        clsx('link type-body md:type-header font-bold z-20 ccm-colors-fg', isActive && 'active')
+                    }
+                    to="/about"
                 >
                     About
-                </Link>
-                <Link
-                    className={(active) => clsx('link type-body font-bold z-20 ccm-colors-fg', active && 'active')}
-                    href="/breakdowns"
+                </NavLink>
+                <NavLink
+                    className={({ isActive }) =>
+                        clsx('link type-body md:type-header font-bold z-20 ccm-colors-fg', isActive && 'active')
+                    }
+                    to="/breakdowns"
                 >
                     Breakdowns
-                </Link>
+                </NavLink>
             </section>
         </nav>
     );
