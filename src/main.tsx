@@ -1,6 +1,6 @@
 import { Suspense, lazy, useLayoutEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Route, Switch, useSearchParams } from 'wouter';
+import { Route, Router, Switch, useSearchParams } from 'wouter';
 import { useSetAtom } from 'jotai';
 import reportWebVitals from './reportWebVitals.ts';
 
@@ -13,6 +13,7 @@ import { selectedNodeIdAtom } from './state/model.ts';
 import { useEmitter } from './hooks/useEmitter.tsx';
 import { useColorScheme } from './hooks/useColorScheme.tsx';
 import { useShowMobileOverlay } from './hooks/useShowMobileOverlay.tsx';
+import { useHashLocation } from './lib/router.tsx';
 
 const IndexView = lazy(() => import('./views/index-view.tsx'));
 const Home = lazy(() => import('./home.tsx'));
@@ -66,14 +67,16 @@ function App() {
         <main className="w-full h-dvh max-h-dvh overflow-hidden relative antialiased ccm-colors">
             {showMobileOverlay && <MobileOverlay setShowMobileOverlay={setShowMobileOverlay} />}
             <Navbar />
-            <Switch>
-                <Route path="/index-page">
-                    <Suspense fallback={<Loading />}>
-                        <IndexView />
-                    </Suspense>
-                </Route>
-                <Route path="/" component={Home} nest />
-            </Switch>
+            <Router hook={useHashLocation as any}>
+                <Switch>
+                    <Route path="/index-page">
+                        <Suspense fallback={<Loading />}>
+                            <IndexView />
+                        </Suspense>
+                    </Route>
+                    <Route path="/" component={Home} nest />
+                </Switch>
+            </Router>
         </main>
     );
 }

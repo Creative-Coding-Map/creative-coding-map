@@ -26,7 +26,7 @@ export function NodeData({ node, prop }: NodeDataProps) {
                         />
                     ) : (
                         <li key={value} className="ellipsis pointer-events-auto">
-                            <Link href={`/?focusNode=${value}`}>{value}</Link>
+                            <Link href={`/#/?focusNode=${value}`}>{value}</Link>
                         </li>
                     )
                 )}
