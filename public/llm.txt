@@ -1,0 +1,18 @@
+# cc-map.net
+
+> cc-map.net is a knowledge mapping and resource site for creative coding, interactive installations, and technological art. 
+
+cc-map.net is a collaborative knowledge base and resource center aimed at mapping the landscape of creative coding. Its content is structured for both human visitors and AI agents, supporting exploration, documentation, and learning within the creative technology field.
+
+
+## Main Site
+
+- [Homepage](https://cc-map.net): Main entry point, knowledge mapping tools, and core project overview.
+
+## Contribute
+
+- [Github](https://github.com/creative-Coding-Map): Help expand and refine cc-map.net by contributing your unique insights, tools, breakdowns, and techniques, via a pull request on GitHub!
+
+## Site Purpose
+
+This site maps creative code domains and platforms and fosters technological art exploration and documentation. Designed for both humans and AIs, it indexes open resources and structured knowledge for the creative coding community.
