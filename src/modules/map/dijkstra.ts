@@ -122,7 +122,7 @@ export function findAdjacentSubtree(links: CCMGraphLink[], node: string) {
 
 export function findAllShortestPaths(nodes: Array<CCMGraphNode>, edges: Array<CCMGraphLink>, start: string, end: string) {
     // Build adjacency list from edges (bidirectional)
-    const {graph, edgeTypes} = buildUndirectedGraph(nodes, edges);
+    const { graph, edgeTypes } = buildUndirectedGraph(nodes, edges);
 
     // Distance from start to each node
     const distances = new Map<string, number>();
@@ -225,23 +225,22 @@ export function findAllShortestPaths(nodes: Array<CCMGraphNode>, edges: Array<CC
     const formattedPaths = allPaths.map((path) => path.reverse());
 
     //
-    const relations = []
+    const relations = [];
     for (const path of formattedPaths) {
-
-        const cur = []
+        const cur = [];
         for (var i = 0; i < path.length - 1; i++) {
             const source = path[i];
             const target = path[i + 1];
             const type = edgeTypes[source][target];
-            cur.push(type)
+            cur.push(type);
         }
-        relations.push(cur)
+        relations.push(cur);
     }
 
     return {
         distance: distances[end],
         paths: formattedPaths,
-        relations: relations
+        relations: relations,
     };
 }
 
@@ -326,7 +325,7 @@ export function minimumSpanningTreeFromSubtree(
 ) {
     // Build adjacency list from all edges (bidirectional)
 
-    const graph = buildUndirectedGraph(nodes, edges, weightFunction).graph;
+    const { graph, edgeTypes } = buildUndirectedGraph(nodes, edges, weightFunction);
 
     // Set of nodes included in MST (start with all nodes from the initial subtree)
     const included = new Set<string>();
@@ -378,6 +377,7 @@ export function minimumSpanningTreeFromSubtree(
                 if (!included.has(neighbor) && graph[node][neighbor] < minWeight) {
                     minWeight = graph[node][neighbor];
                     minEdge = { source: node, target: neighbor, weight: minWeight };
+                    minEdge.type = edgeTypes[node][neighbor];
                     nextNode = neighbor;
                 }
             }
@@ -472,7 +472,7 @@ export function buildUndirectedGraph(
     weightFunction: ((edge: any, source: CCMGraphNode, target: CCMGraphNode) => number) | undefined = undefined
 ) {
     const graph = {};
-    const edgeTypes = {}
+    const edgeTypes = {};
 
     // Initialize graph with empty adjacency lists
     for (const edge of edges) {
@@ -529,8 +529,7 @@ export function buildUndirectedGraph(
         edgeTypes[target][source] = type;
     }
 
-
-    return {  'graph':graph, 'edgeTypes': edgeTypes }
+    return { graph: graph, edgeTypes: edgeTypes };
 }
 
 /**

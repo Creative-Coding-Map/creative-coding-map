@@ -498,10 +498,14 @@ export class CCMapController {
     };
 
     onShortestPathChanged = (removedId: string) => {
+        console.log('onShortestPathChanged', removedId);
         this.skipPathNodes.add(removedId);
+
 
         if (this.pathEnds.start && this.pathEnds.end) {
             this.findShortestPath(this.pathEnds.start, this.pathEnds.end);
+        } else {
+            console.error('no path ends set, aborting findShortestPath');
         }
     };
 
@@ -639,8 +643,12 @@ export class CCMapController {
             ctx.restore();
         } else {
             ctx.save();
+            if (link.type === 'part-of') {
+                linkColor = this.theme === 'light' ? 'rgba(127, 127, 127, 0.45)' : 'rgba(127, 127, 127, 0.45)';
+            }
             ctx.strokeStyle = linkColor;
             ctx.lineWidth = 0.25 / globalScale;
+
             ctx.beginPath();
             ctx.moveTo(start.x, start.y);
             ctx.lineTo(end.x, end.y);
