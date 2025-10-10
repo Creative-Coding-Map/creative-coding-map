@@ -333,7 +333,7 @@ const NodeListItem = memo(function NodeListItem({ node, isLastColumn }: { node: 
             role="button"
             onClick={onShowContent}
         >
-            <span className="w-4 flex-shrink-0">{renderIcon(node.type)}</span>
+            <span className="w-4 flex-shrink-0 ccm-icon">{renderIcon(node.type)}</span>
             <Tooltip
                 className="type-filter cursor-pointer pointer-events-auto"
                 forceShow={showContent}
