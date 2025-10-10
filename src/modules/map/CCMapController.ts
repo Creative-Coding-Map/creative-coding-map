@@ -643,9 +643,6 @@ export class CCMapController {
             ctx.restore();
         } else {
             ctx.save();
-            if (link.type === 'part-of') {
-                linkColor = this.theme === 'light' ? 'rgba(127, 127, 127, 0.45)' : 'rgba(127, 127, 127, 0.45)';
-            }
             ctx.strokeStyle = linkColor;
             ctx.lineWidth = 0.25 / globalScale;
 
@@ -743,10 +740,8 @@ export class CCMapController {
                 break;
             case 'tool':
             case 'technique':
-                minScale = 4.0;
-                break;
             case 'tag':
-                minScale = 1.5;
+                minScale = 1.5 + 5.0 / Math.log2( (1 + node.incoming) * 1.5)
                 break;
         }
 
@@ -808,6 +803,7 @@ export class CCMapController {
             })();
             const name =
                 node.type == 'root' ? '' : node.type == 'domain' || node.type == 'tag' ? node.name.toUpperCase() : node.name;
+
             const label = name + suffix;
 
             const fontSizes = {

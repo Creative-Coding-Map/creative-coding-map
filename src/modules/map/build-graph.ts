@@ -46,6 +46,13 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
     const enableSupportLinks = true;
     const enableTechniqueLinks = true;
 
+    if (!mst) {
+        for (const node of allNodes) {
+            node.incoming = 0
+            node.outgoing = 0
+        }
+    }
+
     const links: Array<CCMGraphLink> = [];
     const nodesById: { [id: string]: CCMGraphNode } = {};
 
@@ -56,16 +63,20 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
 
             if (enableToolTagLinks && !mst) {
                 (n[1].tags || []).forEach((t) => {
-                    const tn = tagNodes.find((it) => it.id === t);
-                    if (tn) {
-                        nodesById[t] = tn;
+                    const tagn = tagNodes.find((it) => it.id === t);
+                    if (tagn) {
+                        tagn.incoming+=1
+                        tooln.outgoing+=1
+                        nodesById[t] = tagn;
                         const link: CCMGraphLink = {
-                            source: tn.id,
-                            target: tooln.id,
+                            source: tooln.id,
+                            target: tagn.id,
                             type: 'tag',
                             curvature: 0.0,
                         };
                         links.push(link);
+                    } else {
+                        console.log("Can't find tag:",n[1], t )
                     }
                 });
             }
@@ -74,9 +85,11 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
                 (n[1].dependsOn || []).forEach((t) => {
                     const dependn = toolNodes.find((it) => it.id === t);
                     if (dependn) {
+                        tooln.outgoing+=1
+                        dependn.incoming+=1
                         const link: CCMGraphLink = {
-                            source: dependn.id,
-                            target: tooln.id,
+                            source: tooln.id,
+                            target: dependn.id,
                             type: 'dependency',
                         };
                         links.push(link);
@@ -86,11 +99,13 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
 
             if (!mst) {
                 (n[1].partOf || []).forEach((t) => {
-                    const dependn = toolNodes.find((it) => it.id === t);
-                    if (dependn) {
+                    const partn = toolNodes.find((it) => it.id === t);
+                    if (partn) {
+                        tooln.outgoing+=1
+                        partn.incoming+=1
                         const link: CCMGraphLink = {
-                            source: dependn.id,
-                            target: tooln.id,
+                            source: tooln.id,
+                            target: partn.id,
                             type: 'part-of',
                         };
                         links.push(link);
@@ -102,9 +117,11 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
                 (n[1].supports || []).forEach((t) => {
                     const supportn = toolNodes.find((it) => it.id === t);
                     if (supportn) {
+                        supportn.incoming+=1
+                        tooln.outgoing+=1
                         const link: CCMGraphLink = {
-                            source: supportn.id,
-                            target: tooln.id,
+                            source: tooln.id,
+                            target: supportn.id,
                             type: 'support',
                         };
                         links.push(link);
@@ -117,12 +134,19 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
             if (enableTechniqueLinks && !mst) {
                 const techniques = n[1].techniques || [];
                 for (const technique of techniques) {
-                    const link: CCMGraphLink = {
-                        source: tooln.id,
-                        target: technique,
-                        type: 'tool-technique',
-                    };
-                    links.push(link);
+                    const techniquen = techniqueNodes.find((it) => it.id === technique);
+                    if (techniquen) {
+                        tooln.outgoing+=1
+                        techniquen.incoming+=1
+                        const link: CCMGraphLink = {
+                            source: tooln.id,
+                            target: technique,
+                            type: 'tool-technique',
+                        };
+                        links.push(link);
+                    } else {
+                        console.log("Can't find technique:",n[1], technique )
+                    }
                 }
             }
             if (!mst) {
@@ -176,9 +200,11 @@ export function buildGraph(ccmData: CCMData, nodes: NodesCollection, mst?: Array
                 (n[1].tags || []).forEach((t) => {
                     const tagn = tagNodes.find((it) => it.name === t);
                     if (tagn) {
+                        techniquen.outgoing+=1
+                        tagn.incoming+=1
                         const link: CCMGraphLink = {
-                            source: tagn.id,
-                            target: techniquen.id,
+                            source: techniquen.id,
+                            target: tagn.id,
                             type: 'tag',
                             curvature: 0.0,
                         };
