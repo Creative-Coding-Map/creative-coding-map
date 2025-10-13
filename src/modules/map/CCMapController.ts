@@ -790,15 +790,34 @@ export class CCMapController {
         }
 
         node.__bckgDimensions = [8, 8];
+        const isSelected = node.id === this.selectedNodeId;
+        const inShortestPath = node.isOnShortestPath;
+
+
+        let labelStyle: string =
+            (!isFiltered && isSelected) || inShortestPath
+                ? 'pill'
+                : node.type === 'tool' || node.type === 'technique'
+                    ? 'text'
+                    : 'pill';
+
+        if (!inShortestPath && showingShortestPaths) {
+            labelStyle = 'text';
+        }
+
+        if (isFiltered && !isSelected && !inShortestPath) {
+            labelStyle = 'text';
+        }
+
 
         // Draw labels if zoomed in enough
         if (scale >= minScale || node.id === this.hoverNodeId || node.id === this.selectedNodeId || node.isOnShortestPath) {
             const suffix = (() => {
                 switch (node.type) {
-                    case 'tag':
-                        return ` [${node.count}]`;
-                    default:
+                    case 'domain':
                         return '';
+                    default:
+                        return `[${node.count}]`;
                 }
             })();
             const name =
@@ -845,26 +864,10 @@ export class CCMapController {
                 (n) => n + fontSize * 0.2
             ) as [number, number];
 
-            const isSelected = node.id === this.selectedNodeId;
 
             const nodeColor = node.type === 'domain' ? this.foreground : node.color || this.foreground;
             const backgroundColor = isSelected ? nodeColor : this.background;
 
-            const inShortestPath = node.isOnShortestPath;
-            let labelStyle: string =
-                (!isFiltered && isSelected) || inShortestPath
-                    ? 'pill'
-                    : node.type === 'tool' || node.type === 'technique'
-                      ? 'text'
-                      : 'pill';
-
-            if (!inShortestPath && showingShortestPaths) {
-                labelStyle = 'text';
-            }
-
-            if (isFiltered && !isSelected && !inShortestPath) {
-                labelStyle = 'text';
-            }
 
             if (labelStyle === 'pill') {
                 ctx.beginPath();
