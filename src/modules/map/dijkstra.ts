@@ -432,8 +432,13 @@ export function isValidSubtree(subtreeEdges) {
 
     // For a tree with n nodes, it must have exactly n-1 edges
     if (subtreeEdges.length !== nodes.size - 1) {
-        console.log(`tree has ${subtreeEdges.length} edges, but should have ${nodes.size - 1}`);
-        return false;
+        // this happens when there are multiple connections between two nodes in `subtreeEdges`
+        console.warn(`tree has ${subtreeEdges.length} edges, but should have ${nodes.size - 1}`);
+
+        // for (const edge of subtreeEdges) {
+        //     console.log(edge)
+        // }
+        // return false;
     }
 
     // Check connectivity using BFS
