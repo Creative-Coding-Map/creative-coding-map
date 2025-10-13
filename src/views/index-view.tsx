@@ -158,82 +158,104 @@ const IndexColumns = memo(function IndexColumns({ dataByLetter }: { dataByLetter
         // Initialize columns
         const columns: ColumnItem[][] = Array.from({ length: columnCount }, () => []);
 
-        // Calculate items per column for roughly equal distribution
-        const totalLetters = sortedDataByLetter.length;
-        const nodesCount = sortedDataByLetter.reduce((acc, [, nodes]) => acc + nodes.length, 0);
-        let itemsPerColumn = Math.ceil((totalLetters + nodesCount) / columnCount);
-        itemsPerColumn += Math.floor(itemsPerColumn * 0.25);
+        // Calculate target height per column for balanced distribution
+        const totalHeight = sortedDataByLetter.reduce((acc, [letter, nodes]) => {
+            return acc + getItemSize({ type: 'header', letter }) + nodes.length * getItemSize({ type: 'node', node: nodes[0] });
+        }, 0);
+        const targetHeightPerColumn = totalHeight / columnCount;
 
-        // Distribute letters: fill columns top-to-bottom, then left-to-right
+        // Distribute letters across columns with height-based balancing
         let columnIndex = 0;
-        let insertedItemsCount = 0;
+        let currentColumnHeight = 0;
 
-        // Distribute letters with nodes evenly across columns
         for (const [letter, nodes] of sortedDataByLetter) {
-            if (insertedItemsCount + nodes.length > itemsPerColumn && columnIndex < columnCount - 1) {
+            // Calculate height of this letter group
+            const groupHeight =
+                getItemSize({ type: 'header', letter }) + nodes.length * getItemSize({ type: 'node', node: nodes[0] });
+
+            // If adding this group would exceed target and we're not on the last column,
+            // and the current column isn't empty, move to next column
+            if (
+                currentColumnHeight + groupHeight > targetHeightPerColumn * 1.1 &&
+                columnIndex < columnCount - 1 &&
+                columns[columnIndex].length > 0
+            ) {
                 columnIndex++;
-                insertedItemsCount = 0;
+                currentColumnHeight = 0;
             }
 
+            // Add letter header
             columns[columnIndex].push({ type: 'header', letter });
-            insertedItemsCount++;
+            currentColumnHeight += getItemSize({ type: 'header', letter });
 
+            // Add all nodes for this letter
             for (const node of nodes) {
                 columns[columnIndex].push({ type: 'node', node });
-                insertedItemsCount++;
+                currentColumnHeight += getItemSize({ type: 'node', node });
             }
         }
 
-        // Rebalancing pass: move letter groups between columns to achieve better balance
+        // Helper function to calculate column height
         const getColumnHeight = (col: ColumnItem[]) => col.reduce((acc, item) => acc + getItemSize(item), 0);
 
-        // Find groups (letter + its nodes) for easier manipulation
-        const findLetterGroups = (column: ColumnItem[]) => {
-            const groups: { startIndex: number; endIndex: number; height: number }[] = [];
-            for (let i = 0; i < column.length; i++) {
-                if (column[i].type === 'header') {
-                    const startIndex = i;
-                    let endIndex = i;
-                    let height = getItemSize(column[i]);
+        // Fine-tuning pass: move letter groups between adjacent columns for better balance
+        for (let iteration = 0; iteration < 5; iteration++) {
+            const columnHeights = columns.map(getColumnHeight);
+            const maxHeight = Math.max(...columnHeights);
+            const minHeight = Math.min(...columnHeights);
 
-                    // Find all nodes belonging to this letter
-                    while (endIndex + 1 < column.length && column[endIndex + 1].type === 'node') {
-                        endIndex++;
-                        height += getItemSize(column[endIndex]);
+            // If columns are reasonably balanced, we're done
+            if (maxHeight - minHeight < targetHeightPerColumn * 0.25) break;
+
+            let moved = false;
+
+            // Try to move letters between adjacent columns to balance height
+            for (let colIndex = 0; colIndex < columns.length - 1; colIndex++) {
+                const currentColumn = columns[colIndex];
+                const nextColumn = columns[colIndex + 1];
+                const currentHeight = columnHeights[colIndex];
+                const nextHeight = columnHeights[colIndex + 1];
+
+                // If current column is significantly heavier, try to move last group to next column
+                if (currentHeight > nextHeight + 50) {
+                    // Find the last letter group
+                    let lastGroupStart = currentColumn.length - 1;
+                    while (lastGroupStart > 0 && currentColumn[lastGroupStart].type !== 'header') {
+                        lastGroupStart--;
                     }
 
-                    groups.push({ startIndex, endIndex, height });
-                    i = endIndex; // Skip to next letter
+                    // Check if there's at least one other group in the column
+                    let hasEarlierGroup = false;
+                    for (let i = 0; i < lastGroupStart; i++) {
+                        if (currentColumn[i].type === 'header') {
+                            hasEarlierGroup = true;
+                            break;
+                        }
+                    }
+
+                    if (hasEarlierGroup && lastGroupStart < currentColumn.length) {
+                        // Calculate the height of the group we're about to move
+                        const groupHeight = currentColumn.slice(lastGroupStart).reduce((acc, item) => acc + getItemSize(item), 0);
+
+                        // Only move if it improves balance
+                        const newCurrentHeight = currentHeight - groupHeight;
+                        const newNextHeight = nextHeight + groupHeight;
+                        const currentImbalance = Math.abs(currentHeight - nextHeight);
+                        const newImbalance = Math.abs(newCurrentHeight - newNextHeight);
+
+                        if (newImbalance < currentImbalance) {
+                            const groupItems = currentColumn.splice(lastGroupStart);
+                            nextColumn.unshift(...groupItems);
+                            columnHeights[colIndex] = newCurrentHeight;
+                            columnHeights[colIndex + 1] = newNextHeight;
+                            moved = true;
+                        }
+                    }
                 }
             }
-            return groups;
-        };
 
-        // Rebalance by moving letter groups from heavy columns to light ones
-        for (let iteration = 0; iteration < 2; iteration++) {
-            const columnHeights = columns.map(getColumnHeight);
-            const avgHeight = columnHeights.reduce((a, b) => a + b, 0) / columnHeights.length;
-
-            // Find heaviest and lightest columns
-            const heaviestIndex = columnHeights.indexOf(Math.max(...columnHeights));
-            const lightestIndex = columnHeights.indexOf(Math.min(...columnHeights));
-
-            const heaviestColumn = columns[heaviestIndex];
-            const lightestColumn = columns[lightestIndex];
-
-            // If difference is significant, try to move a letter group
-            if (columnHeights[heaviestIndex] - columnHeights[lightestIndex] > avgHeight * 0.3) {
-                const heavyGroups = findLetterGroups(heaviestColumn);
-
-                // Try to move the last group from heavy to light column (maintains order)
-                if (heavyGroups.length > 1) {
-                    const lastGroup = heavyGroups[heavyGroups.length - 1];
-                    const groupItems = heaviestColumn.splice(lastGroup.startIndex, lastGroup.endIndex - lastGroup.startIndex + 1);
-                    lightestColumn.push(...groupItems);
-                }
-            } else {
-                break; // Good enough balance achieved
-            }
+            // If no moves were made, we're done
+            if (!moved) break;
         }
 
         const columnWidth = Math.floor((width - gutter * (columns.length - 1)) / columns.length);
