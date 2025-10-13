@@ -860,9 +860,7 @@ export class CCMapController {
                 (n) => n + fontSize * 0.2
             ) as [number, number];
 
-            const bckgDimensions: [number, number] = [textWidth + 2 * hmargin + focusButtonWidth, fontSize + vmargin].map(
-                (n) => n + fontSize * 0.2
-            ) as [number, number];
+
 
 
             const nodeColor = node.type === 'domain' ? this.foreground : node.color || this.foreground;
@@ -882,7 +880,13 @@ export class CCMapController {
             }
 
             // draw label
-            const textY = labelStyle === 'pill' ? node.y + 1.5 / globalScale : node.y - 16.0 / globalScale;
+            const textShiftY = labelStyle === 'pill' ?  1.5 / globalScale : - 16.0 / globalScale;
+            const textY = node.y + textShiftY
+            const bckgDimensions: [number, number] = [textWidth + 2 * hmargin + focusButtonWidth, fontSize + vmargin - textShiftY*2].map(
+                (n) => n + fontSize * 0.2
+            ) as [number, number];
+
+
             if (!isFiltered || node.isOnShortestPath) {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
