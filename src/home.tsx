@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import { useMatch } from 'react-router-dom';
 
 import * as m from 'motion/react-m';
 import { AnimatePresence } from 'motion/react';
@@ -12,6 +11,7 @@ import { LegendOverlay } from '@/modules/legend-overlay.tsx';
 import CCMap from '@/modules/map/CCMap';
 import { ActionsOverlay } from '@/modules/actions-overlay';
 import { MapOverlay } from '@/modules/map-overlay';
+import { useMatch } from '@/lib/router';
 
 export default function Home() {
     const isAboutPage = useMatch('/about');

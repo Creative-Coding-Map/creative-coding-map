@@ -1,6 +1,5 @@
-import { Suspense, lazy, useLayoutEffect, useState } from 'react';
+import { Suspense, lazy, useLayoutEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useSetAtom } from 'jotai';
 import reportWebVitals from './reportWebVitals.ts';
 
@@ -13,9 +12,11 @@ import { selectedNodeIdAtom } from './state/model.ts';
 import { useEmitter } from './hooks/useEmitter.tsx';
 import { useColorScheme } from './hooks/useColorScheme.tsx';
 import { useShowMobileOverlay } from './hooks/useShowMobileOverlay.tsx';
+import { useSessionStorage } from './hooks/useSessionStorage.tsx';
+import { Router, useRouter, useSearchParams } from './lib/router.tsx';
+import Home from './home.tsx';
 
 const IndexView = lazy(() => import('./views/index-view.tsx'));
-const Home = lazy(() => import('./home.tsx'));
 const MobileOverlay = lazy(() => import('./modules/mobile-overlay.tsx').then((module) => ({ default: module.MobileOverlay })));
 
 const rootElement = document.getElementById('app');
@@ -24,9 +25,12 @@ function App() {
     const [showMobileOverlay, setShowMobileOverlay] = useShowMobileOverlay();
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom);
     const { emitter } = useEmitter();
-    const [searchParams] = useSearchParams();
-    const [isMapInitialized, setIsMapInitialized] = useState(false);
+    const searchParams = useSearchParams();
+    const { path } = useRouter();
+    const [isMapInitialized, setIsMapInitialized] = useSessionStorage('isMapInitialized');
     useColorScheme();
+
+    console.log('isMapInitialized', isMapInitialized);
 
     const focusNodeParam = searchParams.get('focusNode');
     const nodeParam = searchParams.get('node');
@@ -42,16 +46,15 @@ function App() {
 
         return () => {
             emitter.off('map:initialized', onMapInitialized);
-            setIsMapInitialized(false);
         };
-    }, [emitter, setSelectedNodeId, focusNodeParam, isMapInitialized]);
+    }, [emitter, setSelectedNodeId, focusNodeParam, isMapInitialized, setIsMapInitialized]);
 
     useLayoutEffect(() => {
         if (!isMapInitialized && !nodeParam) return;
 
         setSelectedNodeId(nodeParam);
         emitter.emit('app:selected-node:changed', nodeParam);
-    }, [nodeParam, isMapInitialized]);
+    }, [nodeParam, isMapInitialized, setSelectedNodeId, emitter]);
 
     useLayoutEffect(() => {
         if (!isMapInitialized && !focusNodeParam) return;
@@ -60,23 +63,19 @@ function App() {
             setSelectedNodeId(focusNodeParam);
             emitter.emit('app:selected-node:focus', focusNodeParam);
         }
-    }, [focusNodeParam, emitter, isMapInitialized]);
+    }, [focusNodeParam, emitter, isMapInitialized, setSelectedNodeId]);
 
     return (
         <main className="w-full h-dvh max-h-dvh overflow-hidden relative antialiased ccm-colors">
             {showMobileOverlay && <MobileOverlay setShowMobileOverlay={setShowMobileOverlay} />}
             <Navbar />
-            <Routes>
-                <Route
-                    path="/index-page"
-                    element={
-                        <Suspense fallback={<Loading />}>
-                            <IndexView />
-                        </Suspense>
-                    }
-                />
-                <Route path="/*" element={<Home />} />
-            </Routes>
+            {path === '/index-page' ? (
+                <Suspense fallback={<Loading />}>
+                    <IndexView />
+                </Suspense>
+            ) : (
+                <Home />
+            )}
         </main>
     );
 }
@@ -84,11 +83,11 @@ function App() {
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
-        <HashRouter>
+        <Router>
             <Providers>
                 <App />
             </Providers>
-        </HashRouter>
+        </Router>
     );
 }
 

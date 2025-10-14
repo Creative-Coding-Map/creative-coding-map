@@ -1,17 +1,17 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import * as m from 'motion/react-m';
-import { useNavigate } from 'react-router-dom';
 import { NodeData } from './node-data';
 import { ActionButton } from '@/components/action-button';
 import { store } from '@/state/store';
 import CloseIcon from '@/components/icons/Close';
 import { selectedNodeAtom, selectedNodeIdAtom } from '@/state/model';
 import { useEmitter } from '@/hooks/useEmitter';
+import { useRouter } from '@/lib/router';
 
 export function SelectedNode() {
     const selectedNode = useAtomValue(selectedNodeAtom, { store });
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
-    const navigate = useNavigate();
+    const { navigate } = useRouter();
     const { emitter } = useEmitter();
 
     // const database = useAtomValue(databaseAtom, { store });

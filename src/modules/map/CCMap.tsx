@@ -3,12 +3,12 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import ForceGraph2D from 'react-force-graph-2d';
-import { useNavigate } from 'react-router-dom';
 import throttle from 'just-throttle';
 import { fetchCCMData } from './fetch-data';
 import { CCMapController } from './CCMapController';
 import type { ForceGraphProps } from 'react-force-graph-2d';
 import type { CCMGraphData, CCMGraphLink, CCMGraphNode } from '@/types/ccmap';
+import { useRouter } from '@/lib/router';
 import '@/styles/ccmap.css';
 import { useEmitter } from '@/hooks/useEmitter';
 
@@ -18,7 +18,7 @@ interface CCMapProps {
 
 const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const fgRef = useRef<any>(null);
-    const navigate = useNavigate();
+    const { navigate } = useRouter();
     const controllerRef = useRef<CCMapController | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [graphData, setGraphData] = useState<CCMGraphData | null>(null);

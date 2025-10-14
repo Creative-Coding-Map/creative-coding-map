@@ -369,7 +369,7 @@ const NodeListItem = memo(function NodeListItem({ node, isLastColumn }: { node: 
                             {node.name} ({node.type.toUpperCase()})
                         </p>
                         <Link
-                            to={`/?focusNode=${node.id}`}
+                            href={`/?focusNode=${node.id}`}
                             className="type-hint flex items-center gap-1 text-xs border-b border-transparent hover:border-black ccm-transition w-fit"
                         >
                             SHOW IT ON THE MAP <ArrowRight className="size-3" />

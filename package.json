@@ -28,7 +28,6 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-force-graph-2d": "^1.29.0",
-        "react-router-dom": "^7.9.3",
         "react-virtualized-auto-sizer": "^1.0.26",
         "react-window": "^1.8.11",
         "tailwindcss": "^4.1.8",
@@ -37,8 +36,6 @@
     "devDependencies": {
         "@fullhuman/postcss-purgecss": "^7.0.2",
         "@prettier/plugin-xml": "^3.4.1",
-        "@tanstack/eslint-config": "^0.3.2",
-        "@tanstack/react-router-devtools": "^1.114.3",
         "@testing-library/dom": "^10.4.0",
         "@testing-library/react": "^16.2.0",
         "@toolwind/anchors": "^1.0.10",

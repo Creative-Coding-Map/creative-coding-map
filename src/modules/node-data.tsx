@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import type { CCMNode } from '@/types/ccmap';
+import { Link } from '@/lib/router';
 import { NODE_DATA_KEYS } from '@/state/constants';
 import { Link as ExternalLink } from '@/components/Link';
 
@@ -26,7 +26,7 @@ export function NodeData({ node, prop }: NodeDataProps) {
                         />
                     ) : (
                         <li key={value} className="ellipsis pointer-events-auto">
-                            <Link to={`/?focusNode=${value}`}>{value}</Link>
+                            <Link href={`/?focusNode=${value}`}>{value}</Link>
                         </li>
                     )
                 )}

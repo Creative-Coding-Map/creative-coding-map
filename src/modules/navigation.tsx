@@ -1,11 +1,11 @@
 import clsx from 'clsx';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink } from '@/lib/router';
 
 export const Navbar = () => {
     return (
         <nav className="flex justify-between items-start md:items-center absolute top-0 left-0 right-0 ccm-padding">
             <section className="flex items-center gap-4">
-                <Link className="type-header z-20 ccm-colors-fg" to="/">
+                <Link className="type-header z-20 ccm-colors-fg" href="/">
                     Creative Coding Map
                 </Link>
             </section>
@@ -14,7 +14,7 @@ export const Navbar = () => {
                     className={({ isActive }) =>
                         clsx('link type-body md:type-header font-bold z-20 ccm-colors-fg', isActive && 'active')
                     }
-                    to="/index-page"
+                    href="/index-page"
                 >
                     Index
                 </NavLink>
@@ -22,7 +22,7 @@ export const Navbar = () => {
                     className={({ isActive }) =>
                         clsx('link type-body md:type-header font-bold z-20 ccm-colors-fg', isActive && 'active')
                     }
-                    to="/about"
+                    href="/about"
                 >
                     About
                 </NavLink>
@@ -30,7 +30,7 @@ export const Navbar = () => {
                     className={({ isActive }) =>
                         clsx('link type-body md:type-header font-bold z-20 ccm-colors-fg', isActive && 'active')
                     }
-                    to="/breakdowns"
+                    href="/breakdowns"
                 >
                     Breakdowns
                 </NavLink>

@@ -3,7 +3,6 @@ import { useCallback, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
 import { useSetAtom } from 'jotai';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Suggestions } from './suggestions';
 import type { CCMNode } from '@/types/ccmap';
 import { useSuggestions } from '@/hooks/useSuggestions';
@@ -11,13 +10,13 @@ import { useEmitter } from '@/hooks/useEmitter';
 import Search from '@/components/icons/Search';
 import { selectedNodeIdAtom } from '@/state/model';
 import { store } from '@/state/store';
+import { useRouter } from '@/lib/router';
 
 export function SearchOverlay() {
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
     const inputRef = useRef<HTMLInputElement>(null);
     const [search, setSearch] = useState('');
-    const location = useLocation();
-    const navigate = useNavigate();
+    const { navigate } = useRouter();
 
     const { emitter } = useEmitter();
 
