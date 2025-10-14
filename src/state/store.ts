@@ -21,5 +21,7 @@ emitter.on('map:shortest-path:changed', (shortestPath: Array<Array<string>>) => 
     const head = shortestPath.length > 0 ? shortestPath[0] : [];
     const path = head.map((nodeId) => database.getNode(nodeId)).filter((node) => node != null);
 
+    store.set(pathStartNodeAtom, path[0]);
+    store.set(pathEndNodeAtom, path[path.length - 1]);
     store.set(shortestPathNodesAtom, path);
 });
