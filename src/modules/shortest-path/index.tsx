@@ -28,8 +28,8 @@ export function ShortestPath() {
 function Path() {
     const [shortestPathNodes, setShortestPathNodes] = useAtom(shortestPathNodesAtom, { store });
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
-    const startNode = useAtomValue(pathStartNodeAtom, { store });
-    const endNode = useAtomValue(pathEndNodeAtom, { store });
+    const [startNode, setStartNode] = useAtom(pathStartNodeAtom, { store });
+    const [endNode, setEndNode] = useAtom(pathEndNodeAtom, { store });
     const { emitter } = useEmitter();
 
     const connections: ConnectionItem[] = useMemo(() => {
@@ -57,6 +57,8 @@ function Path() {
 
     const clearPath = () => {
         setShortestPathNodes([]);
+        setStartNode(null);
+        setEndNode(null);
         emitter.emit('app:shortest-path:cleared');
     };
 
