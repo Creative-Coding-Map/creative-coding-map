@@ -5,7 +5,6 @@ import { atom, useAtom } from 'jotai';
 import { VariableSizeList as List } from 'react-window';
 import useResizeObserver from 'use-resize-observer';
 import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { NodeData } from '../modules/node-data';
@@ -22,6 +21,7 @@ import { fetchCCMData } from '@/modules/map/fetch-data';
 import { store } from '@/state/store';
 import { useEmitter } from '@/hooks/useEmitter';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { Link } from '@/lib/router';
 
 type IndexNode = CCMNode & { category: string; description: string };
 

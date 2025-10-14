@@ -14,9 +14,9 @@ import { useColorScheme } from './hooks/useColorScheme.tsx';
 import { useShowMobileOverlay } from './hooks/useShowMobileOverlay.tsx';
 import { useSessionStorage } from './hooks/useSessionStorage.tsx';
 import { Router, useRouter, useSearchParams } from './lib/router.tsx';
-import Home from './home.tsx';
 
 const IndexView = lazy(() => import('./views/index-view.tsx'));
+const Home = lazy(() => import('./home.tsx'));
 const MobileOverlay = lazy(() => import('./modules/mobile-overlay.tsx').then((module) => ({ default: module.MobileOverlay })));
 
 const rootElement = document.getElementById('app');
@@ -69,13 +69,7 @@ function App() {
         <main className="w-full h-dvh max-h-dvh overflow-hidden relative antialiased ccm-colors">
             {showMobileOverlay && <MobileOverlay setShowMobileOverlay={setShowMobileOverlay} />}
             <Navbar />
-            {path === '/index-page' ? (
-                <Suspense fallback={<Loading />}>
-                    <IndexView />
-                </Suspense>
-            ) : (
-                <Home />
-            )}
+            <Suspense fallback={<Loading />}>{path === '/index-page' ? <IndexView /> : <Home />}</Suspense>
         </main>
     );
 }
