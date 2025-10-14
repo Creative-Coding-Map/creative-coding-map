@@ -541,9 +541,10 @@ export function buildUndirectedGraph(
  * Finds the degree of separation between one node and all other nodes in the graph
  * @param {Array} links - Array of objects with 'source' and 'target' properties
  * @param {string} startNode - The starting node
+ * @param {Set<string>} linkTypes
  * @returns {Object} Object mapping each node to its degree of separation from startNode, or -1 if unreachable
  */
-export function findAllDegreesOfSeparation(links: CCMGraphLink[], startNode: string) {
+export function findAllDegreesOfSeparation(links: CCMGraphLink[], startNode: string, linkTypes: Set<string> = new Set()) {
     // Handle edge cases
     if (!links || links.length === 0) return {};
 
@@ -554,19 +555,23 @@ export function findAllDegreesOfSeparation(links: CCMGraphLink[], startNode: str
     links.forEach((link) => {
         const { source, target } = link;
 
-        const sourceId = nodeId(source);
-        const targetId = nodeId(target);
+        console.log(link)
+        if (linkTypes.size == 0 || linkTypes.has(link.type)) {
 
-        // Track all nodes
-        allNodes.add(source);
-        allNodes.add(target);
+            allNodes.add(source);
+            allNodes.add(target);
 
-        // Add bidirectional connections (undirected graph)
-        if (!graph[source]) graph[source] = [];
-        if (!graph[target]) graph[target] = [];
+            // Track all nodes
+            allNodes.add(source);
+            allNodes.add(target);
 
-        graph[source].push(target);
-        graph[target].push(source);
+            // Add bidirectional connections (undirected graph)
+            if (!graph[source]) graph[source] = [];
+            if (!graph[target]) graph[target] = [];
+
+            graph[source].push(target);
+            graph[target].push(source);
+        }
     });
 
     // Check if start node exists in the graph

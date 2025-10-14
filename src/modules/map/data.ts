@@ -7,7 +7,7 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
         domainSets: [
             {
                 name: 'graphics',
-                color: "#E10404",
+                color: '#E10404',
                 nodes: [
                     { id: '3d graphics', degree: 1 },
                     { id: 'computer graphics', degree: 1 },
@@ -88,11 +88,12 @@ export const VIEW_CONFIGURATIONS: Array<CCMViewConfiguration> = [
                     { id: 'augmented reality', degree: 1 },
                 ],
             },
-        ]
+        ],
     },
     {
         name: 'Frameworks',
         id: 'frameworks',
+        links: ['part-of'],
         domainSets: [
             {
                 name: 'Processing',

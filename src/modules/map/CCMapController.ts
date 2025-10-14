@@ -139,7 +139,7 @@ export class CCMapController {
         this.domainGraph = buildDomainGraph(this.ogGraph!, this.viewConfiguration.domainSets) as CCMGraphData;
         this.nodes.domainNodes = this.domainGraph.nodes;
         this.nodes.allNodes = this.ogGraph.nodes.concat(this.domainGraph.nodes);
-        colorGraph(this.ogGraph, this.viewConfiguration.domainSets);
+        colorGraph(this.ogGraph, this.viewConfiguration);
 
         const subTree = findAdjacentSubtree(this.domainGraph.links, '___root');
 

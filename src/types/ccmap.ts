@@ -84,6 +84,7 @@ export interface ColorSet {
 export interface CCMViewConfiguration {
     name: string;
     id: string;
+    links?: string[];
     domainSets: CCMDomainSet[];
 }
 
