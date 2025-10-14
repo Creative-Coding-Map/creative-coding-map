@@ -152,6 +152,14 @@ export class CCMapController {
 
         this.graphData = this.localBuildGraph(mstNamed.mstEdges);
         this.graphData.links = mstNamed.mstEdges;
+
+        const database = store.get(databaseAtom);
+
+        this.nodes?.allNodes.forEach((node) => {
+            if (database.hasNode(node.id)) {
+                database.getNode(node.id)!.color = node.color;
+            }
+        });
     }
 
     zoomIn = () => {
