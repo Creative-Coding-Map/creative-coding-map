@@ -6,12 +6,12 @@ import { store } from '@/state/store';
 import CloseIcon from '@/components/icons/Close';
 import { selectedNodeAtom, selectedNodeIdAtom } from '@/state/model';
 import { useEmitter } from '@/hooks/useEmitter';
-import { useRouter } from '@/lib/router';
+import { useSearchParams } from '@/lib/router';
 
 export function SelectedNode() {
     const selectedNode = useAtomValue(selectedNodeAtom, { store });
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
-    const { navigate } = useRouter();
+    const [, setSearchParams] = useSearchParams();
     const { emitter } = useEmitter();
 
     // const database = useAtomValue(databaseAtom, { store });
@@ -35,7 +35,10 @@ export function SelectedNode() {
                 onClick={() => {
                     setSelectedNodeId(null);
                     emitter.emit('app:selected-node:changed', null);
-                    navigate('/');
+                    setSearchParams((params) => {
+                        params.delete('node');
+                        params.delete('focusNode');
+                    });
                 }}
                 label="Close"
             >

@@ -12,6 +12,7 @@ import CreatePathIcon from '@/components/icons/CreatePath';
 import CloseIcon from '@/components/icons/Close';
 import { ActionButton } from '@/components/action-button';
 import { useEmitter } from '@/hooks/useEmitter';
+import { useRouter, useSearchParams } from '@/lib/router';
 
 export function ShortestPath() {
     const createPath = useAtomValue(showCreatePathAtom, { store });
@@ -31,6 +32,7 @@ function Path() {
     const [startNode, setStartNode] = useAtom(pathStartNodeAtom, { store });
     const [endNode, setEndNode] = useAtom(pathEndNodeAtom, { store });
     const { emitter } = useEmitter();
+    const [, setSearchParams] = useSearchParams();
 
     const connections: ConnectionItem[] = useMemo(() => {
         return shortestPathNodes
@@ -59,6 +61,10 @@ function Path() {
         setShortestPathNodes([]);
         setStartNode(null);
         setEndNode(null);
+        setSearchParams((params) => {
+            params.delete('path');
+        });
+
         emitter.emit('app:shortest-path:cleared');
     };
 

@@ -11,6 +11,7 @@
         "emittery": "^1.2.0",
         "force-graph": "^1.49.6",
         "jotai": "^2.12.5",
+        "just-intersect": "^4.3.0",
         "just-throttle": "^4.2.0",
         "lucide-react": "^0.544.0",
         "motion": "^12.17.0",
@@ -852,6 +853,8 @@
     "json-parse-even-better-errors": ["json-parse-even-better-errors@2.3.1", "", {}, "sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w=="],
 
     "json5": ["json5@2.2.3", "", { "bin": { "json5": "lib/cli.js" } }, "sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg=="],
+
+    "just-intersect": ["just-intersect@4.3.0", "", {}, "sha512-XdAiJUmfM7VOoBUh7I4xo+0YYuzCPiV0Xf21oAmR+1j6a/P8KxJUCigZDblmURZmkIWffNziY2sbSaHrJbNcuA=="],
 
     "just-throttle": ["just-throttle@4.2.0", "", {}, "sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg=="],
 

@@ -1,4 +1,5 @@
 import type { CCMDomainSet, CCMGraphNode, ColorSet } from '@/types/ccmap';
+import intersect from 'just-intersect';
 
 /**
  * Calculates a score for a given node based on its tags, degrees of separation, and interaction with a color set.
@@ -12,12 +13,12 @@ import type { CCMDomainSet, CCMGraphNode, ColorSet } from '@/types/ccmap';
  */
 export function calculateNodeScore(node: CCMGraphNode, set: CCMDomainSet | ColorSet, degreesOfSeparation: any) {
     if (!node.ccmData) {
-        node.ccmData = [node.id, { tags: [node.id] }];
+        node.ccmData = [node.id, { tags: [node.id], id: node.id, type: node.type }];
     }
 
     const nodeTagSet = new Set(node.ccmData?.[1]?.tags || []);
     const colorSetTagSet = new Set(set.tags);
-    const tagScore = nodeTagSet.intersection(colorSetTagSet).size / Math.max(1, colorSetTagSet.size);
+    const tagScore = intersect(Array.from(nodeTagSet), Array.from(colorSetTagSet)).length / Math.max(1, colorSetTagSet.size);
 
     const nodeScore = (set.nodes || [])
         .map((setNode) => {
@@ -38,7 +39,7 @@ export function calculateNodeScore(node: CCMGraphNode, set: CCMDomainSet | Color
 
 export function calculateNodeDegree(node: CCMGraphNode, set: CCMDomainSet, degreesOfSeparation: any) {
     if (!node.ccmData) {
-        node.ccmData = [node.id, { tags: [node.id] }];
+        node.ccmData = [node.id, { tags: [node.id], id: node.id, type: node.type }];
     }
 
     const degrees = (set.nodes || []).map((setNode) => {

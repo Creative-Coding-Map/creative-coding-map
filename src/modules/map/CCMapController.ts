@@ -173,7 +173,8 @@ export class CCMapController {
     };
 
     recenter = () => {
-        this.graphRef?.centerAt(0, 0, 500);
+        // this.graphRef?.centerAt(0, 0, 500);
+        this.graphRef?.zoomToFit(1000, 20, () => true);
     };
 
     /**
@@ -509,7 +510,6 @@ export class CCMapController {
         console.log('onShortestPathChanged', removedId);
         this.skipPathNodes.add(removedId);
 
-
         if (this.pathEnds.start && this.pathEnds.end) {
             this.findShortestPath(this.pathEnds.start, this.pathEnds.end);
         } else {
@@ -528,6 +528,8 @@ export class CCMapController {
     onFocusSelectedNode = (nodeId: string | null) => {
         if (nodeId) {
             this.selectedNodeId = nodeId;
+            this.zoom *= 2;
+            this.graphRef?.zoom(this.zoom, 2000);
             this.focusOnNode(nodeId);
         }
     };
@@ -749,7 +751,7 @@ export class CCMapController {
             case 'tool':
             case 'technique':
             case 'tag':
-                minScale = 1.5 + 5.0 / Math.log2( (1 + node.incoming) * 1.5)
+                minScale = 1.5 + 5.0 / Math.log2((1 + node.incoming) * 1.5);
                 break;
         }
 
@@ -801,13 +803,12 @@ export class CCMapController {
         const isSelected = node.id === this.selectedNodeId;
         const inShortestPath = node.isOnShortestPath;
 
-
         let labelStyle: string =
             (!isFiltered && isSelected) || inShortestPath
                 ? 'pill'
                 : node.type === 'tool' || node.type === 'technique'
-                    ? 'text'
-                    : 'pill';
+                  ? 'text'
+                  : 'pill';
 
         if (!inShortestPath && showingShortestPaths) {
             labelStyle = 'text';
@@ -816,7 +817,6 @@ export class CCMapController {
         if (isFiltered && !isSelected && !inShortestPath) {
             labelStyle = 'text';
         }
-
 
         // Draw labels if zoomed in enough
         if (scale >= minScale || node.id === this.hoverNodeId || node.id === this.selectedNodeId || node.isOnShortestPath) {
@@ -868,12 +868,8 @@ export class CCMapController {
                 (n) => n + fontSize * 0.2
             ) as [number, number];
 
-
-
-
             const nodeColor = node.type === 'domain' ? this.foreground : node.color || this.foreground;
             const backgroundColor = isSelected ? nodeColor : this.background;
-
 
             if (labelStyle === 'pill') {
                 ctx.beginPath();
@@ -888,12 +884,12 @@ export class CCMapController {
             }
 
             // draw label
-            const textShiftY = labelStyle === 'pill' ?  1.5 / globalScale : - 16.0 / globalScale;
-            const textY = node.y + textShiftY
-            const bckgDimensions: [number, number] = [textWidth + 2 * hmargin + focusButtonWidth, fontSize + vmargin - textShiftY*2].map(
-                (n) => n + fontSize * 0.2
-            ) as [number, number];
-
+            const textShiftY = labelStyle === 'pill' ? 1.5 / globalScale : -16.0 / globalScale;
+            const textY = node.y + textShiftY;
+            const bckgDimensions: [number, number] = [
+                textWidth + 2 * hmargin + focusButtonWidth,
+                fontSize + vmargin - textShiftY * 2,
+            ].map((n) => n + fontSize * 0.2) as [number, number];
 
             if (!isFiltered || node.isOnShortestPath) {
                 ctx.textAlign = 'center';

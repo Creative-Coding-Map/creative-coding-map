@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 interface RouterContextValue {
     path: string;
     navigate: (to: string) => void;
+    updateParams: (updater: (params: URLSearchParams) => void) => void;
 }
 
 const RouterContext = createContext<RouterContextValue | null>(null);
@@ -12,6 +13,15 @@ function getHashPath(): string {
     const hash = window.location.hash;
     // Remove the # and return the path, default to '/'
     return hash.slice(1) || '/';
+}
+
+function getPathWithoutSearch(path: string): string {
+    return path.split('?')[0];
+}
+
+function getSearchString(path: string): string {
+    const searchIndex = path.indexOf('?');
+    return searchIndex >= 0 ? path.slice(searchIndex + 1) : '';
 }
 
 export function Router({ children }: { children: ReactNode }) {
@@ -30,7 +40,20 @@ export function Router({ children }: { children: ReactNode }) {
         window.location.hash = to;
     }, []);
 
-    return <RouterContext.Provider value={{ path, navigate }}>{children}</RouterContext.Provider>;
+    const updateParams = useCallback((updater: (params: URLSearchParams) => void) => {
+        const currentPath = getHashPath();
+        const pathWithoutSearch = getPathWithoutSearch(currentPath);
+        const searchString = getSearchString(currentPath);
+        const params = new URLSearchParams(searchString);
+
+        updater(params);
+
+        const newSearch = params.toString();
+        const newPath = newSearch ? `${pathWithoutSearch}?${newSearch}` : pathWithoutSearch;
+        window.location.hash = newPath;
+    }, []);
+
+    return <RouterContext.Provider value={{ path, navigate, updateParams }}>{children}</RouterContext.Provider>;
 }
 
 export function useRouter(): RouterContextValue {
@@ -46,10 +69,11 @@ export function useMatch(pattern: string): boolean {
     return path === pattern;
 }
 
-export function useSearchParams(): URLSearchParams {
-    const { path } = useRouter();
+export function useSearchParams(): [URLSearchParams, (updater: (params: URLSearchParams) => void) => void] {
+    const { path, updateParams } = useRouter();
     const searchString = path.includes('?') ? path.split('?')[1] : '';
-    return new URLSearchParams(searchString);
+    const searchParams = new URLSearchParams(searchString);
+    return [searchParams, updateParams];
 }
 
 interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {

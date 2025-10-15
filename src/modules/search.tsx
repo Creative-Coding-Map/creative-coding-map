@@ -10,13 +10,13 @@ import { useEmitter } from '@/hooks/useEmitter';
 import Search from '@/components/icons/Search';
 import { selectedNodeIdAtom } from '@/state/model';
 import { store } from '@/state/store';
-import { useRouter } from '@/lib/router';
+import { useSearchParams } from '@/lib/router';
 
 export function SearchOverlay() {
     const setSelectedNodeId = useSetAtom(selectedNodeIdAtom, { store });
     const inputRef = useRef<HTMLInputElement>(null);
     const [search, setSearch] = useState('');
-    const { navigate } = useRouter();
+    const [, setSearchParams] = useSearchParams();
 
     const { emitter } = useEmitter();
 
@@ -24,12 +24,13 @@ export function SearchOverlay() {
         (suggestion: CCMNode) => {
             setSelectedNodeId(suggestion.id);
             setSearch('');
-            const params = new URLSearchParams({ focusNode: suggestion.id });
-            navigate(`/?${params.toString()}`);
+            setSearchParams((params) => {
+                params.set('focusNode', suggestion.id);
+            });
             emitter.emit('app:selected-node:focus', suggestion.id);
             emitter.emit('app:suggestions:reset');
         },
-        [emitter, setSelectedNodeId]
+        [emitter, setSelectedNodeId, setSearchParams]
     );
 
     const {

@@ -7,8 +7,8 @@ import throttle from 'just-throttle';
 import { fetchCCMData } from './fetch-data';
 import { CCMapController } from './CCMapController';
 import type { ForceGraphProps } from 'react-force-graph-2d';
-import type { CCMGraphData, CCMGraphLink, CCMGraphNode } from '@/types/ccmap';
-import { useRouter } from '@/lib/router';
+import type { CCMGraphData, CCMGraphLink, CCMGraphNode, CCMPathEnds } from '@/types/ccmap';
+import { useRouter, useSearchParams } from '@/lib/router';
 import '@/styles/ccmap.css';
 import { useEmitter } from '@/hooks/useEmitter';
 
@@ -18,7 +18,7 @@ interface CCMapProps {
 
 const CCMap: React.FC<CCMapProps> = ({ className }) => {
     const fgRef = useRef<any>(null);
-    const { navigate } = useRouter();
+    const [, setSearchParams] = useSearchParams();
     const controllerRef = useRef<CCMapController | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [graphData, setGraphData] = useState<CCMGraphData | null>(null);
@@ -36,9 +36,18 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
 
         const onSelectedNodeChanged = (nodeId: string | null) => {
             if (nodeId) {
-                const params = new URLSearchParams({ node: nodeId });
-                console.log('navigating to', `//?${params.toString()}`);
-                navigate(`/?${params.toString()}`);
+                setSearchParams((params) => {
+                    params.delete('focusNode');
+                    params.set('node', nodeId);
+                });
+            }
+        };
+
+        const onPathEndsChanged = (pathEnds: CCMPathEnds) => {
+            if (pathEnds.start && pathEnds.end) {
+                setSearchParams((params) => {
+                    params.set('path', pathEnds.start + ':' + pathEnds.end);
+                });
             }
         };
 
@@ -69,6 +78,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 emitter.on('map:graph-data:updated', onGraphDataUpdated);
                 emitter.on('map:runtime-props:updated', onRuntimePropsUpdated);
                 emitter.on('map:selected-node:changed', onSelectedNodeChanged);
+                emitter.on('map:path-ends:changed', onPathEndsChanged);
 
                 const data = await fetchCCMData();
 
@@ -99,7 +109,7 @@ const CCMap: React.FC<CCMapProps> = ({ className }) => {
                 console.log('CCMap unmounted');
             }
         };
-    }, [fgRef, emitter, navigate]);
+    }, [fgRef, emitter, setSearchParams]);
 
     if (error) {
         return (

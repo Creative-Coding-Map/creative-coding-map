@@ -21,6 +21,7 @@
         "emittery": "^1.2.0",
         "force-graph": "^1.49.6",
         "jotai": "^2.12.5",
+        "just-intersect": "^4.3.0",
         "just-throttle": "^4.2.0",
         "lucide-react": "^0.544.0",
         "motion": "^12.17.0",

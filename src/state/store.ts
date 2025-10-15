@@ -16,7 +16,6 @@ emitter.on('app:shortest-path:create', () => {
 });
 
 emitter.on('map:shortest-path:changed', (shortestPath: Array<Array<string>>) => {
-    console.log('shortest path changed', shortestPath);
     const database = store.get(databaseAtom);
     const head = shortestPath.length > 0 ? shortestPath[0] : [];
     const path = head.map((nodeId) => database.getNode(nodeId)).filter((node) => node != null);
