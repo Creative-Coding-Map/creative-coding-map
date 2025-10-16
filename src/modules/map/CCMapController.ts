@@ -822,6 +822,7 @@ export class CCMapController {
         if (scale >= minScale || node.id === this.hoverNodeId || node.id === this.selectedNodeId || node.isOnShortestPath) {
             const suffix = (() => {
                 switch (node.type) {
+                    case 'root':
                     case 'domain':
                         return '';
                     default:
